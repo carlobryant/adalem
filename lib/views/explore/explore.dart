@@ -69,30 +69,30 @@ class _ExploreViewState extends State<ExploreView> {
       ),
 
 
-      body: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: SafeArea(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              //childAspectRatio: 0.7,
-              mainAxisExtent: 220, 
-            ),
+      body: SafeArea(
+        child: GridView.builder(
+          padding: EdgeInsets.all(10),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            mainAxisExtent: 220, 
+          ),
           
-            itemCount: notebooks.length,
-            itemBuilder: (context, index) {
-              final notebook = notebooks[index];
-              return NotebookCard(
-                title: notebook['title']!, 
-                course: notebook['course']!, 
-                imageUrl: notebook['imageUrl']!,
-              );
-            }
-            ),
+          itemCount: notebooks.length,
+          itemBuilder: (context, index) {
+            final notebook = notebooks[index];
+            return NotebookCard(
+               title: notebook['title']!, 
+               course: notebook['course']!, 
+               imageUrl: notebook['imageUrl']!,
+            );
+          }
         ),
       ),
     );
   }
 }
+
+
+//https://youtu.be/c7xl9Og8eEM?list=PLwEKe-KnxbnD5z91CdrxCXORakEGqaKx0

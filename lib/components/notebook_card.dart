@@ -29,7 +29,30 @@ class NotebookCard extends StatelessWidget {
             height: 150,
             width: double.infinity,
             fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                height: 150,
+                color: Colors.grey.shade200,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded / 
+                          loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                height: 150,
+                color: Colors.grey.shade300,
+                child: Center(child: Icon(Icons.error)),
+              );
+            },
           ),
+
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
