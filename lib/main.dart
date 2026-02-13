@@ -28,8 +28,9 @@ class MyApp extends StatelessWidget {
 
       theme: lightMode,
       darkTheme: darkMode,
-
-      home: Platform.isAndroid ? Login(onTap: () {}) : MainWrapper(), //Add view: ADALEM is only available on Android
+      
+      home: Login(onTap: () {}),
+      //home: Platform.isAndroid ? Login(onTap: () {}) : MainWrapper(), //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
       routes: {

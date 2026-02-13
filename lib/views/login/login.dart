@@ -2,6 +2,7 @@ import 'package:adalem/components/xlbutton.dart';
 import 'package:adalem/main_wrapper.dart';
 import 'package:adalem/services/auth/google_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 //https://youtu.be/eGFwpDSHXh0?t=1071
 //https://youtu.be/D5V3tknJ0NQ?list=LL&t=560
@@ -34,8 +35,8 @@ class _LoginState extends State<Login> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const MainWrapper()),
-          (route) => false, // Remove all previous routes
-);
+          (route) => false, // REMOVE ALL PREVIOUS ROUTES
+        );
       }
     } catch(e) {
       if (!mounted) return;
@@ -59,14 +60,9 @@ class _LoginState extends State<Login> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /*Icon(
-                Icons.person,
-                size: 80,
-                color: Theme.of(context).colorScheme.primary,
-              ),*/
 
               Image(
-                image: AssetImage('assets/img_adalem.png'),
+                image: AssetImage("assets/img_adalem.png"),
                 width: 200,
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -81,29 +77,46 @@ class _LoginState extends State<Login> {
               const SizedBox(height: 100),
           
               XLButton(
-                text: "Login with Google",
                 onTap: _isLoading ? null : _handleGoogleSignIn,
-              ),
-
-              const SizedBox(height: 15),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Don't have an account?"),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                     child: Text(
-                      "Register Here",
-                       style: TextStyle(
-                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.inversePrimary,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        "Sign in with ",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ],
+
+                    Flexible(
+                      child: SvgPicture.asset(
+                        "assets/google.svg",
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.inverseSurface,
+                          BlendMode.srcIn,
+                          ),
+                        height: 28,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ],
+                )
               ),
+
+              const SizedBox(height: 5),
+
+              Text(
+                "Sign in or create a new account",
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+            
+            
 
             ],
           

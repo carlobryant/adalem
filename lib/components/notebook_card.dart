@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:redacted/redacted.dart';
 
 class NotebookCard extends StatelessWidget {
   final String title;
   final String course;
   final String imageUrl;
+  final bool isLoading;
 
   const NotebookCard({
     super.key,
     required this.title,
     required this.course,
     required this.imageUrl,
+    required this.isLoading,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      shadowColor: Theme.of(context).colorScheme.inverseSurface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      shadowColor: Theme.of(context).colorScheme.shadow,
       elevation: 5,
       
 
@@ -24,33 +27,27 @@ class NotebookCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
-          Image.network(
-            imageUrl,
-            height: 150,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                height: 150,
-                color: Colors.grey.shade200,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded / 
-                          loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 150,
-                color: Colors.grey.shade300,
-                child: Center(child: Icon(Icons.error)),
-              );
-            },
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+            child: isLoading ?
+            Container(
+              height: 150,
+              width: double.infinity,
+              color: Colors.grey.shade300,
+            ).redacted(context: context, redact: true)
+            : Image.network(
+              imageUrl,
+              height: 150,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 150,
+                  color: Colors.grey.shade300,
+                  child: Center(child: Icon(Icons.error)),
+                );
+              },
+            ),
           ),
 
           Padding(
@@ -58,9 +55,17 @@ class NotebookCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
 
-              children: [
-
-                Text(
+              children: [ 
+                isLoading ?
+                Container(
+                  height: 20,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ).redacted(context: context, redact: true)
+                : Text(
                   title,
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
                     fontSize: 16,
@@ -71,12 +76,43 @@ class NotebookCard extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 4),
+              
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    isLoading ?
+                    const SizedBox()
+                    : Text(
+                      course,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 10,
+                          color: Colors.grey.shade600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
 
-                Text(
-                  course,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: 14,
+                    Spacer(),
+
+                    isLoading ?
+                    Expanded(
+                      child: Container(
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ).redacted(context: context, redact: true),
                     )
+                    : Text(
+                      course,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
 
               ],

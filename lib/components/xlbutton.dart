@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class XLButton extends StatelessWidget {
-  final String text;
   final void Function()? onTap;
+  final Widget child;
 
   const XLButton({
     super.key,
-    required this.text,
+    required this.child,
     required this.onTap,
     });
 
@@ -21,13 +21,7 @@ class XLButton extends StatelessWidget {
         ),
         padding: EdgeInsets.all(25),
         child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
+          child: child,
         ),
       ),
     );

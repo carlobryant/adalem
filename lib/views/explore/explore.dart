@@ -9,6 +9,8 @@ class ExploreView extends StatefulWidget {
 }
 
 class _ExploreViewState extends State<ExploreView> {
+  bool isLoading = true;
+
   final List<Map<String, String>> notebooks = const [
     {
       'title': 'Introduction to Flutter',
@@ -58,6 +60,19 @@ class _ExploreViewState extends State<ExploreView> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Show loading animation for 2 seconds
+    Future.delayed(const Duration(seconds: 10), () {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -76,7 +91,7 @@ class _ExploreViewState extends State<ExploreView> {
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            mainAxisExtent: 220, 
+            mainAxisExtent: 226, 
           ),
           
           itemCount: notebooks.length,
@@ -86,6 +101,7 @@ class _ExploreViewState extends State<ExploreView> {
                title: notebook['title']!, 
                course: notebook['course']!, 
                imageUrl: notebook['imageUrl']!,
+               isLoading: isLoading,
             );
           }
         ),
@@ -93,6 +109,3 @@ class _ExploreViewState extends State<ExploreView> {
     );
   }
 }
-
-
-//https://youtu.be/c7xl9Og8eEM?list=PLwEKe-KnxbnD5z91CdrxCXORakEGqaKx0
