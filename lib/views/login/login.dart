@@ -3,6 +3,7 @@ import 'package:adalem/main_wrapper.dart';
 import 'package:adalem/services/auth/google_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:toastification/toastification.dart';
 
 //https://youtu.be/eGFwpDSHXh0?t=1071
 //https://youtu.be/D5V3tknJ0NQ?list=LL&t=560
@@ -30,14 +31,40 @@ class _LoginState extends State<Login> {
     try {
       final result = await _authService.signInWithGoogle();
       if (!mounted) return;
+
       if (result != null) {
+        toastification.show(
+          context: context,
+          type: ToastificationType.success,
+          style: ToastificationStyle.fillColored,
+          title: const Text("Time To Lock In!"),
+          description: Text("Signed in as ${result.user?.displayName ?? result.user?.email ?? "User"}"),
+          alignment: Alignment.topCenter,
+          autoCloseDuration: const Duration(seconds: 8),
+          icon: CircleAvatar(
+            radius: 25, 
+            backgroundImage: NetworkImage(result.user?.photoURL ?? ""),
+            backgroundColor: Colors.grey.shade600, 
+          ),
+          primaryColor: Theme.of(context).colorScheme.primary,
+          backgroundColor: Theme.of(context).colorScheme.shadow,
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.surface,
+            width: 3,
+            strokeAlign: BorderSide.strokeAlignInside,
+          ),
+        );
+
+        await Future.delayed(const Duration(milliseconds: 500));
+
         if(!mounted) return;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const MainWrapper()),
           (route) => false, // REMOVE ALL PREVIOUS ROUTES
         );
-      }
+      } //else {}
     } catch(e) {
       if (!mounted) return;
 

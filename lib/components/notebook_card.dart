@@ -35,8 +35,8 @@ class NotebookCard extends StatelessWidget {
               width: double.infinity,
               color: Colors.grey.shade300,
             ).redacted(context: context, redact: true)
-            : Image.network(
-              imageUrl,
+            : Image(
+              image: AssetImage("assets/nb_$imageUrl.jpg"),
               height: 150,
               width: double.infinity,
               fit: BoxFit.cover,

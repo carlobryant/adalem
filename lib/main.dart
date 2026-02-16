@@ -27,10 +27,10 @@ class MyApp extends StatelessWidget {
       title: 'ADALEM',
 
       theme: lightMode,
-      darkTheme: darkMode,
+      //darkTheme: darkMode,
       
-      home: Login(onTap: () {}),
-      //home: Platform.isAndroid ? Login(onTap: () {}) : MainWrapper(), //Add view: ADALEM is only available on Android
+      //home: MainWrapper(),
+      home: Platform.isAndroid ? Login(onTap: () {}) : MainWrapper(), //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
       routes: {
