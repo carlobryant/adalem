@@ -1,9 +1,9 @@
+import 'package:adalem/components/card_toast.dart';
 import 'package:adalem/components/xlbutton.dart';
 import 'package:adalem/main_wrapper.dart';
 import 'package:adalem/services/auth/google_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:toastification/toastification.dart';
 
 //https://youtu.be/eGFwpDSHXh0?t=1071
 //https://youtu.be/D5V3tknJ0NQ?list=LL&t=560
@@ -33,30 +33,17 @@ class _LoginState extends State<Login> {
       if (!mounted) return;
 
       if (result != null) {
-        toastification.show(
-          context: context,
-          type: ToastificationType.success,
-          style: ToastificationStyle.fillColored,
-          title: const Text("Time To Lock In!"),
-          description: Text("Signed in as ${result.user?.displayName ?? result.user?.email ?? "User"}"),
-          alignment: Alignment.topCenter,
-          autoCloseDuration: const Duration(seconds: 8),
+        ToastCard.success(
+          context, "Time to Lock In!",
+          description: "Signed in as ${result.user?.displayName ?? result.user?.email ?? "User"}",
           icon: CircleAvatar(
             radius: 25, 
             backgroundImage: NetworkImage(result.user?.photoURL ?? ""),
             backgroundColor: Colors.grey.shade600, 
-          ),
-          primaryColor: Theme.of(context).colorScheme.primary,
-          backgroundColor: Theme.of(context).colorScheme.shadow,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.surface,
-            width: 3,
-            strokeAlign: BorderSide.strokeAlignInside,
-          ),
+            ),
         );
 
-        await Future.delayed(const Duration(milliseconds: 500));
+        //await Future.delayed(const Duration(milliseconds: 500));
 
         if(!mounted) return;
         Navigator.pushAndRemoveUntil(
@@ -64,14 +51,23 @@ class _LoginState extends State<Login> {
           MaterialPageRoute(builder: (context) => const MainWrapper()),
           (route) => false, // REMOVE ALL PREVIOUS ROUTES
         );
-      } //else {}
+      } else {
+        ToastCard.error(
+          context, "Sign In Cancelled",
+          description: "Sign in process did not complete.",
+        );
+      }
     } catch(e) {
       if (!mounted) return;
 
-     ScaffoldMessenger.of(context).showSnackBar(
+     /*ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
       );
-      print('Sign In Error $e');
+      print('Sign In Error $e');*/
+      ToastCard.error(
+          context, "Sign In Canceled",
+          description: "Process did not complete.",
+        );
     } finally {
       if (mounted) setState(() =>_isLoading = false);
     }

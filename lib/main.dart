@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'ADALEM',
 
       theme: lightMode,
-      //darkTheme: darkMode,
+      darkTheme: darkMode,
       
       //home: MainWrapper(),
       home: Platform.isAndroid ? Login(onTap: () {}) : MainWrapper(), //Add view: ADALEM is only available on Android

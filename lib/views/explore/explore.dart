@@ -1,4 +1,4 @@
-import 'package:adalem/components/notebook_card.dart';
+import 'package:adalem/components/card_notebook.dart';
 import 'package:flutter/material.dart';
 
 class ExploreView extends StatefulWidget {
