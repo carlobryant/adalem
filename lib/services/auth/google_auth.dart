@@ -1,3 +1,4 @@
+import 'package:adalem/config/config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -10,7 +11,7 @@ class GoogleSignInService {
   static Future<void> initSignIn() async {
     if(!isInitialize) {
       await _googleSignIn.initialize(
-        serverClientId: '106131849309-f6rhc2r9i2kudan1fpams780iauh2025.apps.googleusercontent.com',
+        serverClientId: AppConfig.googleClientId,
       );
     }
     isInitialize = true;
@@ -54,7 +55,7 @@ class GoogleSignInService {
         final docSnapshot = await userDoc.get();
         if (!docSnapshot.exists) {
           await userDoc.set({
-            'uid': user.uid,
+            //'uid': user.uid,
             'name': user.displayName ?? '',
             'email': user.email ?? '',
             'photoURL': user.photoURL ?? '',

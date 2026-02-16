@@ -1,0 +1,64 @@
+{
+  "configurations": [
+    {
+      "name": "Dev (Android)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/dev.json"
+      ],
+      "deviceId": "android"
+    },
+    {
+      "name": "Dev (iOS)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/dev.json"
+      ],
+      "deviceId": "ios"
+    },
+    {
+      "name": "Dev (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/dev.json"
+      ],
+      "deviceId": "chrome"
+    },
+    {
+      "name": "Dev (Windows)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/dev.json"
+      ],
+      "deviceId": "windows"
+    },
+    {
+      "name": "Production (Android)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/prod.json"
+      ],
+      "deviceId": "android"
+    },
+    {
+      "name": "Production (iOS)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/prod.json"
+      ],
+      "deviceId": "ios"
+    }
+  ]
+}

@@ -34,8 +34,8 @@ class _LoginState extends State<Login> {
 
       if (result != null) {
         ToastCard.success(
-          context, "Time to Lock In!",
-          description: "Signed in as ${result.user?.displayName ?? result.user?.email ?? "User"}",
+          context, "Hello ${result.user?.displayName ?? "User"}!",
+          description: result.user?.email ?? "Signed in with Google",
           icon: CircleAvatar(
             radius: 25, 
             backgroundImage: NetworkImage(result.user?.photoURL ?? ""),
@@ -68,6 +68,7 @@ class _LoginState extends State<Login> {
           context, "Sign In Canceled",
           description: "Process did not complete.",
         );
+
     } finally {
       if (mounted) setState(() =>_isLoading = false);
     }

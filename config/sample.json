@@ -1,0 +1,6 @@
+{
+  "GOOGLE_CLIENT_ID_ANDROID": "your_android_client_id_here",
+  "GOOGLE_CLIENT_ID_IOS": "your_ios_client_id_here",
+  "GOOGLE_CLIENT_ID_WEB": "your_web_client_id_here",
+  "APP_ENVIRONMENT": "development"
+}

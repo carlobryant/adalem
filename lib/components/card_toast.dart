@@ -14,9 +14,15 @@ class ToastCard {
         context: context,
         type: ToastificationType.success,
         style: ToastificationStyle.fillColored,
-        title: Text(title),
+        title: Text(
+          title,
+          maxLines: 1, 
+          overflow: TextOverflow.ellipsis,
+          ),
         description: description != null ? Text(
           description,
+          maxLines: 2, 
+          overflow: TextOverflow.ellipsis,
           style:
             TextStyle(
               fontWeight: FontWeight.bold,
@@ -45,9 +51,15 @@ class ToastCard {
         context: context,
         type: ToastificationType.error,
         style: ToastificationStyle.fillColored,
-        title: Text(title),
+        title: Text(
+          title,
+          maxLines: 1, 
+          overflow: TextOverflow.ellipsis,
+        ),
         description: description != null ? Text(
           description,
+          maxLines: 2, 
+          overflow: TextOverflow.ellipsis,
           style:
             TextStyle(
               fontWeight: FontWeight.bold,
@@ -70,7 +82,4 @@ class ToastCard {
         ),
       );
     }
-
-  static void warning() {}
-  static void info() {}
 }
