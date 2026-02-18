@@ -107,7 +107,7 @@ class _LoginState extends State<Login> {
                   children: [
                     Flexible(
                       child: Text(
-                        "Sign in with ",
+                        "Continue with ",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
