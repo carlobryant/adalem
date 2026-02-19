@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:adalem/firebase_options.dart';
+import 'package:adalem/features/auth/presentation/view_login.dart';
+import 'package:adalem/core/config/firebase_options.dart';
 import 'package:adalem/main_wrapper.dart';
-import 'package:adalem/theme/dark_mode.dart';
-import 'package:adalem/theme/light_mode.dart';
-import 'package:adalem/views/login/login.dart';
+import 'package:adalem/core/theme/dark_mode.dart';
+import 'package:adalem/core/theme/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       darkTheme: darkMode,
       
       //home: MainWrapper(),
-      home: Platform.isAndroid ? Login(onTap: () {}) : MainWrapper(), //Add view: ADALEM is only available on Android
+      home: Platform.isAndroid ? LoginView() : MainWrapper(), //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
       routes: {

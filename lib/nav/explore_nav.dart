@@ -1,4 +1,4 @@
-import 'package:adalem/views/explore/explore.dart';
+import 'package:adalem/features/explore/presentation/view_explore.dart';
 import 'package:flutter/material.dart';
 
 class Explore extends StatefulWidget {

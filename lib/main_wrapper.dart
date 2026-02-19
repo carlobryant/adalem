@@ -1,5 +1,5 @@
+import 'package:adalem/features/explore/presentation/view_explore.dart';
 import 'package:adalem/nav/create_nav.dart';
-import 'package:adalem/nav/explore_nav.dart';
 import 'package:adalem/nav/home_nav.dart';
 import 'package:adalem/nav/profile_nav.dart';
 import 'package:adalem/nav/share_nav.dart';
@@ -62,7 +62,7 @@ class _MyWidgetState extends State<MainWrapper> {
             index: _selectedIndex,
             children: const <Widget>[
               Home(),
-              Explore(),
+              ExploreView(),
               Create(),
               Share(),
               Profile(),
