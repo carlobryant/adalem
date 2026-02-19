@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/core/config/firebase_options.dart';
-import 'package:adalem/main_wrapper.dart';
+import 'package:adalem/shell.dart';
 import 'package:adalem/core/theme/dark_mode.dart';
 import 'package:adalem/core/theme/light_mode.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+FirebaseFirestore.instance.settings = const Settings(
+  persistenceEnabled: true,
+  cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+);
 
   runApp(const MyApp());
 }
@@ -30,11 +36,11 @@ class MyApp extends StatelessWidget {
       darkTheme: darkMode,
       
       //home: MainWrapper(),
-      home: Platform.isAndroid ? LoginView() : MainWrapper(), //Add view: ADALEM is only available on Android
+      home: Platform.isAndroid ? LoginView() : Shell(), //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
       routes: {
-        '/home': (context) => const MainWrapper(),
+        '/home': (context) => const Shell(),
       }
     );
   }

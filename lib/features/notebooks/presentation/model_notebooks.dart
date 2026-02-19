@@ -1,7 +1,7 @@
 import 'package:adalem/features/notebooks/domain/notebook.dart';
 import 'package:intl/intl.dart';
 
-class NotebookCardModel {
+class NotebookModel {
   final String id;
   final String owner;
   final List<String> uid;
@@ -12,7 +12,7 @@ class NotebookCardModel {
   final String image;
   final String path;
 
-  const NotebookCardModel({
+  const NotebookModel({
     required this.id,
     required this.owner,
     required this.uid,
@@ -24,13 +24,13 @@ class NotebookCardModel {
     required this.path,
   });
 
-  factory NotebookCardModel.fromEntity(Notebook notebook) {
-    return NotebookCardModel(
+  factory NotebookModel.fromEntity(Notebook notebook) {
+    return NotebookModel(
       id: notebook.id,
       owner: notebook.owner,
       uid: notebook.uid,
       createdAt: DateFormat('MMM d, yyyy').format(notebook.createdAt),
-      updatedAt: DateFormat('MMM d, yyyy').format(notebook.createdAt),
+      updatedAt: DateFormat('MMM d, yyyy').format(notebook.updatedAt),
       title: notebook.title,
       course: notebook.course,
       image: notebook.image,
@@ -38,8 +38,8 @@ class NotebookCardModel {
     );
   }
 
-  factory NotebookCardModel.empty() {
-  return const NotebookCardModel(
+  factory NotebookModel.empty() {
+  return const NotebookModel(
     id: '',
     owner: '',
     uid: [],

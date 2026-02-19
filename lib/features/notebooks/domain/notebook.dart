@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Notebook {
   final String id;
   final String owner;
@@ -8,7 +10,6 @@ class Notebook {
   final String course;
   final String image;
   final String path;
-  
 
   const Notebook({
     required this.id,
@@ -21,4 +22,18 @@ class Notebook {
     required this.image,
     required this.path,
   });
+
+  factory Notebook.fromMap(Map<String, dynamic> map) {
+    return Notebook(
+      id: map['id'] as String,
+      owner: map['owner'] as String? ?? '',
+      uid: List<String>.from(map['uid'] ?? []),
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      title: map['title'] as String? ?? '',
+      course: map['course'] as String? ?? '',
+      image: map['image'] as String? ?? '',
+      path: map['path'] as String? ?? '',
+    );
+  }
 }

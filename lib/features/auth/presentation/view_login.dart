@@ -4,7 +4,7 @@ import 'package:adalem/features/auth/data/repo_impl.dart';
 import 'package:adalem/features/auth/data/google_datasource.dart';
 import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
-import 'package:adalem/main_wrapper.dart';
+import 'package:adalem/shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -57,7 +57,7 @@ class _LoginViewState extends State<LoginView> {
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const MainWrapper()),
+        MaterialPageRoute(builder: (context) => const Shell()),
         (route) => false,
       );
     } else {

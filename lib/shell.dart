@@ -1,21 +1,48 @@
-import 'package:adalem/features/explore/presentation/view_explore.dart';
+import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
+import 'package:adalem/features/notebooks/data/repo_impl.dart';
+import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/nav/create_nav.dart';
+import 'package:adalem/nav/explore_nav.dart';
 import 'package:adalem/nav/home_nav.dart';
 import 'package:adalem/nav/profile_nav.dart';
 import 'package:adalem/nav/share_nav.dart';
 import 'package:flutter/material.dart';
 
-class MainWrapper extends StatefulWidget {
-  const MainWrapper({super.key});
+class Shell extends StatefulWidget {
+  const Shell({super.key});
 
   @override
-  State<MainWrapper> createState() => _MyWidgetState();
+  State<Shell> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<MainWrapper> {
+class _MyWidgetState extends State<Shell> {
   int _selectedIndex = 0;
 
   final PageStorageBucket _bucket = PageStorageBucket();
+  late final NotebookViewModel _notebookViewModel;
+  
+ @override
+void initState() {
+  super.initState();
+  final notebookRepo = NotebookRepositoryImpl(
+    dataSource: FirestoreDataSourceImpl(),
+  );
+
+  _notebookViewModel = NotebookViewModel(
+    getNotebooks: GetNotebooks(notebookRepo),
+    createNotebook: CreateNotebook(notebookRepo),
+  );
+
+  _notebookViewModel.loadNotebooks();
+}
+
+  @override
+  void dispose() {
+    _notebookViewModel.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,10 +87,10 @@ class _MyWidgetState extends State<MainWrapper> {
           bucket: _bucket,
           child: IndexedStack(
             index: _selectedIndex,
-            children: const <Widget>[
+            children: <Widget>[
               Home(),
-              ExploreView(),
-              Create(),
+              Explore(notebookViewModel: _notebookViewModel),
+              Create(notebookViewModel: _notebookViewModel),
               Share(),
               Profile(),
             ],

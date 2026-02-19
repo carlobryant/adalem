@@ -1,8 +1,10 @@
 import 'package:adalem/features/explore/presentation/view_explore.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
 
 class Explore extends StatefulWidget {
-  const Explore({super.key});
+  final NotebookViewModel notebookViewModel;
+  const Explore({super.key, required this.notebookViewModel});
 
   @override
   State<Explore> createState() => _ExploreState();
@@ -21,9 +23,9 @@ class _ExploreState extends State<Explore> {
           settings: settings,
           builder: (BuildContext context){
             if(settings.name == '/'){
-              return const ExploreView();
+              return ExploreView(notebookViewModel: widget.notebookViewModel);
             } 
-            return const ExploreView();
+            return ExploreView(notebookViewModel: widget.notebookViewModel);
           },
         );
       } 

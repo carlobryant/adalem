@@ -6,7 +6,7 @@ class GetNotebooks {
 
   GetNotebooks(this._notebookRepo);
 
-  Future<List<Notebook>> call() async {
-    return await _notebookRepo.getNotebooks();
+   Stream<List<Notebook>> call() {
+    return _notebookRepo.fetchNotebooks();
   }
 }

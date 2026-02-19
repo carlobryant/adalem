@@ -1,8 +1,10 @@
-import 'package:adalem/views/create/create.dart';
+import 'package:adalem/features/create/presentation/view_create.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
 
 class Create extends StatefulWidget {
-  const Create({super.key});
+  final NotebookViewModel notebookViewModel;
+  const Create({super.key, required this.notebookViewModel});
 
   @override
   State<Create> createState() => _CreateState();
@@ -21,9 +23,9 @@ class _CreateState extends State<Create> {
           settings: settings,
           builder: (BuildContext context){
             if(settings.name == '/'){
-              return const CreateView();
+              return CreateView(notebookViewModel: widget.notebookViewModel);
             } 
-            return const CreateView();
+            return CreateView(notebookViewModel: widget.notebookViewModel);
           },
         );
       } 
