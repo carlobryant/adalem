@@ -44,6 +44,7 @@ class _CreateViewState extends State<CreateView> {
       widget.notebookViewModel.resetCreate();
     } else if (widget.notebookViewModel.errorMessage != null) {
       ToastCard.error(context, widget.notebookViewModel.errorMessage!);
+      widget.notebookViewModel.clearError();
     }
   }
 

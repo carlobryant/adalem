@@ -47,7 +47,6 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {

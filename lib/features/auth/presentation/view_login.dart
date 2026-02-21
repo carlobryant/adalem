@@ -1,5 +1,6 @@
 import 'package:adalem/components/card_toast.dart';
 import 'package:adalem/components/button_xl.dart';
+import 'package:adalem/components/loader_md.dart';
 import 'package:adalem/features/auth/data/repo_impl.dart';
 import 'package:adalem/features/auth/data/google_datasource.dart';
 import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
@@ -77,7 +78,7 @@ class _LoginViewState extends State<LoginView> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
-          body: Center(
+          body: _viewModel.isLoading ? MediumLoader() : Center(
             child: Padding(
               padding: const EdgeInsets.all(25.0),
               child: Column(

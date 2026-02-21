@@ -26,11 +26,12 @@ class LoginViewModel extends ChangeNotifier {
         _result = AuthResult.success(user);
       } else {
         _result = AuthResult.cancelled();
+        _isLoading = false;
       }
     } catch (e) {
       _result = AuthResult.failure(e.toString());
-    } finally {
       _isLoading = false;
+    } finally {
       notifyListeners();
     }
   }

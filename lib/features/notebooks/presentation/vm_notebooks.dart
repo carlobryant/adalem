@@ -60,6 +60,7 @@ class NotebookViewModel extends ChangeNotifier {
 
   void selectImage(String image) {
     _selectedImage = image;
+    _errorMessage = null;
     notifyListeners();
   }
 
@@ -94,7 +95,7 @@ class NotebookViewModel extends ChangeNotifier {
       );
 
       _isSuccess = true;
-      loadNotebooks(); // refresh after creation
+      loadNotebooks(); // REFRESH AFTER CREATION
     } catch (e) {
       _errorMessage = 'Failed to create notebook. Please try again.';
     } finally {
@@ -118,5 +119,10 @@ class NotebookViewModel extends ChangeNotifier {
     titleController.dispose();
     courseController.dispose();
     super.dispose();
+  }
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
   }
 }
