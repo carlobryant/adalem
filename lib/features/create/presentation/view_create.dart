@@ -1,5 +1,6 @@
 import 'package:adalem/components/button_xl.dart';
 import 'package:adalem/components/card_toast.dart';
+import 'package:adalem/components/loader_md.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +62,8 @@ class _CreateViewState extends State<CreateView> {
               style: TextStyle(color: Colors.white),
             ),
           ),
-          body: SafeArea(
+          body: widget.notebookViewModel.isLoading ? 
+          const MediumLoader() : SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(25.0),
               child: Column(
@@ -141,7 +143,7 @@ class _CreateViewState extends State<CreateView> {
 
                   const SizedBox(height: 25),
 
-                  // UPLOAD FILES (static, non-functional)
+                  // UPLOAD FILES
                   OutlinedButton.icon(
                     onPressed: null,
                     icon: const Icon(Icons.upload_file),
@@ -155,11 +157,10 @@ class _CreateViewState extends State<CreateView> {
                     width: double.infinity,
                     child: XLButton(
                       onTap: widget.notebookViewModel.isLoading ? null : widget.notebookViewModel.handleCreate,
-                      child: widget.notebookViewModel.isLoading
-                          ? const CircularProgressIndicator()
-                          : const Text(
-                              'Create',
+                      child: Text(
+                              "Create",
                               style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),

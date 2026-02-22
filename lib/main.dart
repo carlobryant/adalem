@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:adalem/components/loader_md.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
-import 'package:adalem/core/config/firebase_options.dart';
+import 'package:adalem/config/firebase_options.dart';
 import 'package:adalem/shell.dart';
-import 'package:adalem/core/theme/dark_mode.dart';
-import 'package:adalem/core/theme/light_mode.dart';
+import 'package:adalem/config/theme/dark_mode.dart';
+import 'package:adalem/config/theme/light_mode.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

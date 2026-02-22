@@ -92,9 +92,20 @@ class _LoginViewState extends State<LoginView> {
 
                   const SizedBox(height: 25),
 
-                  const Text(
-                    "A D A L E M",
-                    style: TextStyle(fontSize: 20),
+                  Text(
+                    "ADALEM",
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w100,
+                      letterSpacing: 6,
+                      fontFamily: 'Collegiate',
+                      shadows: [Shadow(
+                        color: Colors.grey.shade600, 
+                        offset: Offset(0, 2), 
+                        blurRadius: 100,
+                        )],
+                      ),
                   ),
 
                   const SizedBox(height: 100),
@@ -109,7 +120,8 @@ class _LoginViewState extends State<LoginView> {
                         Flexible(
                           child: Text(
                             "Continue with ",
-                            style: const TextStyle(
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                             ),
@@ -120,7 +132,7 @@ class _LoginViewState extends State<LoginView> {
                           child: SvgPicture.asset(
                             "assets/google.svg",
                             colorFilter: ColorFilter.mode(
-                              Theme.of(context).colorScheme.inverseSurface,
+                              Theme.of(context).colorScheme.onPrimary,
                               BlendMode.srcIn,
                             ),
                             height: 28,

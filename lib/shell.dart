@@ -47,37 +47,43 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: <NavigationDestination>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: 'Home'),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.search),
-            icon: Icon(Icons.search),
-            label: 'Search'),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.add),
-            icon: Icon(Icons.add),
-            label: ''),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.ios_share),
-            icon: Icon(Icons.ios_share),
-            label: 'Share'),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.account_circle),
-            icon: Icon(Icons.account_circle_outlined),
-            label: 'Me'),       
-        ],
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        indicatorColor: Theme.of(context).colorScheme.inversePrimary,
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
+          (states) => TextStyle(color: Theme.of(context).colorScheme.onPrimary),)),
+        child: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: <NavigationDestination>[
+            NavigationDestination(
+              selectedIcon: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(Icons.home_outlined, color: Theme.of(context).colorScheme.onPrimary),
+              label: "Home"),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.chrome_reader_mode, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(Icons.chrome_reader_mode_outlined, color: Theme.of(context).colorScheme.onPrimary),
+              label: 'Explore'),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(Icons.add, size: 38, color: Theme.of(context).colorScheme.onPrimary),
+              label: 'Create'),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.share_rounded, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(Icons.share_outlined, color: Theme.of(context).colorScheme.onPrimary),
+              label: 'Share'),
+            NavigationDestination(
+              selectedIcon: Icon(Icons.account_circle, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(Icons.account_circle_outlined, color: Theme.of(context).colorScheme.onPrimary),
+              label: 'Me'),       
+          ],
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          indicatorColor: Theme.of(context).colorScheme.inversePrimary,
+          height: 65,
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        ),
       ),
 
       body: SafeArea(

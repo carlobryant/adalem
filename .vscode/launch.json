@@ -11,6 +11,16 @@
       "deviceId": "android"
     },
     {
+      "name": "Dev (Android Emulator)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define-from-file=config/dev.json"
+      ],
+      "deviceId": "emulator-5554"
+    },
+    {
       "name": "Dev (iOS)",
       "request": "launch",
       "type": "dart",
