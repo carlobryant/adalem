@@ -89,6 +89,8 @@ class _MediumLoaderState extends State<MediumLoader>
             style: TextStyle(
               color: Colors.grey.shade600,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ],
       ),

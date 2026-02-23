@@ -1,22 +1,25 @@
 import 'dart:async';
 
+import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebooks/domain/notebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NotebookViewModel extends ChangeNotifier {
   StreamSubscription<List<Notebook>>? _subscription;
   final GetNotebooks _getNotebooks;
   final CreateNotebook _createNotebook;
+  final GetCurrentUser _getCurrentUser;
 
   NotebookViewModel({
     required GetNotebooks getNotebooks,
     required CreateNotebook createNotebook,
+    required GetCurrentUser getCurrentUser,
   })  : _getNotebooks = getNotebooks,
-        _createNotebook = createNotebook;
+        _createNotebook = createNotebook,
+        _getCurrentUser = getCurrentUser;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController courseController = TextEditingController();
@@ -79,9 +82,9 @@ class NotebookViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        _errorMessage = 'No user logged in.';
+      final currentUser = _getCurrentUser();
+      if(currentUser == null) {
+        _errorMessage = "Authentication Error.";
         return;
       }
 

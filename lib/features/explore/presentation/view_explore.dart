@@ -2,55 +2,46 @@ import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ExploreView extends StatefulWidget {
-  final NotebookViewModel notebookViewModel;
-  const ExploreView({super.key, required this.notebookViewModel});
+  const ExploreView({super.key});
 
   @override
   State<ExploreView> createState() => _ExploreViewState();
 }
 
 class _ExploreViewState extends State<ExploreView> {
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> _refresh() async {
-  widget.notebookViewModel.loadNotebooks();
+  context.read<NotebookViewModel>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.notebookViewModel,
-      builder: (context, _) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            title: const Text(
-              "Explore",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          body: SafeArea(
-            child: _buildBody(),
-          ),
-        );
-      },
+    final viewModel = context.watch<NotebookViewModel>();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: const Text(
+          "Explore",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      body: SafeArea(
+        child: _buildBody(viewModel),
+      ),
     );
   }
 
-  Widget _buildBody() {
-    if (widget.notebookViewModel.errorMessage != null) {
-      return Center(child: Text(widget.notebookViewModel.errorMessage!));
+  Widget _buildBody(NotebookViewModel viewModel) {
+    if (viewModel.errorMessage != null) {
+      return Center(child: Text(viewModel.errorMessage!));
     }
 
-    final isLoading = widget.notebookViewModel.isLoading;
+    final isLoading = viewModel.isLoading;
     final items = isLoading
       ? List.filled(6, NotebookModel.empty()) 
-      : widget.notebookViewModel.notebooks;
+      : viewModel.notebooks;
 
     return RefreshIndicator(
       color: Theme.of(context).colorScheme.primary,
@@ -72,7 +63,7 @@ class _ExploreViewState extends State<ExploreView> {
             course: notebook.course,
             createdAt: notebook.createdAt,
             image: notebook.image,
-            isLoading: widget.notebookViewModel.isLoading,
+            isLoading: viewModel.isLoading,
           );
         },
       ),

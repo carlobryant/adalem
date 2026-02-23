@@ -1,13 +1,25 @@
 import 'dart:io';
 import 'package:adalem/components/loader_md.dart';
+import 'package:adalem/features/auth/data/google_datasource.dart';
+import 'package:adalem/features/auth/data/repo_impl.dart';
+import 'package:adalem/features/auth/domain/uc_getuser.dart';
+import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
+import 'package:adalem/features/auth/domain/uc_signout.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/config/firebase_options.dart';
+import 'package:adalem/features/auth/presentation/vm_login.dart';
+import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
+import 'package:adalem/features/notebooks/data/repo_impl.dart';
+import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:adalem/shell.dart';
-import 'package:adalem/config/theme/dark_mode.dart';
-import 'package:adalem/config/theme/light_mode.dart';
+import 'package:adalem/config/theme_mode.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +33,35 @@ void main() async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
-  runApp(const MyApp());
+  final authRepo = AuthRepositoryImpl(dataSource: AuthRemoteDataSourceImpl());
+  final notebookRepo = NotebookRepositoryImpl(dataSource: FirestoreDataSourceImpl());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+        create: (_) => LoginViewModel(
+          signInWithGoogle: SignInWithGoogle(authRepo),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NotebookViewModel(
+            getNotebooks: GetNotebooks(notebookRepo), 
+            createNotebook: CreateNotebook(notebookRepo),
+            getCurrentUser: GetCurrentUser(authRepo),
+          )..loadNotebooks(),
+        ),
+
+        ChangeNotifierProvider(
+          create:(_) => ProfileViewModel(
+            signOut: SignOut(authRepo), 
+            getCurrentUser: GetCurrentUser(authRepo),
+          )..init(),
+        ),
+      ],
+      child: const MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {

@@ -1,4 +1,5 @@
-import 'package:adalem/views/profile/profile.dart';
+
+import 'package:adalem/features/profile/presentation/view_profile.dart';
 import 'package:flutter/material.dart';
 
 class Profile extends StatefulWidget {
@@ -21,9 +22,9 @@ class _ProfileState extends State<Profile> {
           settings: settings,
           builder: (BuildContext context){
             if(settings.name == '/'){
-              return const ProfileView();
+              return ProfileView();
             } 
-            return const ProfileView();
+            return ProfileView();
           },
         );
       } 

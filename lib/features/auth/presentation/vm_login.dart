@@ -35,4 +35,10 @@ class LoginViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void reset() {
+  _isLoading = false;
+  _result = null;
+  notifyListeners();
+  }
 }
