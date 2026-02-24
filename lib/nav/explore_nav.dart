@@ -2,7 +2,9 @@ import 'package:adalem/features/explore/presentation/view_explore.dart';
 import 'package:flutter/material.dart';
 
 class Explore extends StatefulWidget {
-  const Explore({super.key});
+  final GlobalKey<ExploreViewState>? exploreKey;
+
+  const Explore({super.key, this.exploreKey});
 
   @override
   State<Explore> createState() => _ExploreState();
@@ -21,9 +23,9 @@ class _ExploreState extends State<Explore> {
           settings: settings,
           builder: (BuildContext context){
             if(settings.name == '/'){
-              return ExploreView();
+              return ExploreView(key: widget.exploreKey);
             } 
-            return ExploreView();
+            return ExploreView(key: widget.exploreKey);
           },
         );
       } 

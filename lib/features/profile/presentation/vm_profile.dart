@@ -33,7 +33,7 @@ class ProfileViewModel extends ChangeNotifier {
     try {
       await _signOut();
     } catch (e) {
-      _errorMessage = 'Failed to sign out. Please try again.';
+      _errorMessage = "Failed to sign out. Please try again.";
     } finally {
       _isLoading = false;
       notifyListeners();

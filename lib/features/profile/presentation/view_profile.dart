@@ -51,13 +51,19 @@ class _ProfileViewState extends State<ProfileView> {
     final user = viewModel.user!;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
+      body: NestedScrollView(
+        headerSliverBuilder:(context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            floating: true,
+            snap: true,
+            title: Text(
             user.name.isNotEmpty ? user.name : "User",
             style: TextStyle(color: Colors.white),
-        )
-      ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          )
+        ],
+        body: Text("test")),
     );
   }
 }

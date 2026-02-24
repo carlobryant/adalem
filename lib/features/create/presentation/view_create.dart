@@ -1,6 +1,6 @@
 import 'package:adalem/components/button_xl.dart';
 import 'package:adalem/components/card_toast.dart';
-import 'package:adalem/components/loader_md.dart';
+import 'package:adalem/features/create/presentation/view_creating.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,12 +41,9 @@ class _CreateViewState extends State<CreateView> {
 
   void _onViewModelChanged() {
     final viewModel = context.read<NotebookViewModel>();
-    if (viewModel.isSuccess) {
-      ToastCard.success(context, "Notebook created!");
-      viewModel.resetCreate();
-    } else if (viewModel.errorMessage != null) {
-      ToastCard.error(context, viewModel.errorMessage!);
-      viewModel.clearError();
+    if(viewModel.createError != null) {
+      ToastCard.error(context, viewModel.createError!);
+      viewModel.clearCreateError();
     }
   }
 
@@ -57,12 +54,11 @@ class _CreateViewState extends State<CreateView> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text(
-          "Create Notebook",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: viewModel.isLoading ? 
-      const MediumLoader() : SafeArea(
+            "Create",
+            style: TextStyle(color: Colors.white),
+        )
+     ),
+      body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(25.0),
           child: Column(
@@ -104,7 +100,7 @@ class _CreateViewState extends State<CreateView> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: _imageOptions.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  separatorBuilder: (_, _) => const SizedBox(width: 10),
                   itemBuilder: (context, index) {
                     final option = _imageOptions[index];
                     final isSelected = viewModel.selectedImage == option;
@@ -155,12 +151,19 @@ class _CreateViewState extends State<CreateView> {
               SizedBox(
                 width: double.infinity,
                 child: XLButton(
-                  onTap: viewModel.isLoading ? null : viewModel.handleCreate,
+                  onTap: () {
+                    if (!viewModel.validateCreate()) return;
+
+                    Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(builder: (context) => const CreatingView()),
+                    );
+                    viewModel.handleCreate(); 
+                  },
                   child: Text(
                           "Create",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onPrimary,
-                            fontSize: 16,
+                            fontSize: 20,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

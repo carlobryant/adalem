@@ -1,8 +1,10 @@
-import 'package:adalem/views/home/home.dart';
+import 'package:adalem/features/home/presentation/view_home.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final VoidCallback onNavigateToExplore;
+
+  const Home({super.key, required this.onNavigateToExplore});
 
   @override
   State<Home> createState() => _HomeState();
@@ -21,9 +23,9 @@ class _HomeState extends State<Home> {
           settings: settings,
           builder: (BuildContext context){
             if(settings.name == '/'){
-              return const HomeView();
+              return HomeView(onNavigateToExplore: widget.onNavigateToExplore);
             } 
-            return const HomeView();
+            return HomeView(onNavigateToExplore: widget.onNavigateToExplore);
           },
         );
       } 

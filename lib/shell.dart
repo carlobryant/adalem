@@ -1,3 +1,4 @@
+import 'package:adalem/features/explore/presentation/view_explore.dart';
 import 'package:adalem/nav/create_nav.dart';
 import 'package:adalem/nav/explore_nav.dart';
 import 'package:adalem/nav/home_nav.dart';
@@ -6,20 +7,22 @@ import 'package:adalem/nav/share_nav.dart';
 import 'package:flutter/material.dart';
 
 class Shell extends StatefulWidget {
-  const Shell({super.key});
+  final int initIndex;
+  const Shell({super.key, this.initIndex = 0});
 
   @override
   State<Shell> createState() => _ShellState();
 }
 
 class _ShellState extends State<Shell> {
-  int _selectedIndex = 0;
-
+  late int _selectedIndex = widget.initIndex;
   final PageStorageBucket _bucket = PageStorageBucket();
+
+  final GlobalKey<ExploreViewState> _exploreKey = GlobalKey<ExploreViewState>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold( 
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
           (states) => TextStyle(color: Theme.of(context).colorScheme.onPrimary),)),
@@ -66,8 +69,15 @@ class _ShellState extends State<Shell> {
           child: IndexedStack(
             index: _selectedIndex,
             children: <Widget>[
-              Home(),
-              Explore(),
+              Home(
+                onNavigateToExplore: () {
+                  setState(() {_selectedIndex = 1;});
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _exploreKey.currentState?.scrollToTop();
+                  });
+                },
+              ),
+              Explore(exploreKey: _exploreKey),
               Create(),
               Share(),
               Profile(),

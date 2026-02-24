@@ -31,6 +31,9 @@ flutter:
   assets: 
     - assets/
   fonts:
+  - family: Segoe
+    fonts:
+    - asset: assets/SegoeUI.ttf
   - family: Collegiate
     fonts:
     - asset: assets/CollegiateInsideFLF.ttf

@@ -2,7 +2,8 @@ import 'package:adalem/features/notebooks/presentation/view_hnotebookcard.dart';
 import 'package:flutter/material.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final VoidCallback onNavigateToExplore;
+  const HomeView({super.key, required this.onNavigateToExplore});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -62,34 +63,44 @@ class _HomeViewState extends State<HomeView> {
   @override
    Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: const Text(
-            "Home",
-            style: TextStyle(color: Colors.white),
-        )
-     ),
-
-     body: SafeArea(
-      child: GridView.builder(
-        padding: EdgeInsets.all(10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            mainAxisExtent: 226, 
+      body: NestedScrollView(
+        headerSliverBuilder:(context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            floating: true,
+            snap: true,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            actions: [
+              IconButton(
+                onPressed: widget.onNavigateToExplore, 
+                icon: Icon(Icons.search, 
+                  size: 30,
+                  color: Theme.of(context).colorScheme.onPrimary
+                ),
+              ),
+            ],
+          )
+        ],
+        body: SafeArea(
+          child: GridView.builder(
+            padding: EdgeInsets.all(10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              mainAxisExtent: 226, 
+            ),
+      
+            itemCount: notebooks.length,
+            itemBuilder: (context, index) {
+              final notebook = notebooks[index];
+              return HorizontalNotebookCard(
+                title: notebook['title']!,
+                course: notebook['course']!,
+                image: notebook['image']!,
+                assessment: notebook['course']!,
+                isLoading: isLoading);
+            },
           ),
-
-          itemCount: notebooks.length,
-          itemBuilder: (context, index) {
-            final notebook = notebooks[index];
-            return HorizontalNotebookCard(
-              title: notebook['title']!,
-              course: notebook['course']!,
-              image: notebook['image']!,
-              assessment: notebook['course']!,
-              isLoading: isLoading);
-          },
         ),
       ),
     );

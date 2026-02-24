@@ -68,7 +68,9 @@ class _LoginViewState extends State<LoginView> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: viewModel.isLoading ? MediumLoader(loading: ["Connecting to Google", "Just a Moment", "Authenticating Account"]) : Center(
+      body: viewModel.isLoading ? 
+      MediumLoader(loading: ["Connecting to Google", "Just a Moment", "Authenticating Account"])
+      : Center(
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Column(

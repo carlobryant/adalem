@@ -88,9 +88,10 @@ class _MediumLoaderState extends State<MediumLoader>
             widget.loading![_textIndex] : "",
             style: TextStyle(
               color: Colors.grey.shade600,
+              fontWeight: FontWeight.w600,
             ),
             overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+            maxLines: 2,
           ),
         ],
       ),

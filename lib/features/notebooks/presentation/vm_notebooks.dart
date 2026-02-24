@@ -5,6 +5,7 @@ import 'package:adalem/features/notebooks/domain/notebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class NotebookViewModel extends ChangeNotifier {
@@ -24,23 +25,39 @@ class NotebookViewModel extends ChangeNotifier {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController courseController = TextEditingController();
 
+  // CREATE VARIABLES
+  bool _isCreating = false;
+  bool get isCreating => _isCreating;
+  bool _isSuccess = false;
+  bool get isSuccess => _isSuccess;
+  String? _createError;
+  String? get createError => _createError;
   String _selectedImage = "yellow";
   String get selectedImage => _selectedImage;
 
+  // RETRIEVE VARIABLES
+  String? _streamError;
+  String? get streamError => _streamError;
+  String _searchQuery = "";
+  String get searchQuery => _searchQuery;
+  List<NotebookModel> _notebooks = [];
+  //List<NotebookModel> get notebooks => _notebooks;
+  List<NotebookModel> get filteredNotebooks {
+    if(_searchQuery.isEmpty) return _notebooks;
+    final query = _searchQuery.toLowerCase();
+    return _notebooks.where((notebook) {
+      return notebook.title.toLowerCase().contains(query) ||
+      notebook.course.toLowerCase().contains(query);
+    }).toList();
+  }
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-
-  bool _isCreating = false;
-  bool get isCreating => _isCreating;
-
-  List<NotebookModel> _notebooks = [];
-  List<NotebookModel> get notebooks => _notebooks;
-
+  
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  bool _isSuccess = false;
-  bool get isSuccess => _isSuccess;
+  DateTime? _lastValidationError;
 
   void loadNotebooks() {
   _isLoading = true;
@@ -50,15 +67,20 @@ class NotebookViewModel extends ChangeNotifier {
     (notebooks) {
       _notebooks = notebooks.map(NotebookModel.fromEntity).toList();
       _isLoading = false;
-      _errorMessage = null;
+      _streamError = null;
       notifyListeners();
     },
     onError: (e) {
-        _errorMessage = 'Service unavailable. Please check your connection or try again later.';
+        _streamError = 'Service unavailable. Please check your connection or try again later.';
         _isLoading = false;
         notifyListeners();
       },
     );
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
   }
 
   void selectImage(String image) {
@@ -67,18 +89,32 @@ class NotebookViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> handleCreate() async {
+  bool validateCreate() {
     final title = titleController.text.trim();
     final course = courseController.text.trim();
 
     if (title.isEmpty || course.isEmpty) {
-      _errorMessage = 'Please fill in all fields.';
-      notifyListeners();
-      return;
+      final now = DateTime.now();
+      if (_lastValidationError == null ||
+          now.difference(_lastValidationError!) > const Duration(seconds: 6)) {
+        _lastValidationError = now;
+        _createError = "Please Fill In All Fields.";
+        notifyListeners();
+      }
+      return false;
     }
+    return true;
+  }
 
+  Future<void> handleCreate() async {
     _isCreating = true;
-    _errorMessage = null;
+    notifyListeners();
+
+    final title = titleController.text.trim();
+    final course = courseController.text.trim();
+    
+    _lastValidationError = null;
+    _createError = null;
     notifyListeners();
 
     try {
@@ -100,7 +136,7 @@ class NotebookViewModel extends ChangeNotifier {
       _isSuccess = true;
       loadNotebooks(); // REFRESH AFTER CREATION
     } catch (e) {
-      _errorMessage = 'Failed to create notebook. Please try again.';
+      _createError = 'Failed to create notebook. Please try again.';
     } finally {
       _isCreating = false;
       notifyListeners();
@@ -110,7 +146,7 @@ class NotebookViewModel extends ChangeNotifier {
   void resetCreate() {
     titleController.clear();
     courseController.clear();
-    _selectedImage = 'default';
+    _selectedImage = "yellow";
     _isSuccess = false;
     _errorMessage = null;
     notifyListeners();
@@ -122,6 +158,16 @@ class NotebookViewModel extends ChangeNotifier {
     titleController.dispose();
     courseController.dispose();
     super.dispose();
+  }
+
+  void clearCreateError() {
+    _createError = null;
+    notifyListeners();
+  }
+
+  void clearStreamError() {
+    _streamError = null;
+    notifyListeners();
   }
 
   void clearError() {
