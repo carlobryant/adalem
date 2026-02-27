@@ -88,10 +88,10 @@ class _LoginViewState extends State<LoginView> {
                 "ADALEM",
                 style: TextStyle(
                   color: Colors.grey.shade600,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 42,
+                  fontWeight: FontWeight.bold,
                   letterSpacing: 6,
-                  fontFamily: 'Collegiate',
+                  fontFamily: "LoveYaLikeASister",
                   shadows: [Shadow(
                     color: Colors.grey.shade600, 
                     offset: Offset(0, 2), 

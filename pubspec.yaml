@@ -31,12 +31,12 @@ flutter:
   assets: 
     - assets/
   fonts:
-  - family: Segoe
+  - family: GoogleSans
     fonts:
-    - asset: assets/SegoeUI.ttf
-  - family: Collegiate
+    - asset: assets/GoogleSans-VariableFont_GRAD,opsz,wght.ttf
+  - family: LoveYaLikeASister
     fonts:
-    - asset: assets/CollegiateInsideFLF.ttf
+    - asset: assets/LoveYaLikeASister-Regular.ttf
 
 flutter_launcher_icons:
   android: "launcher_icon"

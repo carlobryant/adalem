@@ -1,4 +1,6 @@
-import 'package:adalem/components/notebook_searchbar.dart';
+import 'package:adalem/components/card_popup.dart';
+import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
+import 'package:adalem/features/notebooks/presentation/view_searchbar.dart';
 import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
@@ -27,16 +29,27 @@ class ExploreViewState extends State<ExploreView> {
     super.dispose();
   }
 
-  void scrollToTop() {
+  void scrollToTop() async {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+    _refresh();
+    
     if(_scrollController.hasClients) {
-      _scrollController.animateTo(0.0,
+      await _scrollController.animateTo(0.0,
       duration: const Duration(milliseconds: 300), 
       curve: Curves.easeOut,
       );
     }
+    _searchFocusNode.requestFocus();
   }
 
-  void _filterSearch() {}
+  void _filterSearch() {
+    _searchFocusNode.unfocus();
+    Navigator.of(context).push(
+      PopupCard(builder: (context) => const FilterPopup())
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,18 +75,30 @@ class ExploreViewState extends State<ExploreView> {
               },
             ),
             actions: [
-              IconButton(
-                onPressed: _filterSearch, 
-                icon: Icon(Icons.filter_list,
-                  size: 30,
-                  color: Theme.of(context).colorScheme.onPrimary,
+              Hero(
+                tag: heroFilterTag,
+                child: Material(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  child: IconButton(
+                    onPressed: _filterSearch, 
+                    icon: Icon(Icons.filter_list,
+                      size: 30,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
                 ),
               ),
             ],
           )
         ], 
-        body: SafeArea(
-          child: _buildBody(viewModel),
+        body: RefreshIndicator(
+          color: Theme.of(context).colorScheme.primary,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          onRefresh: _refresh,
+          child: SafeArea(
+            child: _buildBody(viewModel),
+          ),
         ),
       ),
     );
@@ -88,31 +113,47 @@ class ExploreViewState extends State<ExploreView> {
     final items = isLoading ? 
     List.filled(6, NotebookModel.empty()) : viewModel.filteredNotebooks;
     
-    return RefreshIndicator(
-      color: Theme.of(context).colorScheme.primary,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: _refresh,
-      child: GridView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          mainAxisExtent: 240,
-        ),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final notebook = items[index];
-          return VerticalNotebookCard(
-            title: notebook.title,
-            course: notebook.course,
-            createdAt: notebook.createdAt,
-            image: notebook.image,
-            isLoading: viewModel.isLoading,
-          );
-        },
+    return !isLoading && items.isEmpty ?
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image(
+            image: AssetImage("assets/ic_notfound.png"),
+            width: 180,
+            color: Theme.of(context).colorScheme.onSurface,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 16),
+          Text("No Notebooks Found!",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
+    )
+    : GridView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(10),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        mainAxisExtent: 240,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final notebook = items[index];
+        return VerticalNotebookCard(
+          title: notebook.title,
+          course: notebook.course,
+          createdAt: notebook.createdAt,
+          image: notebook.image,
+          isLoading: viewModel.isLoading,
+        );
+      },
     );
   }
 }
