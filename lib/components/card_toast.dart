@@ -18,6 +18,7 @@ class ToastCard {
           title,
           maxLines: 1, 
           overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
           ),
         description: description != null ? Text(
           description,
@@ -25,14 +26,15 @@ class ToastCard {
           overflow: TextOverflow.ellipsis,
           style:
             TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
             ),
           ) : null,
         alignment: Alignment.topCenter,
         autoCloseDuration: const Duration(seconds: 6),
-        icon: icon ?? const Icon(Icons.check_circle),
+        icon: icon ?? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onPrimary),
         primaryColor: Theme.of(context).colorScheme.primary,
-        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.all(Radius.circular(20)),
         borderSide: BorderSide(
           color: Theme.of(context).colorScheme.inversePrimary,

@@ -19,10 +19,16 @@ class PopupCard<T> extends PageRoute<T> {
   Duration get transitionDuration => const Duration(milliseconds: 300);
 
   @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 150);
+
+  @override
   bool get maintainState => true;
 
   @override
   Color get barrierColor => Colors.black54;
+
+  @override
+  String get barrierLabel => "Popup dialog open";
 
   @override
   Widget buildTransitions(
@@ -40,7 +46,4 @@ class PopupCard<T> extends PageRoute<T> {
     Animation<double> secondaryAnimation,) {
       return _builder(context);
   }
-
-  @override
-  String get barrierLabel => "Popup dialog open";
 }
