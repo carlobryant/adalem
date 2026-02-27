@@ -1,10 +1,25 @@
 import 'package:adalem/components/card_popuptween.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const String heroFilterTag = "filter-popup";
 
-class FilterPopup extends StatelessWidget {
+class FilterPopup extends StatefulWidget {
   const FilterPopup({super.key});
+
+  @override
+  State<FilterPopup> createState() => _FilterPopupState();
+}
+
+class _FilterPopupState extends State<FilterPopup> {
+  late SortOption _tempOption;
+
+  @override
+  void initState() {
+    super.initState();
+    _tempOption = context.read<NotebookViewModel>().currentSort;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +66,19 @@ class FilterPopup extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _radioOption(context, "Latest", true),
+                            _radioOption("Latest", SortOption.latest),
                             Divider(height: 5, color: Theme.of(context).colorScheme.onSurface),
-                            _radioOption(context, "Oldest", false),
+                            _radioOption("Oldest", SortOption.oldest),
                             Divider(height: 5, color: Theme.of(context).colorScheme.onSurface),
-                            _radioOption(context, "Alphabetical", false),
+                            _radioOption("Alphabetical", SortOption.alphabetical),
                             const SizedBox(height: 20),
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: () { Navigator.of(context).pop(); },
+                                onPressed: () {
+                                  context.read<NotebookViewModel>().setSortOption(_tempOption);
+                                  Navigator.of(context).pop();
+                                  },
                                 style: TextButton.styleFrom(
                                   backgroundColor: Theme.of(context).colorScheme.primary,
                                   shape: RoundedRectangleBorder(
@@ -94,26 +112,36 @@ class FilterPopup extends StatelessWidget {
     );
   }
 
-  Widget _radioOption(BuildContext context, String title, bool isSelected) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(isSelected ?
-            Icons.radio_button_checked : Icons.radio_button_unchecked,
-            color: isSelected ?
-            Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(title,
-              style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+  Widget _radioOption(String title, SortOption option) {
+    final isSelected = _tempOption == option;
+
+    return GestureDetector(
+      onTap:() {
+        setState(() {
+          _tempOption = option;
+        });
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(isSelected ?
+              Icons.radio_button_checked : Icons.radio_button_unchecked,
+              color: isSelected ?
+              Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurface,
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(title,
+                style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

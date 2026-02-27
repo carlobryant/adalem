@@ -5,8 +5,9 @@ import 'package:adalem/features/notebooks/domain/notebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+enum SortOption {latest, oldest, alphabetical}
 
 class NotebookViewModel extends ChangeNotifier {
   StreamSubscription<List<Notebook>>? _subscription;
@@ -28,28 +29,58 @@ class NotebookViewModel extends ChangeNotifier {
   // CREATE VARIABLES
   bool _isCreating = false;
   bool get isCreating => _isCreating;
+
   bool _isSuccess = false;
   bool get isSuccess => _isSuccess;
+
   String? _createError;
   String? get createError => _createError;
+
   String _selectedImage = "yellow";
   String get selectedImage => _selectedImage;
 
   // RETRIEVE VARIABLES
   String? _streamError;
   String? get streamError => _streamError;
+
   String _searchQuery = "";
   String get searchQuery => _searchQuery;
+
+  SortOption _currentSort = SortOption.latest;
+  SortOption get currentSort => _currentSort;
+
+  void setSortOption(SortOption option) {
+    _currentSort = option;
+    notifyListeners();
+  }
+
   List<NotebookModel> _notebooks = [];
   //List<NotebookModel> get notebooks => _notebooks;
+  
   List<NotebookModel> get filteredNotebooks {
-    if(_searchQuery.isEmpty) return _notebooks;
-    final query = _searchQuery.toLowerCase();
-    return _notebooks.where((notebook) {
-      return notebook.title.toLowerCase().contains(query) ||
-      notebook.course.toLowerCase().contains(query);
-    }).toList();
+    var list = List<NotebookModel>.from(_notebooks);
+    
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      list = _notebooks.where((notebook) {
+        return notebook.title.toLowerCase().contains(query) ||
+        notebook.course.toLowerCase().contains(query);
+      }).toList();
+    }
+
+    switch (_currentSort) {
+      case SortOption.latest: list.sort((b, a) => a.updatedAt.compareTo(b.updatedAt));
+      break;
+      case SortOption.oldest: list.sort((a, b) => a.updatedAt.compareTo(b.updatedAt));
+      break;
+      case SortOption.alphabetical: list.sort((a, b) => a.title.toLowerCase()
+        .compareTo(b.title.toLowerCase()));
+      break;
+    }
+
+    return list;
   }
+
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
