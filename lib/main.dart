@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:adalem/components/loader_md.dart';
+import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/auth/data/google_datasource.dart';
 import 'package:adalem/features/auth/data/repo_impl.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
@@ -15,7 +15,7 @@ import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:adalem/shell.dart';
-import 'package:adalem/config/theme_mode.dart';
+import 'package:adalem/core/theme_mode.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

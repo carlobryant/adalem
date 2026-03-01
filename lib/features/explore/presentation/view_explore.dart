@@ -1,5 +1,5 @@
-import 'package:adalem/components/card_popup.dart';
-import 'package:adalem/components/card_popuptween.dart';
+import 'package:adalem/core/components/card_popup.dart';
+import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
 import 'package:adalem/features/notebooks/presentation/view_searchbar.dart';
 import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';

@@ -1,5 +1,5 @@
-import 'package:adalem/components/card_toast.dart';
-import 'package:adalem/components/loader_md.dart';
+import 'package:adalem/core/components/card_toast.dart';
+import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/shell.dart';
 import 'package:flutter/material.dart';

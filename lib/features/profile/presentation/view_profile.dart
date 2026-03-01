@@ -1,6 +1,6 @@
-import 'package:adalem/components/card_popup.dart';
-import 'package:adalem/components/card_popuptween.dart';
-import 'package:adalem/components/card_toast.dart';
+import 'package:adalem/core/components/card_popup.dart';
+import 'package:adalem/core/components/card_popuptween.dart';
+import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';

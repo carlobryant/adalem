@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:adalem/components/card_popuptween.dart';
+import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
