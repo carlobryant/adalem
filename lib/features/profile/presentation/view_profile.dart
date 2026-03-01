@@ -3,6 +3,7 @@ import 'package:adalem/components/card_popuptween.dart';
 import 'package:adalem/components/card_toast.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/view_signoutpopup.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:flutter/material.dart';
@@ -39,10 +40,15 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   void _handleSignOut() async {
-    await context.read<ProfileViewModel>().handleSignOut();
+    final profilevm = context.read<ProfileViewModel>();
+    await profilevm.handleSignOut();
     if(!mounted) return;
+    if(profilevm.errorMessage != null) return;
+
+    context.read<NotebookViewModel>().clearData();
     context.read<LoginViewModel>().reset();
-    Navigator.pushAndRemoveUntil(context,
+
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
     MaterialPageRoute(builder: (context) => const LoginView()),
     (route) => false,
     );
@@ -75,7 +81,10 @@ class _ProfileViewState extends State<ProfileView> {
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).push(
-                        PopupCard(builder: (context) => SignOutPopup(username: username))
+                        PopupCard(builder: (context) => SignOutPopup(
+                          username: username,
+                          onConfirm: _handleSignOut,
+                        ))
                       );
                     }, 
                     icon: Icon(Icons.logout,

@@ -5,7 +5,13 @@ const String heroSignoutTag = "signout-popup";
 
 class SignOutPopup extends StatefulWidget {
   final String username;
-  const SignOutPopup({super.key, required this.username});
+  final VoidCallback onConfirm;
+
+  const SignOutPopup({
+    super.key,
+    required this.username,
+    required this.onConfirm,
+    });
 
   @override
   State<SignOutPopup> createState() => _SignOutPopupState();
@@ -99,6 +105,7 @@ class _SignOutPopupState extends State<SignOutPopup> {
                               TextButton(
                                 onPressed: () {
                                   Navigator.of(context).pop();
+                                  widget.onConfirm();
                                   },
                                 style: TextButton.styleFrom(
                                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -108,7 +115,7 @@ class _SignOutPopupState extends State<SignOutPopup> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  child: Text("Sign Out",
+                                  child: Text("Confirm",
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.onPrimary,
                                       fontSize: 16,

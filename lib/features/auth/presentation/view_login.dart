@@ -2,6 +2,7 @@ import 'package:adalem/components/card_toast.dart';
 import 'package:adalem/components/button_xl.dart';
 import 'package:adalem/components/loader_md.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -46,6 +47,8 @@ class _LoginViewState extends State<LoginView> {
           backgroundColor: Colors.grey.shade600,
         ),
       );
+
+      context.read<NotebookViewModel>().loadNotebooks();
 
       Navigator.pushAndRemoveUntil(
         context,

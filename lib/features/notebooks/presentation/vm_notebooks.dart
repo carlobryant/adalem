@@ -81,10 +81,8 @@ class NotebookViewModel extends ChangeNotifier {
         .compareTo(b.title.toLowerCase()));
       break;
     }
-
     return list;
   }
-
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -184,6 +182,15 @@ class NotebookViewModel extends ChangeNotifier {
     _selectedImage = "yellow";
     _isSuccess = false;
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  void clearData() {
+    _notebooks =[];
+    _searchQuery = "";
+    _streamError = null;
+    _errorMessage = null;
+    _subscription?.cancel();
     notifyListeners();
   }
 

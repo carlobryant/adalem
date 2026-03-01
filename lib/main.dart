@@ -51,7 +51,6 @@ void main() async {
             getCurrentUser: GetCurrentUser(authRepo),
           )..loadNotebooks(),
         ),
-
         ChangeNotifierProvider(
           create:(_) => ProfileViewModel(
             signOut: SignOut(authRepo), 
