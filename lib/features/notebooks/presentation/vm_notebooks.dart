@@ -49,8 +49,12 @@ class NotebookViewModel extends ChangeNotifier {
   SortOption _currentSort = SortOption.latest;
   SortOption get currentSort => _currentSort;
 
-  void setSortOption(SortOption option) {
+  void setSortOption(SortOption option) async {
+    _isLoading = true;
     _currentSort = option;
+    notifyListeners();
+    await Future.delayed(const Duration(milliseconds: 550));
+    _isLoading = false;
     notifyListeners();
   }
 

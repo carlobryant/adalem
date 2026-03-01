@@ -2,21 +2,18 @@
 import 'package:adalem/features/profile/presentation/view_profile.dart';
 import 'package:flutter/material.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class Profile extends StatelessWidget {
+  final GlobalKey<NavigatorState> navigatorKey;
+  const Profile({
+    super.key,
+    required this.navigatorKey,
+    });
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
-
-  GlobalKey<NavigatorState> profileNavigatorKey = GlobalKey<NavigatorState>();
-  
   @override
   Widget build(BuildContext context) {
     return Navigator(
-      key: profileNavigatorKey,
+      key: navigatorKey,
+      observers: [HeroController()],
       onGenerateRoute: (RouteSettings settings){
         return MaterialPageRoute(
           settings: settings,

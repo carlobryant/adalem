@@ -16,7 +16,7 @@ class ExploreView extends StatefulWidget {
 }
 
 class ExploreViewState extends State<ExploreView> {
-  Future<void> _refresh() async {context.read<NotebookViewModel>();}
+  Future<void> _refresh() async { context.read<NotebookViewModel>(); }
   final ScrollController _scrollController = ScrollController();
 
   final TextEditingController _searchController = TextEditingController();

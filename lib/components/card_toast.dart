@@ -74,7 +74,7 @@ class ToastCard {
           width: 50,
           color: const Color.fromARGB(255, 75, 2, 2),
           ),
-        primaryColor: Colors.red.shade500,
+        primaryColor: Theme.of(context).colorScheme.error,
         backgroundColor: const Color.fromARGB(255, 75, 2, 2),
         borderRadius: BorderRadius.all(Radius.circular(20)),
         borderSide: BorderSide(

@@ -5,6 +5,7 @@ Color _primary = Colors.green.shade900;
 Color _inPrimary = Colors.green.shade400;
 Color _onPrimary = Colors.grey.shade300;
 Color _onSurface = Colors.grey.shade600;
+Color _error = Color.fromARGB(255, 186, 84, 71);
 
 ThemeData lightMode = ThemeData(
   fontFamily: _globalFont,
@@ -17,7 +18,7 @@ ThemeData lightMode = ThemeData(
     secondary: Colors.grey.shade400,
     inversePrimary: _inPrimary,
     onPrimary: _onPrimary,
-    error: Colors.red.shade300,
+    error: _error,
   ),
   brightness: Brightness.light,
   textTheme: ThemeData.light().textTheme.apply(
@@ -38,7 +39,7 @@ ThemeData darkMode = ThemeData(
     secondary: Colors.grey.shade700,
     inversePrimary: _inPrimary,
     onPrimary: _onPrimary,
-    error: Colors.red.shade900,
+    error: _error,
   ),
   brightness: Brightness.dark,
   textTheme: ThemeData.dark().textTheme.apply(

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:adalem/components/card_popuptween.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 const String heroFilterTag = "filter-popup";
@@ -38,8 +40,10 @@ class _FilterPopupState extends State<FilterPopup> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               clipBehavior: Clip.antiAlias,
               child: SingleChildScrollView(
-                child: SizedBox(
-                  width: cardWidth,
+                child: OverflowBox(
+                  minWidth: cardWidth,
+                  maxWidth: cardWidth,
+                  fit: OverflowBoxFit.deferToChild,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,18 +80,17 @@ class _FilterPopupState extends State<FilterPopup> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  context.read<NotebookViewModel>().setSortOption(_tempOption);
                                   Navigator.of(context).pop();
                                   },
                                 style: TextButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  backgroundColor: Theme.of(context).colorScheme.onSurface,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                  child: Text("Apply",
+                                  child: Text("Cancel",
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.onPrimary,
                                       fontSize: 16,
@@ -116,9 +119,14 @@ class _FilterPopupState extends State<FilterPopup> {
     final isSelected = _tempOption == option;
 
     return GestureDetector(
-      onTap:() {
+      onTap:() async {
         setState(() {
           _tempOption = option;
+        });
+        context.read<NotebookViewModel>().setSortOption(_tempOption);
+        await Future.delayed(Duration(milliseconds: 400), (){
+          if (!mounted) return;
+          Navigator.of(context).pop();
         });
       },
       behavior: HitTestBehavior.opaque,

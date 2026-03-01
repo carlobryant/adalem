@@ -15,7 +15,7 @@ class Explore extends StatelessWidget {
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      observers: [ HeroController() ],
+      observers: [HeroController()],
       onGenerateRoute: (RouteSettings settings){
         return MaterialPageRoute(
           settings: settings,

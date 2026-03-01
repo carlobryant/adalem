@@ -1,6 +1,9 @@
+import 'package:adalem/components/card_popup.dart';
+import 'package:adalem/components/card_popuptween.dart';
 import 'package:adalem/components/card_toast.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
+import 'package:adalem/features/profile/presentation/view_signoutpopup.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +52,7 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
     final user = viewModel.user!;
+    final username = user.name.isNotEmpty ? user.name : "User";
 
     return Scaffold(
       body: NestedScrollView(
@@ -57,10 +61,31 @@ class _ProfileViewState extends State<ProfileView> {
             floating: true,
             snap: true,
             title: Text(
-            user.name.isNotEmpty ? user.name : "User",
+            username,
             style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
+            actions: [
+              Hero(
+                tag: heroSignoutTag,
+                createRectTween: (begin, end) => PopupTween(begin: begin, end: end),
+                child: Material(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        PopupCard(builder: (context) => SignOutPopup(username: username))
+                      );
+                    }, 
+                    icon: Icon(Icons.logout,
+                    size: 30,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           )
         ],
         body: Text("test")),

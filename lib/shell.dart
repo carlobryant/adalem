@@ -110,7 +110,7 @@ class _ShellState extends State<Shell> {
                   ),
                 Create(),
                 Share(),
-                Profile(),
+                Profile(navigatorKey: _navigatorKeys[4]),
               ],
             )
           ),
