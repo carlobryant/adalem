@@ -1,3 +1,4 @@
+import 'package:adalem/core/components/card_network.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/loader_md.dart';
@@ -106,9 +107,12 @@ class _LoginViewState extends State<LoginView> {
               const SizedBox(height: 100),
 
               XLButton(
-                onTap: viewModel.isLoading
-                    ? null
-                    : viewModel.handleGoogleSignIn,
+                onTap: viewModel.isLoading ? null
+                    : () => CheckNetwork.execute(
+                      signedIn: false,
+                      context: context,
+                      onTap: viewModel.handleGoogleSignIn,
+                      ), 
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -1,3 +1,4 @@
+import 'package:adalem/core/components/card_network.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/create/presentation/view_creating.dart';
@@ -151,14 +152,18 @@ class _CreateViewState extends State<CreateView> {
               SizedBox(
                 width: double.infinity,
                 child: XLButton(
-                  onTap: () {
-                    if (!viewModel.validateCreate()) return;
+                  onTap: () => CheckNetwork.execute(
+                    signedIn: true,
+                    context: context,
+                    onTap: () async {
+                      if (!viewModel.validateCreate()) return;
 
-                    Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(builder: (context) => const CreatingView()),
-                    );
-                    viewModel.handleCreate(); 
-                  },
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(builder: (context) => const CreatingView()),
+                      );
+                      viewModel.handleCreate(); 
+                    },
+                  ),
                   child: Text(
                           "Create",
                           style: TextStyle(
