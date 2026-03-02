@@ -2,18 +2,21 @@ import 'dart:io';
 import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/auth/data/google_datasource.dart';
 import 'package:adalem/features/auth/data/repo_impl.dart';
+import 'package:adalem/features/auth/domain/uc_getauthstate.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
 import 'package:adalem/features/auth/domain/uc_signout.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/config/firebase_options.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
+import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
 import 'package:adalem/features/notebooks/data/repo_impl.dart';
 import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
+import 'package:adalem/nav/authgate_nav.dart';
 import 'package:adalem/shell.dart';
 import 'package:adalem/core/theme_mode.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -35,10 +38,15 @@ void main() async {
 
   final authRepo = AuthRepositoryImpl(dataSource: AuthRemoteDataSourceImpl());
   final notebookRepo = NotebookRepositoryImpl(dataSource: FirestoreDataSourceImpl());
+  final getAuthState = GetAuthState(authRepo);
 
   runApp(
     MultiProvider(
       providers: [
+        Provider.value(value: authRepo),
+        Provider.value(value: notebookRepo),
+        Provider.value(value: getAuthState),
+
         ChangeNotifierProvider(
         create: (_) => LoginViewModel(
           signInWithGoogle: SignInWithGoogle(authRepo),
@@ -47,10 +55,14 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => NotebookViewModel(
             getNotebooks: GetNotebooks(notebookRepo), 
-            createNotebook: CreateNotebook(notebookRepo),
-            getCurrentUser: GetCurrentUser(authRepo),
           )..loadNotebooks(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => CreateViewModel(
+            createNotebook: CreateNotebook(notebookRepo),
+            getCurrentUser: GetCurrentUser(authRepo),
+            ),
+          ),
         ChangeNotifierProvider(
           create:(_) => ProfileViewModel(
             signOut: SignOut(authRepo), 
@@ -75,7 +87,7 @@ class MyApp extends StatelessWidget {
       darkTheme: darkMode,
       
       //home: SmallLoader(),
-      home: Platform.isAndroid ? LoginView() : Shell(), //Add view: ADALEM is only available on Android
+      home: const AuthGate(), //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
       routes: {

@@ -1,78 +1,94 @@
+import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CreateViewModel extends ChangeNotifier {
   final CreateNotebook _createNotebook;
+  final GetCurrentUser _getCurrentUser;
 
-  CreateViewModel({required CreateNotebook createNotebook})
-      : _createNotebook = createNotebook;
+  CreateViewModel({
+    required CreateNotebook createNotebook,
+    required GetCurrentUser getCurrentUser,
+  }) : _createNotebook = createNotebook, _getCurrentUser = getCurrentUser;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController courseController = TextEditingController();
 
-  String _selectedImage = "yellow"; 
+  String _selectedImage = "yellow";
   String get selectedImage => _selectedImage;
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  bool _isCreating = false;
+  bool get isCreating => _isCreating;
 
-  String? _errorMessage;
-  String? get errorMessage => _errorMessage;
+  String? _createError;
+  String? get createError => _createError;
 
   bool _isSuccess = false;
   bool get isSuccess => _isSuccess;
 
   void selectImage(String image) {
     _selectedImage = image;
+    _createError = null;
     notifyListeners();
   }
 
-  Future<void> handleCreate() async {
+  bool validateCreate() {
     final title = titleController.text.trim();
     final course = courseController.text.trim();
 
     if (title.isEmpty || course.isEmpty) {
-      _errorMessage = 'Please fill in all fields.';
+      _createError = "Please Fill in All Fields.";
       notifyListeners();
-      return;
+      return false;
     }
+    return true;
+  }
 
-    _isLoading = true;
-    _errorMessage = null;
+  Future<void> handleCreate() async {
+    if (!validateCreate()) return;
+
+    _isCreating = true;
+    _createError = null;
     notifyListeners();
 
     try {
-      final currentUser = FirebaseAuth.instance.currentUser;
+      final currentUser = _getCurrentUser();
+      
       if (currentUser == null) {
-        _errorMessage = 'No user logged in.';
+        _createError = "No User Authenticated.";
         return;
       }
 
       await _createNotebook(
         owner: currentUser.uid,
         uid: [currentUser.uid],
-        title: title,
-        course: course,
+        title: titleController.text.trim(),
+        course: courseController.text.trim(),
         image: _selectedImage,
         path: '/',
       );
 
       _isSuccess = true;
     } catch (e) {
-      _errorMessage = 'Failed to create notebook. Please try again.';
+      _createError = "Failed to Create, Please Try Again Later.";
+      //print("$e");
     } finally {
-      _isLoading = false;
+      _isCreating = false;
       notifyListeners();
     }
   }
 
-  void reset() {
+  void resetCreate() {
     titleController.clear();
     courseController.clear();
-    _selectedImage = 'default';
+    _selectedImage =  "yellow";
     _isSuccess = false;
-    _errorMessage = null;
+    _createError = null;
+    notifyListeners();
+  }
+
+  void clearCreateError() {
+    _createError = null;
     notifyListeners();
   }
 

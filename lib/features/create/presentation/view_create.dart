@@ -2,7 +2,7 @@ import 'package:adalem/core/components/card_network.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/create/presentation/view_creating.dart';
-import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +14,7 @@ class CreateView extends StatefulWidget {
 }
 
 class _CreateViewState extends State<CreateView> {
-  late final NotebookViewModel _viewModel;
+  late final CreateViewModel _createViewModel;
 
   final List<String> _imageOptions = [
     "red",
@@ -30,18 +30,19 @@ class _CreateViewState extends State<CreateView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = context.read<NotebookViewModel>();
-    _viewModel.addListener(_onViewModelChanged);
+    _createViewModel = context.read<CreateViewModel>();
+    _createViewModel.addListener(_onViewModelChanged);
   }
 
   @override
   void dispose() {
-    _viewModel.removeListener(_onViewModelChanged);
+    _createViewModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
   void _onViewModelChanged() {
-    final viewModel = context.read<NotebookViewModel>();
+
+    final viewModel = context.read<CreateViewModel>();
     if(viewModel.createError != null) {
       ToastCard.error(context, viewModel.createError!);
       viewModel.clearCreateError();
@@ -50,7 +51,7 @@ class _CreateViewState extends State<CreateView> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<NotebookViewModel>();
+    final viewModel = context.watch<CreateViewModel>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,

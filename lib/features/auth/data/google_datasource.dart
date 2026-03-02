@@ -6,6 +6,7 @@ abstract class AuthRemoteDataSource {
   Future<UserCredential> signInWithGoogle();
   Future<void> signOut();
   User? getCurrentUser();
+  Stream<User?> get authStateChanges;
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -64,4 +65,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   //GET USER CALL
   @override
   User? getCurrentUser() => _auth.currentUser;
+
+  @override
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 }

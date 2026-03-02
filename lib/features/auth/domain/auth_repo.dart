@@ -4,4 +4,5 @@ abstract class AuthRepo {
   Future<AuthUser?> signInWithGoogle();
   Future<void> signOut();
   AuthUser? getCurrentUser();
+  Stream<AuthUser?> get authStateChanges;
 }

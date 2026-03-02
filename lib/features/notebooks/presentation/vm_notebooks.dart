@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebooks/domain/notebook.dart';
-import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
 import 'package:flutter/material.dart';
@@ -12,34 +10,11 @@ enum SortOption {latest, oldest, alphabetical}
 class NotebookViewModel extends ChangeNotifier {
   StreamSubscription<List<Notebook>>? _subscription;
   final GetNotebooks _getNotebooks;
-  final CreateNotebook _createNotebook;
-  final GetCurrentUser _getCurrentUser;
 
   NotebookViewModel({
     required GetNotebooks getNotebooks,
-    required CreateNotebook createNotebook,
-    required GetCurrentUser getCurrentUser,
-  })  : _getNotebooks = getNotebooks,
-        _createNotebook = createNotebook,
-        _getCurrentUser = getCurrentUser;
+  })  : _getNotebooks = getNotebooks;
 
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController courseController = TextEditingController();
-
-  // CREATE VARIABLES
-  bool _isCreating = false;
-  bool get isCreating => _isCreating;
-
-  bool _isSuccess = false;
-  bool get isSuccess => _isSuccess;
-
-  String? _createError;
-  String? get createError => _createError;
-
-  String _selectedImage = "yellow";
-  String get selectedImage => _selectedImage;
-
-  // RETRIEVE VARIABLES
   String? _streamError;
   String? get streamError => _streamError;
 
@@ -90,8 +65,6 @@ class NotebookViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  DateTime? _lastValidationError;
-
   void loadNotebooks() {
   _isLoading = true;
   notifyListeners();
@@ -104,7 +77,7 @@ class NotebookViewModel extends ChangeNotifier {
       notifyListeners();
     },
     onError: (e) {
-        _streamError = 'Service unavailable. Please check your connection or try again later.';
+        _streamError = "Service Unavailable, Please Check Your Connection";
         _isLoading = false;
         notifyListeners();
       },
@@ -113,75 +86,6 @@ class NotebookViewModel extends ChangeNotifier {
 
   void setSearchQuery(String query) {
     _searchQuery = query;
-    notifyListeners();
-  }
-
-  void selectImage(String image) {
-    _selectedImage = image;
-    _errorMessage = null;
-    notifyListeners();
-  }
-
-  bool validateCreate() {
-    final title = titleController.text.trim();
-    final course = courseController.text.trim();
-
-    if (title.isEmpty || course.isEmpty) {
-      final now = DateTime.now();
-      if (_lastValidationError == null ||
-          now.difference(_lastValidationError!) > const Duration(seconds: 6)) {
-        _lastValidationError = now;
-        _createError = "Please Fill In All Fields.";
-        notifyListeners();
-      }
-      return false;
-    }
-    return true;
-  }
-
-  Future<void> handleCreate() async {
-    _isCreating = true;
-    notifyListeners();
-
-    final title = titleController.text.trim();
-    final course = courseController.text.trim();
-    
-    _lastValidationError = null;
-    _createError = null;
-    notifyListeners();
-
-    try {
-      final currentUser = _getCurrentUser();
-      if(currentUser == null) {
-        _errorMessage = "Authentication Error.";
-        return;
-      }
-
-      await _createNotebook(
-        owner: currentUser.uid,
-        uid: [currentUser.uid],
-        title: title,
-        course: course,
-        image: _selectedImage,
-        path: '/',
-      );
-
-      _isSuccess = true;
-      loadNotebooks(); // REFRESH AFTER CREATION
-    } catch (e) {
-      _createError = 'Failed to create notebook. Please try again.';
-    } finally {
-      _isCreating = false;
-      notifyListeners();
-    }
-  }
-
-  void resetCreate() {
-    titleController.clear();
-    courseController.clear();
-    _selectedImage = "yellow";
-    _isSuccess = false;
-    _errorMessage = null;
     notifyListeners();
   }
 
@@ -197,14 +101,7 @@ class NotebookViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
-    titleController.dispose();
-    courseController.dispose();
     super.dispose();
-  }
-
-  void clearCreateError() {
-    _createError = null;
-    notifyListeners();
   }
 
   void clearStreamError() {

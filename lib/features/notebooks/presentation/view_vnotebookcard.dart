@@ -4,7 +4,7 @@ import 'package:redacted/redacted.dart';
 class VerticalNotebookCard extends StatelessWidget {
   final String title;
   final String course;
-  final String createdAt;
+  final String updatedAt;
   final String image;
   final bool isLoading;
 
@@ -12,13 +12,15 @@ class VerticalNotebookCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.course,
-    required this.createdAt,
+    required this.updatedAt,
     required this.image,
     required this.isLoading,
   });
 
   @override
   Widget build(BuildContext context) {
+    final displayDate = updatedAt.split('-').first;
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       shadowColor: Theme.of(context).colorScheme.shadow,
@@ -96,7 +98,7 @@ class VerticalNotebookCard extends StatelessWidget {
                         child: isLoading ?
                         const SizedBox()
                         : Text(
-                          createdAt,
+                          displayDate,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontSize: 10,
                               color: Colors.grey.shade600,

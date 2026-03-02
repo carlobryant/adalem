@@ -151,7 +151,7 @@ class ExploreViewState extends State<ExploreView> {
         return VerticalNotebookCard(
           title: notebook.title,
           course: notebook.course,
-          createdAt: notebook.createdAt,
+          updatedAt: notebook.updatedAt,
           image: notebook.image,
           isLoading: viewModel.isLoading,
         );

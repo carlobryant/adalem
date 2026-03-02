@@ -58,6 +58,20 @@ class AuthRepositoryImpl implements AuthRepo {
     );
   }
 
+  @override
+  Stream<AuthUser?> get authStateChanges {
+    return _dataSource.authStateChanges.map((user) {
+      if (user == null) return null;
+      return AuthUser(
+        uid: user.uid,
+        name: user.displayName ?? "",
+        email: user.email ?? '',
+      photoURL: user.photoURL ?? '',
+      provider: 'google',
+      );
+    });
+  }
+
   //CREATE FIRESTORE DOCUMENT
   Future<void> _saveUserToFirestore(User user) async {
     final userDoc = _firestore.collection('users').doc(user.uid);
