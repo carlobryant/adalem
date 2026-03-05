@@ -41,7 +41,6 @@ class _CreateViewState extends State<CreateView> {
   }
 
   void _onViewModelChanged() {
-
     final viewModel = context.read<CreateViewModel>();
     if(viewModel.createError != null) {
       ToastCard.error(context, viewModel.createError!);
@@ -157,6 +156,7 @@ class _CreateViewState extends State<CreateView> {
                     signedIn: true,
                     context: context,
                     onTap: () async {
+                      ToastCard.clearError();
                       if (!viewModel.validateCreate()) return;
 
                       Navigator.of(context, rootNavigator: true).push(

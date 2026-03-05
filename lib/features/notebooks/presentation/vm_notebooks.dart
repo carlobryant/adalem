@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:adalem/features/notebooks/domain/notebook.dart';
+import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +66,7 @@ class NotebookViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   void loadNotebooks() {
+  _subscription?.cancel();
   _isLoading = true;
   notifyListeners();
 

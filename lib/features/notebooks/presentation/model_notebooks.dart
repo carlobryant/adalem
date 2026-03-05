@@ -1,4 +1,4 @@
-import 'package:adalem/features/notebooks/domain/notebook.dart';
+import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:intl/intl.dart';
 
 class NotebookModel {
@@ -39,16 +39,16 @@ class NotebookModel {
   }
 
   factory NotebookModel.empty() {
-  return const NotebookModel(
-    id: '',
-    owner: '',
-    uid: [],
-    createdAt: '',
-    updatedAt: '',
-    title: '',
-    course: '',
-    image: '',
-    path: '',
-  );
-}
+    return const NotebookModel(
+      id: '',
+      owner: '',
+      uid: [],
+      createdAt: '',
+      updatedAt: '',
+      title: '',
+      course: '',
+      image: '',
+      path: '',
+    );
+  }
 }

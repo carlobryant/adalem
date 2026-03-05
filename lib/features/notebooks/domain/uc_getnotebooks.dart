@@ -1,4 +1,4 @@
-import 'package:adalem/features/notebooks/domain/notebook.dart';
+import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 
 class GetNotebooks {

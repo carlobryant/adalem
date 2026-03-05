@@ -59,14 +59,23 @@ class CreateViewModel extends ChangeNotifier {
         return;
       }
 
-      await _createNotebook(
+      // await _createNotebook(
+      //   owner: currentUser.uid,
+      //   uid: [currentUser.uid],
+      //   title: titleController.text.trim(),
+      //   course: courseController.text.trim(),
+      //   image: _selectedImage,
+      //   path: '/',
+      // );
+
+      final params = CreateNotebookParams(
         owner: currentUser.uid,
-        uid: [currentUser.uid],
         title: titleController.text.trim(),
         course: courseController.text.trim(),
         image: _selectedImage,
-        path: '/',
       );
+
+      await _createNotebook(params);
 
       _isSuccess = true;
     } catch (e) {

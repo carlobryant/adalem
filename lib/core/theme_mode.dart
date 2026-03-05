@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 const String _globalFont = "GoogleSans";
 Color _primary = Colors.green.shade900;
@@ -8,7 +9,7 @@ Color _onSurface = Colors.grey.shade600;
 Color _error = Color.fromARGB(255, 186, 84, 71);
 Color _onError = Color.fromARGB(255, 75, 2, 2);
 
-ThemeData lightMode = ThemeData(
+ThemeData get lightMode => ThemeData(
   fontFamily: _globalFont,
   colorScheme: ColorScheme.light(
     surface: Colors.grey.shade300,
@@ -30,7 +31,7 @@ ThemeData lightMode = ThemeData(
     ),
 );
 
-ThemeData darkMode = ThemeData(
+ThemeData get darkMode => ThemeData(
   fontFamily: _globalFont,
   colorScheme: ColorScheme.dark(
     surface: Colors.grey.shade900,
@@ -51,3 +52,22 @@ ThemeData darkMode = ThemeData(
     displayColor: Colors.white,
     ),
 );
+  
+class FontScale {
+  static const String _fontSizeKey = "font_size_scale";
+  static final _storage = GetStorage();
+
+  static const Map<String, double> fontSizeScales = {
+    'Small': 0.8,
+    'Normal': 1.0,
+    'Large': 1.2,
+    'Extra Large': 1.4,
+  };
+
+  static double get currentFontScale => _storage.read(_fontSizeKey) ?? fontSizeScales['Extra Large']!;
+
+  static Future<void> setFontScale(double scale) async {
+    await _storage.write(_fontSizeKey, scale);
+  }
+}
+

@@ -1,4 +1,3 @@
-import 'package:adalem/core/components/card_popup.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
 import 'package:adalem/features/notebooks/presentation/view_searchbar.dart';
@@ -16,7 +15,6 @@ class ExploreView extends StatefulWidget {
 }
 
 class ExploreViewState extends State<ExploreView> {
-  Future<void> _refresh() async { context.read<NotebookViewModel>(); }
   final ScrollController _scrollController = ScrollController();
 
   final TextEditingController _searchController = TextEditingController();
@@ -34,7 +32,7 @@ class ExploreViewState extends State<ExploreView> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
-    _refresh();
+    //_refresh();
     
     if(_scrollController.hasClients) {
       await _scrollController.animateTo(0.0,
@@ -48,7 +46,7 @@ class ExploreViewState extends State<ExploreView> {
   void _filterSearch() {
     _searchFocusNode.unfocus();
     Navigator.of(context).push(
-      PopupCard(builder: (context) => const FilterPopup())
+      PopupHeroDialog(builder: (context) => const FilterPopup())
     );
   }
 
@@ -97,7 +95,10 @@ class ExploreViewState extends State<ExploreView> {
         body: RefreshIndicator(
           color: Theme.of(context).colorScheme.primary,
           backgroundColor: Theme.of(context).colorScheme.surface,
-          onRefresh: _refresh,
+          onRefresh: () async {
+            viewModel.setSortOption(viewModel.currentSort); 
+            await Future.delayed(const Duration(milliseconds: 550));
+            },
           child: SafeArea(
             child: _buildBody(viewModel),
           ),

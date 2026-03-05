@@ -1,4 +1,3 @@
-import 'package:adalem/core/components/card_popup.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
@@ -24,6 +23,7 @@ class _ProfileViewState extends State<ProfileView> {
     super.initState();
     _viewModel = context.read<ProfileViewModel>();
     _viewModel.addListener(_onViewModelChanged);
+    _viewModel.init();
   }
 
   @override
@@ -81,7 +81,7 @@ class _ProfileViewState extends State<ProfileView> {
                   child: IconButton(
                     onPressed: () {
                       Navigator.of(context).push(
-                        PopupCard(builder: (context) => SignOutPopup(
+                        PopupHeroDialog(builder: (context) => SignOutPopup(
                           username: username,
                           onConfirm: _handleSignOut,
                         ))

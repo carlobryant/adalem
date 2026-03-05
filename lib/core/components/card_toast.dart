@@ -44,12 +44,20 @@ class ToastCard {
       );
     }
 
+    static ToastificationItem? _activeErrorToast;
+    static void clearError() {
+      if (_activeErrorToast != null) {
+        toastification.dismiss(_activeErrorToast!);
+        _activeErrorToast = null;
+      }
+    }
+
   static void error(
     BuildContext context,
     String title, {
     String? description,
     }) {
-      toastification.show(
+      _activeErrorToast = toastification.show(
         context: context,
         type: ToastificationType.error,
         style: ToastificationStyle.fillColored,
@@ -82,11 +90,14 @@ class ToastCard {
           width: 1,
           strokeAlign: BorderSide.strokeAlignInside,
         ),
+        callbacks: ToastificationCallbacks(
+          onAutoCompleteCompleted: (_) => _activeErrorToast = null,
+          onDismissed: (_) => _activeErrorToast = null,
+        ),
       );
     }
 
     static ToastificationItem? _activeNoInternetToast;
-
     static void clearNoInternet() {
       if (_activeNoInternetToast != null) {
         toastification.dismiss(_activeNoInternetToast!);

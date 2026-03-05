@@ -57,6 +57,7 @@ class _LoginViewState extends State<LoginView> {
         (route) => false,
       );
     } else {
+      ToastCard.clearError();
       bool err = result.errorMessage?.toLowerCase().contains('cancel') ?? false;
       ToastCard.error(
         context,
