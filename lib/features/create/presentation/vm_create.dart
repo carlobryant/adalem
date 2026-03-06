@@ -1,5 +1,5 @@
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
-import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 import 'package:flutter/material.dart';
 
 class CreateViewModel extends ChangeNotifier {
@@ -58,15 +58,6 @@ class CreateViewModel extends ChangeNotifier {
         _createError = "No User Authenticated.";
         return;
       }
-
-      // await _createNotebook(
-      //   owner: currentUser.uid,
-      //   uid: [currentUser.uid],
-      //   title: titleController.text.trim(),
-      //   course: courseController.text.trim(),
-      //   image: _selectedImage,
-      //   path: '/',
-      // );
 
       final params = CreateNotebookParams(
         owner: currentUser.uid,

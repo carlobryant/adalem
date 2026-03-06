@@ -20,7 +20,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
   Stream<List<Map<String, dynamic>>> fetchNotebooks(String uid) {
       return _firestore
       .collection('notebooks')
-      .where('uid', arrayContains: uid)
+      .where('users.$uid', isNull: false)
       .snapshots()
       .map((snapshot) => snapshot.docs
           .map((doc) => {'id': doc.id, ...doc.data()})

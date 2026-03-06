@@ -1,5 +1,7 @@
 import 'package:adalem/core/components/card_popuptween.dart';
+import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
+import 'package:adalem/features/notebook_content/presentation/view_content.dart';
 import 'package:adalem/features/notebooks/presentation/view_searchbar.dart';
 import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
@@ -32,7 +34,6 @@ class ExploreViewState extends State<ExploreView> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
-    //_refresh();
     
     if(_scrollController.hasClients) {
       await _scrollController.animateTo(0.0,
@@ -48,6 +49,25 @@ class ExploreViewState extends State<ExploreView> {
     Navigator.of(context).push(
       PopupHeroDialog(builder: (context) => const FilterPopup())
     );
+  }
+
+  void _redirectToContent(String title, String id, String image, bool available, String? contentId) {
+    if(contentId==null) {
+      ToastCard.clearError();
+      if(!available) {
+        ToastCard.error(context, "Try Again Later",
+        description: "$title is still processing.");
+        return;
+      } else {
+        ToastCard.error(context, "Notebook Missing",
+        description: "$title not found.");
+        return;
+      }
+    }
+    Navigator.of(context, rootNavigator: true)
+      .push(MaterialPageRoute(
+        builder: (context) => ContentView(notebookId: id, image: image)
+        ));
   }
 
   @override
@@ -149,12 +169,22 @@ class ExploreViewState extends State<ExploreView> {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final notebook = items[index];
-        return VerticalNotebookCard(
-          title: notebook.title,
-          course: notebook.course,
-          updatedAt: notebook.updatedAt,
-          image: notebook.image,
-          isLoading: viewModel.isLoading,
+        return GestureDetector(
+          onTap: isLoading ? null 
+          : () => _redirectToContent(
+            notebook.title,
+            notebook.id, 
+            notebook.image,
+            notebook.available,
+            notebook.contentId,
+          ),
+          child: VerticalNotebookCard(
+            title: notebook.title,
+            course: notebook.course,
+            updatedAt: notebook.updatedAt,
+            image: notebook.image,
+            isLoading: viewModel.isLoading,
+          ),
         );
       },
     );

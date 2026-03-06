@@ -10,9 +10,11 @@ import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/config/firebase_options.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
+import 'package:adalem/features/notebook_content/data/firestore_datasource.dart';
+import 'package:adalem/features/notebook_content/data/repo_impl.dart';
 import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
 import 'package:adalem/features/notebooks/data/repo_impl.dart';
-import 'package:adalem/features/notebooks/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
@@ -38,6 +40,7 @@ void main() async {
 
   final authRepo = AuthRepositoryImpl(dataSource: AuthRemoteDataSourceImpl());
   final notebookRepo = NotebookRepositoryImpl(dataSource: FirestoreDataSourceImpl());
+  final contentRepo = ContentRepositoryImpl(dataSource: ContentDataSourceImpl());
   final getAuthState = GetAuthState(authRepo);
 
   runApp(
@@ -45,6 +48,7 @@ void main() async {
       providers: [
         Provider.value(value: authRepo),
         Provider.value(value: notebookRepo),
+        Provider.value(value: contentRepo),
         Provider.value(value: getAuthState),
 
         ChangeNotifierProvider(
@@ -59,7 +63,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => CreateViewModel(
-            createNotebook: CreateNotebook(notebookRepo),
+            createNotebook: CreateNotebook(
+              contentRepo: contentRepo,
+            ),
             getCurrentUser: GetCurrentUser(authRepo),
             ),
           ),

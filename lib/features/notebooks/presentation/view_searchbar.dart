@@ -38,7 +38,7 @@ class NotebookSearchbar extends StatelessWidget {
             builder: (context, value, child) {
               if(value.text.isNotEmpty){
                 return IconButton(
-                  icon: Icon(Icons.cancel, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                  icon: Icon(Icons.cancel, color: Theme.of(context).colorScheme.onSurface),
                   onPressed: onClear, // CALLBACK 
                 );
               } return const SizedBox.shrink();
