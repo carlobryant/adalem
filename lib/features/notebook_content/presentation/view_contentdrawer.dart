@@ -1,85 +1,160 @@
+import 'package:adalem/core/components/button_xl.dart';
+import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
-class ContentDrawer extends StatelessWidget {
-  final List<ChapterModel> chapters;
-  final Function(GlobalKey) onChapterTap;
+class ContentDrawer extends StatefulWidget {
+  final List<ChapterModel>? chapters;
+  final Function(GlobalKey)? onChapterTap;
   final VoidCallback onBack;
+  final Color primary;
+  final String notebookTitle;
 
   const ContentDrawer({
     super.key,
-    required this.chapters,
-    required this.onChapterTap,
+    this.chapters,
+    this.onChapterTap,
     required this.onBack,
+    required this.primary,
+    required this.notebookTitle,
   });
 
   @override
+  State<ContentDrawer> createState() => _ContentDrawerState();
+}
+
+class _ContentDrawerState extends State<ContentDrawer> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isBottomBarVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        if (_isBottomBarVisible) setState(() => _isBottomBarVisible = false);
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        if (!_isBottomBarVisible) setState(() => _isBottomBarVisible = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+   @override
   Widget build(BuildContext context) {
-    return Drawer(
+return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            // HEADER SECTION
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); 
-                      onBack();
-                    },
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  ),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      "Chapters",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const Divider(height: 1),
-
-            // LIST CHAPTER
-            Expanded(
-              child: ListView.builder(
-                itemCount: chapters.length,
-                itemBuilder: (context, index) {
-                  final chapterModel = chapters[index];
-                  final chapter = chapterModel.chapter;
-
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    title: Text(
-                      "${index + 1}. ${chapter.header}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                    trailing: const Icon(Icons.chevron_right, size: 20), 
-                    
-                    onTap: () {
-                      Navigator.of(context).pop(); 
-                      onChapterTap(chapterModel.scrollKey); 
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+      
+      // DRAWER HEADER
+      appBar: AppBar(
+        backgroundColor: widget.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary, 
+        elevation: 4, 
+        shadowColor: Colors.black45,
+        leading: IconButton(
+          onPressed: widget.onBack,
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
         ),
+        title: Text(
+          widget.notebookTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+      ),
+
+      // DRAWER LIST
+      body: Stack(
+        children: [
+          widget.chapters == null || widget.onChapterTap == null ? 
+          const Center(child: Padding(
+            padding: EdgeInsets.only(bottom: 350),
+            child: MediumLoader(),
+          ))
+          : ListView.builder(
+              controller: _scrollController,
+              itemCount: widget.chapters!.length,
+              itemBuilder: (context, index) {
+                final chapterModel = widget.chapters![index];
+                final chapter = chapterModel.chapter;
+        
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  title: Text(
+                    "${index + 1}. ${chapter.header}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                  trailing: const Icon(Icons.chevron_right, size: 20),
+                  onTap: () => widget.onChapterTap!(chapterModel.scrollKey),
+                );
+              },
+            ),
+
+            // DRAWER BUTTONS
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              bottom: _isBottomBarVisible ? 0 : -210, 
+              left: 0,
+              right: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  border: BoxBorder.fromLTRB(top: BorderSide(
+                    width: 3,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    )),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, -3),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  top: false, 
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        XLButton(child: Text(
+                          "Flashcards",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ), onTap: () {}),
+                        SizedBox(height: 20),
+                        XLButton(child: Text(
+                          "Start Quiz",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ), onTap: () {}),
+                      ],
+                    ), 
+                  ),
+                ),
+              ),
+            ),
+
+            
+        ],
       ),
     );
   }

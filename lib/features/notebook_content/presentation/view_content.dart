@@ -1,31 +1,43 @@
-import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/notebook_content/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/domain/uc_getcontent.dart';
+import 'package:adalem/features/notebook_content/presentation/model_content.dart';
 import 'package:adalem/features/notebook_content/presentation/view_contentdrawer.dart';
 import 'package:adalem/features/notebook_content/presentation/vm_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:provider/provider.dart';
 
 class ContentView extends StatelessWidget {
   final String notebookId;
+  final String notebookTitle;
   final String image;
 
   const ContentView({
     super.key, 
     required this.notebookId,
+    required this.notebookTitle,
     required this.image,
     });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ContentViewModel(
-        getContent: GetContent(
-          context.read<ContentRepositoryImpl>(),
-        ),
-      )..loadNotebookContent(notebookId),
-      child: _ContentViewContent(notebookId: notebookId, image: image),
+      create: (context) {
+        final viewModel = ContentViewModel(
+          getContent: GetContent(
+            context.read<ContentRepositoryImpl>(),
+          ),
+        );
+
+        Future.microtask(() => viewModel.loadNotebookContent(notebookId));
+        return viewModel;
+      },
+      child: _ContentViewContent(
+        notebookId: notebookId,
+        notebookTitle: notebookTitle,
+        image: image,
+      ),
     );
   }
 }
@@ -34,13 +46,21 @@ class _NotebookColorScheme {
   final Color primary;
   final Color secondary;
 
-  const _NotebookColorScheme({required this.primary, required this.secondary});
+  const _NotebookColorScheme({
+    required this.primary,
+    required this.secondary
+    });
 }
 
 class _ContentViewContent extends StatefulWidget {
   final String notebookId;
+  final String notebookTitle;
   final String image;
-  const _ContentViewContent({required this.notebookId, required this.image});
+  const _ContentViewContent({
+    required this.notebookId,
+    required this.notebookTitle,
+    required this.image
+    });
 
   @override
   State<_ContentViewContent> createState() => _ContentViewContentState();
@@ -63,22 +83,44 @@ class _ContentViewContent extends StatefulWidget {
 class _ContentViewContentState extends State<_ContentViewContent> {
   late final ContentViewModel _viewModel;
 
+  // DRAWER WIDGET
+  double _drawerOffset = 0.0; 
+  bool _isDrawerVisible = true;
+
+  // DRAWER BUTTON
+  final ScrollController _scrollController = ScrollController();
+  bool _isFabVisible = true;
+
   @override
   void initState() {
     super.initState();
     _viewModel = context.read<ContentViewModel>();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        if (_isFabVisible) setState(() => _isFabVisible = false);
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        if (!_isFabVisible) setState(() => _isFabVisible = true);
+      }
+    });
   }
 
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
+  void _openDrawer() {
+    setState(() {
+      _drawerOffset = 0.0;
+      _isDrawerVisible = true;
+    });
   }
 
-// The following assertion was thrown while finalizing the widget tree:
-// A ContentViewModel was used after being disposed.
+  void _closeDrawer() {
+    setState(() {
+      _drawerOffset = -1.0;
+      _isDrawerVisible = false;
+    });
+  }
 
   void _scrollToChapter(GlobalKey key) {
+    _closeDrawer();
     final ctx = key.currentContext;
     if (ctx != null) {
       Scrollable.ensureVisible(
@@ -91,12 +133,24 @@ class _ContentViewContentState extends State<_ContentViewContent> {
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ContentViewModel>();
-    final notebookColors = widget._nbColors(widget.image);
+     final notebookColors = widget._nbColors(widget.image);
 
-    if (viewModel.isLoading) {
-      return const Scaffold(body: MediumLoader());
+    if(viewModel.isLoading) {
+      return Scaffold(
+        body: ContentDrawer(
+          onBack: () => Navigator.of(context, rootNavigator: true).pop(),
+          primary: notebookColors.primary,
+          notebookTitle: widget.notebookTitle,
+          ),
+      );
     }
 
     if (viewModel.errorMessage != null) {
@@ -120,133 +174,169 @@ class _ContentViewContentState extends State<_ContentViewContent> {
     }
 
     final chapters = viewModel.chapterModels;
-    if (chapters.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text("No chapters found in this notebook.")),
-      );
-    }
+    final screenWidth = MediaQuery.of(context).size.width;
+    final topPadding = MediaQuery.of(context).padding.top;
 
-    return Scaffold(
-      drawer: ContentDrawer(
-        chapters: chapters,
-        onChapterTap: _scrollToChapter,
-        onBack: () => Navigator.of(context, rootNavigator: true).pop(),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: chapters.asMap().entries.map((entry) {
-              final index = entry.key;
-              final chapterModel = entry.value;
-              final chapter = chapterModel.chapter;
-          
-              return Container(
-                key: chapterModel.scrollKey,
-                padding: const EdgeInsets.only(bottom: 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Text("CHAPTER ${index + 1}: "),
-                    ),
-                    Container(
-                      width: double.infinity, 
-                      decoration: BoxDecoration(
-                        color: notebookColors.primary,
-                        borderRadius: BorderRadius.only(topRight: Radius.circular(40.0), bottomRight: Radius.circular(40.0)),
-                      ),
-                      padding: EdgeInsets.only(left: 10.0, top: 5.0, right: 35.0, bottom: 5.0),
-                      margin: EdgeInsets.only(right: 20.0),
-                      child: Text(
-                        chapter.header.toUpperCase(),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontFamily: "LoveYaLikeASister",
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                      child: MarkdownBody(
-                        data: chapter.body,
-                        selectable: true,
-                        styleSheet: MarkdownStyleSheet(
-                          p: const TextStyle(fontSize: 16, height: 1.5),
-                          listBullet: const TextStyle(fontSize: 16, height: 1.5),
-                          a: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline,
-                            ),
-                          blockquote: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                          blockquoteDecoration: BoxDecoration(
-                            color: notebookColors.secondary,
-                            borderRadius: BorderRadius.circular(15.0),
-                            ),
-                          horizontalRuleDecoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                width: 3.0,
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    //_buildBody(chapter.body),
-                  ],
+    return PopScope(
+      canPop: _isDrawerVisible,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (!_isDrawerVisible) {
+          _openDrawer();
+        } 
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // CONTENT
+            _buildNotebookContent(chapters, notebookColors),
+            
+            // DRAWER BUTTON
+            Positioned(
+              top: topPadding > 0 ? topPadding + 10 : 20,
+              left: 16,
+              child: AnimatedScale(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutBack,
+                scale: (_isFabVisible && !_isDrawerVisible) ? 1.0 : 0.0,
+                child: FloatingActionButton(
+                  mini: true, 
+                  heroTag: "drawer_menu_btn",
+                  backgroundColor: Theme.of(context).colorScheme.onSurface,
+                  onPressed: _openDrawer,
+                  child: Icon(
+                    Icons.menu, 
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
                 ),
-              );
-            }).toList(),
-          ),
+              ),
+            ),
+
+            // DRAWER OVERLAY
+            if (_isDrawerVisible) 
+            Positioned.fill(
+                  child: GestureDetector(
+                    onTap: _closeDrawer,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: _drawerOffset == 0 ? 1.0 : 0.0,
+                      child: Container(color: Colors.black54),
+                    ),
+                  ),
+                ),
+            
+            // DRAWER
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              left: _drawerOffset * (screenWidth),
+              top: 0,
+              bottom: 0,
+              width: screenWidth,
+              child: ContentDrawer(
+                notebookTitle: widget.notebookTitle,
+                primary: notebookColors.primary,
+                chapters: chapters, 
+                onChapterTap: _scrollToChapter, 
+                onBack: () => Navigator.of(context, rootNavigator: true).pop(),
+                ),
+            ),
+
+          // NOT FOUND
+          if (chapters.isEmpty && !viewModel.isLoading)
+            SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: screenWidth,
+                child: ColoredBox(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Center(child: Text("No chapters found in this notebook."))),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // Widget _buildBody(String rawBody) {
-  //   final lines = rawBody
-  //       .replaceAll(r'\\n', '<LITERAL_NEWLINE>')
-  //       .replaceAll(r'\\t', '<LITERAL_TAB>')
-  //       .replaceAll(r'\n', '\n')
-  //       .replaceAll(r'\t', '\t')
-  //       .replaceAll('<LITERAL_NEWLINE>', r'\n')
-  //       .replaceAll('<LITERAL_TAB>', r'\t')
-  //       .split('\n');
-
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: lines.map((line) {
-  //       final hasIndent = line.startsWith('\t') || line.startsWith('    ');
-  //       final indentWidth = 24.0; // match your tab size visually
-
-  //       return Padding(
-  //         padding: EdgeInsets.only(bottom: 4),
-  //         child: Row(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             if (hasIndent) SizedBox(width: indentWidth),
-  //             Expanded(
-  //               child: Text(
-  //                 hasIndent ? line.trimLeft() : line,
-  //                 style: const TextStyle(fontSize: 16, height: 1.5),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     }).toList(),
-  //   );
-  // }
+  Widget _buildNotebookContent(List<ChapterModel> chapters, _NotebookColorScheme notebookColors){
+    return SafeArea(
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: chapters.asMap().entries.map((entry) {
+            final index = entry.key;
+            final chapterModel = entry.value;
+            final chapter = chapterModel.chapter;
+        
+            return Container(
+              key: chapterModel.scrollKey,
+              padding: const EdgeInsets.only(bottom: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Text("CHAPTER ${index + 1}: "),
+                  ),
+                  Container(
+                    width: double.infinity, 
+                    decoration: BoxDecoration(
+                      color: notebookColors.primary,
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(40.0), bottomRight: Radius.circular(40.0)),
+                    ),
+                    padding: EdgeInsets.only(left: 10.0, top: 5.0, right: 35.0, bottom: 5.0),
+                    margin: EdgeInsets.only(right: 20.0),
+                    child: Text(
+                      chapter.header.toUpperCase(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontFamily: "LoveYaLikeASister",
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: MarkdownBody(
+                      data: chapter.body,
+                      selectable: true,
+                      styleSheet: MarkdownStyleSheet(
+                        p: const TextStyle(fontSize: 16, height: 1.5),
+                        listBullet: const TextStyle(fontSize: 16, height: 1.5),
+                        a: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                          ),
+                        blockquote: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                        blockquoteDecoration: BoxDecoration(
+                          color: notebookColors.secondary,
+                          borderRadius: BorderRadius.circular(15.0),
+                          ),
+                        horizontalRuleDecoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              width: 3.0,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
 }

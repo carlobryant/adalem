@@ -28,6 +28,7 @@ List<ChapterModel> get chapterModels => _chapterModels;
         _chapterModels = content.chapters
             .map((chapter) => ChapterModel(chapter: chapter))
             .toList();
+        await Future.delayed(Duration(milliseconds: 200));
       } else {
         _errorMessage = "Notebook content not found.";
       }

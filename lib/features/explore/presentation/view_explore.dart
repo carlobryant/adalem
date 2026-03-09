@@ -66,7 +66,7 @@ class ExploreViewState extends State<ExploreView> {
     }
     Navigator.of(context, rootNavigator: true)
       .push(MaterialPageRoute(
-        builder: (context) => ContentView(notebookId: id, image: image)
+        builder: (context) => ContentView(notebookId: id, notebookTitle: title, image: image)
         ));
   }
 
