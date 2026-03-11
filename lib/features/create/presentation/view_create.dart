@@ -31,22 +31,22 @@ class _CreateViewState extends State<CreateView> {
   void initState() {
     super.initState();
     _createViewModel = context.read<CreateViewModel>();
-    _createViewModel.addListener(_onViewModelChanged);
+    //_createViewModel.addListener(_onViewModelChanged);
   }
 
   @override
   void dispose() {
-    _createViewModel.removeListener(_onViewModelChanged);
+    //_createViewModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
-  void _onViewModelChanged() {
-    final viewModel = context.read<CreateViewModel>();
-    if(viewModel.createError != null) {
-      ToastCard.error(context, viewModel.createError!);
-      viewModel.clearCreateError();
-    }
-  }
+  // void _onViewModelChanged() {
+  //   final viewModel = context.read<CreateViewModel>();
+  //   if(viewModel.createError != null) {
+  //     ToastCard.error(context, viewModel.createError![0], description: viewModel.createError![1]);
+  //     viewModel.clearCreateError();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -157,8 +157,7 @@ class _CreateViewState extends State<CreateView> {
                     context: context,
                     onTap: () async {
                       ToastCard.clearError();
-                      if (!viewModel.validateCreate()) return;
-
+                      //if (viewModel.validateCreate() == false) return;
                       Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(builder: (context) => const CreatingView()),
                       );

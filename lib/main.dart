@@ -15,6 +15,7 @@ import 'package:adalem/features/notebook_content/data/repo_impl.dart';
 import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
 import 'package:adalem/features/notebooks/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebooks/domain/uc_getnotebookcount.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
@@ -58,7 +59,8 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => NotebookViewModel(
-            getNotebooks: GetNotebooks(notebookRepo), 
+            getNotebooks: GetNotebooks(notebookRepo),
+            getCurrentUser: GetCurrentUser(authRepo), 
           )..loadNotebooks(),
         ),
         ChangeNotifierProvider(
@@ -67,6 +69,7 @@ void main() async {
               contentRepo: contentRepo,
             ),
             getCurrentUser: GetCurrentUser(authRepo),
+            getNotebookCount: GetNotebookCount(notebookRepo),
             ),
           ),
         ChangeNotifierProvider(

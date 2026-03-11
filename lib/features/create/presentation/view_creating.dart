@@ -14,6 +14,7 @@ class CreatingView extends StatefulWidget {
 
 class _CreatingViewState extends State<CreatingView> {
   late final CreateViewModel _createViewModel;
+  bool _createError = false;
 
   @override
   void initState() {
@@ -34,25 +35,28 @@ class _CreatingViewState extends State<CreatingView> {
 
   void _onViewModelChanged() {
     if (_createViewModel.isCreating) return;
-
-    if (_createViewModel.isSuccess) {
+    if (_createViewModel.createError != null) {
+      setState(() {
+        _createError = true;
+      });
+      Navigator.of(context, rootNavigator: true).pop();
+      ToastCard.error(context, _createViewModel.createError![0], description: _createViewModel.createError![1]);
+      _createViewModel.clearCreateError();
+    }
+    else if (_createViewModel.isSuccess) {
       ToastCard.success(context, "Notebook Created!");
       _createViewModel.resetCreate();
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const Shell(initIndex: 1)),
         (route) => false,
       );
-    } else if (_createViewModel.createError != null) {
-      ToastCard.error(context, _createViewModel.createError!);
-      _createViewModel.clearCreateError();
-      Navigator.of(context, rootNavigator: true).pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: _createError,
       child: const Scaffold(
         body: MediumLoader(loading: ["Creating Structured Summary", "Generating Flashcards and Quiz", "Applying Cognitive Load Principles"]),
       ),

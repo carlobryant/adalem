@@ -3,10 +3,11 @@ import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:redacted/redacted.dart';
 
 class ContentDrawer extends StatefulWidget {
   final List<ChapterModel>? chapters;
-  final Function(GlobalKey)? onChapterTap;
+  final Function(int)? onChapterTap;
   final VoidCallback onBack;
   final Color primary;
   final String notebookTitle;
@@ -69,33 +70,45 @@ return Scaffold(
           ),
         ),
       ),
-
+     
       // DRAWER LIST
       body: Stack(
         children: [
-          widget.chapters == null || widget.onChapterTap == null ? 
-          const Center(child: Padding(
-            padding: EdgeInsets.only(bottom: 350),
-            child: MediumLoader(),
-          ))
-          : ListView.builder(
+          ListView.builder(
               controller: _scrollController,
-              itemCount: widget.chapters!.length,
+              itemCount: widget.chapters == null ? 10 : widget.chapters!.length,
               itemBuilder: (context, index) {
-                final chapterModel = widget.chapters![index];
-                final chapter = chapterModel.chapter;
+                final isLoading = widget.chapters == null || widget.onChapterTap == null;
+              
+                final headerText = isLoading 
+                ? "Fetching Chapters of ${widget.notebookTitle}..." 
+                : widget.chapters![index].chapter.header;
         
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  title: Text(
-                    "${index + 1}. ${chapter.header}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
+                  title: Row(
+                    children: [
+                      Text(
+                        "${index + 1}. ",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                        ),
+                      ).redacted(context: context, redact: isLoading),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text(headerText,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                          maxLines: 2,
+                        ).redacted(context: context, redact: isLoading),
+                      ),
+                    ],
                   ),
                   trailing: const Icon(Icons.chevron_right, size: 20),
-                  onTap: () => widget.onChapterTap!(chapterModel.scrollKey),
+                  onTap: isLoading ? null : () => widget.onChapterTap!(index),
                 );
               },
             ),
@@ -104,7 +117,7 @@ return Scaffold(
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
-              bottom: _isBottomBarVisible ? 0 : -210, 
+              bottom: _isBottomBarVisible ? 0 : -225, 
               left: 0,
               right: 0,
               child: Container(
@@ -129,22 +142,46 @@ return Scaffold(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        XLButton(child: Text(
-                          "Flashcards",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        XLButton(child: Column(
+                          children: [
+                            Text(
+                              "Flashcards",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              "Spaced-repetition review",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.inversePrimary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w100,
+                              ),
+                            ),
+                          ],
                         ), onTap: () {}),
                         SizedBox(height: 20),
-                        XLButton(child: Text(
-                          "Start Quiz",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        XLButton(child: Column(
+                          children: [
+                            Text(
+                              "Start Quiz",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              "Performance-based adaptive quiz",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.inversePrimary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w100,
+                              ),
+                            ),
+                          ],
                         ), onTap: () {}),
                       ],
                     ), 

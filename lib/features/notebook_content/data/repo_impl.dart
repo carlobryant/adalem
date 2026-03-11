@@ -10,8 +10,8 @@ class ContentRepositoryImpl implements ContentRepo {
       : _dataSource = dataSource;
 
   @override
-  Future<NotebookContent?> fetchContent(String notebookId) async {
-    return await _dataSource.fetchContent(notebookId);
+  Future<NotebookContent?> fetchContent(String notebookId) {
+    return _dataSource.fetchContent(notebookId);
   }
 
   @override
@@ -20,8 +20,8 @@ class ContentRepositoryImpl implements ContentRepo {
   }
 
   @override
-  Future<NotebookContent> parseContent() async {
-    return await _dataSource.parseContent();
+  Future<NotebookContent> parseContent() {
+    return _dataSource.parseContent();
   }
 
   @override
@@ -30,8 +30,8 @@ class ContentRepositoryImpl implements ContentRepo {
     required NotebookContent content,
     required String notebookId,
     required String contentId,
-  }) async {
-    await _dataSource.batchCreateNotebookAndContent(
+  }) {
+    return _dataSource.batchCreateNotebookAndContent(
       params: params,
       content: content,
       notebookId: notebookId,

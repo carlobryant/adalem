@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
@@ -10,10 +11,13 @@ enum SortOption {latest, oldest, alphabetical}
 class NotebookViewModel extends ChangeNotifier {
   StreamSubscription<List<Notebook>>? _subscription;
   final GetNotebooks _getNotebooks;
+  final GetCurrentUser _getCurrentUser;
 
   NotebookViewModel({
     required GetNotebooks getNotebooks,
-  })  : _getNotebooks = getNotebooks;
+    required GetCurrentUser getCurrentUser, 
+  })  : _getNotebooks = getNotebooks,
+        _getCurrentUser = getCurrentUser;
 
   String? _streamError;
   String? get streamError => _streamError;
@@ -70,7 +74,16 @@ class NotebookViewModel extends ChangeNotifier {
   _isLoading = true;
   notifyListeners();
 
-  _subscription = _getNotebooks().listen(
+    final currentUser = _getCurrentUser();
+
+    if (currentUser == null) {
+      _streamError = "User not logged in";
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+  _subscription = _getNotebooks(currentUser.uid).listen(
     (notebooks) {
       _notebooks = notebooks.map(NotebookModel.fromEntity).toList();
       _isLoading = false;

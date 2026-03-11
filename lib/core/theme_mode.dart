@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 
 const String _globalFont = "GoogleSans";
 Color _primary = Colors.green.shade900;

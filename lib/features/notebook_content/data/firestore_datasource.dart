@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:adalem/features/notebook_content/data/model_datasource.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,7 +34,7 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
 
       if (snapshot.docs.isEmpty) return null;
       final doc = snapshot.docs.first;
-      return _fromMap({'id': doc.id, ...doc.data()});
+      return NotebookContentDataModel.fromMap({'id': doc.id, ...doc.data()});
     } catch (_) {
       final snapshot = await _firestore
           .collection('content')
@@ -43,7 +44,7 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
 
       if (snapshot.docs.isEmpty) return null;
       final doc = snapshot.docs.first;
-      return _fromMap({'id': doc.id, ...doc.data()});
+      return NotebookContentDataModel.fromMap({'id': doc.id, ...doc.data()});
     }
   }
 
@@ -51,15 +52,7 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
   Future<NotebookContent> parseContent() async {
     final jsonString = await rootBundle.loadString('assets/dummy.json');
     final map = json.decode(jsonString) as Map<String, dynamic>;
-    return NotebookContent(
-      id: '',
-      title: map['title'] as String? ?? '',
-      chapterTotal: map['chapterTotal']?.toInt() ?? 0,
-      notebookId: '',
-      chapters: _parseMapToList(map['chapters'], _chapterFromMap),
-      items: _parseMapToList(map['items'], _quizItemFromMap),
-      scenarios: _parseMapToList(map['scenarios'], _scenarioFromMap),
-    );
+    return NotebookContentDataModel.fromMap({'id': '', ...map});
   }
 
   @override
@@ -88,7 +81,11 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
       'image': params.image,
       'contentId': contentId,
       'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
+      'updatedAt': {
+        'content': FieldValue.serverTimestamp(),
+        'flashcard': FieldValue.serverTimestamp(),
+        'quiz': FieldValue.serverTimestamp(),
+      },
       'available': true,
     });
 
@@ -115,62 +112,15 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
         }).toList(),
       ),
     });
+    
     await batch.commit();
   }
 
-  NotebookContent _fromMap(Map<String, dynamic> map) {
-    return NotebookContent(
-      id: map['id'] as String? ?? '',
-      title: map['title'] as String? ?? '',
-      chapterTotal: map['chapterTotal']?.toInt() ?? 0,
-      notebookId: map['notebook'] as String? ?? '',
-      chapters: _parseMapToList(map['chapters'], _chapterFromMap),
-      items: _parseMapToList(map['items'], _quizItemFromMap),
-      scenarios: _parseMapToList(map['scenarios'], _scenarioFromMap),
-    );
-  }
-
-  Chapter _chapterFromMap(Map<String, dynamic> map) {
-    return Chapter(
-      header: map['header'] as String? ?? '',
-      body: (map['body'] as String? ?? '').replaceAll('\\n', '\n'),
-    );
-  }
-
-  QuizItem _quizItemFromMap(Map<String, dynamic> map) {
-    return QuizItem(
-      text: map['text'] as String? ?? '',
-      answer: map['answer'] as String? ?? '',
-      difficulty: map['difficulty']?.toInt() ?? 1,
-    );
-  }
-
-  Scenario _scenarioFromMap(Map<String, dynamic> map) {
-    return Scenario(
-      text: map['text'] as String? ?? '',
-      options: List<String>.from(map['options'] ?? []),
-      answer: map['answer'] as String? ?? '',
-      difficulty: map['difficulty']?.toInt() ?? 1,
-    );
-  }
-
   Map<String, dynamic> _listToNumberedMap(List<Map<String, dynamic>> list) {
-  final map = <String, dynamic>{};
-  for (int i = 0; i < list.length; i++) {
-    map[i.toString()] = list[i];
-  }
-  return map;
-}
-
-  static List<T> _parseMapToList<T>(
-    dynamic mapData,
-    T Function(Map<String, dynamic>) fromMap,
-  ) {
-    if (mapData == null || mapData is! Map) return [];
-    final keys = mapData.keys.toList()
-      ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-    return keys.map((key) {
-      return fromMap(Map<String, dynamic>.from(mapData[key]));
-    }).toList();
+    final map = <String, dynamic>{};
+    for (int i = 0; i < list.length; i++) {
+      map[i.toString()] = list[i];
+    }
+    return map;
   }
 }

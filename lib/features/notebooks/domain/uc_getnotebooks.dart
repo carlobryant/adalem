@@ -2,11 +2,10 @@ import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 
 class GetNotebooks {
-  final NotebookRepo _notebookRepo;
+  final NotebookRepo _repository;
+  GetNotebooks(this._repository);
 
-  GetNotebooks(this._notebookRepo);
-
-   Stream<List<Notebook>> call() {
-    return _notebookRepo.fetchNotebooks();
+  Stream<List<Notebook>> call(String uid) {
+    return _repository.fetchNotebooks(uid);
   }
 }

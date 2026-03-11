@@ -27,6 +27,16 @@ class NotebookModel {
   });
 
   factory NotebookModel.fromEntity(Notebook notebook) {
+    String formattedUpdated = "";
+    
+    if (notebook.updatedAt.content != null) {
+      formattedUpdated = DateFormat("MMM d, yyyy-HH:mm").format(notebook.updatedAt.content!);
+    } else if (notebook.updatedAt.flashcard != null) {
+      formattedUpdated = DateFormat("MMM d, yyyy-HH:mm").format(notebook.updatedAt.flashcard!);
+    } else if (notebook.updatedAt.quiz != null) {
+      formattedUpdated = DateFormat("MMM d, yyyy-HH:mm").format(notebook.updatedAt.quiz!);
+    }
+
     return NotebookModel(
       id: notebook.id,
       owner: notebook.owner,
@@ -34,7 +44,7 @@ class NotebookModel {
         (key, value) => MapEntry(key, NotebookUserModel.fromEntity(value)),
       ),
       createdAt: DateFormat("MMM d, yyyy-HH:mm").format(notebook.createdAt),
-      updatedAt: DateFormat("MMM d, yyyy-HH:mm").format(notebook.updatedAt),
+      updatedAt: formattedUpdated, 
       title: notebook.title,
       course: notebook.course,
       image: notebook.image,
@@ -86,12 +96,12 @@ class NotebookUserModel {
 }
 
 class NotebookFlashcardModel {
-  final int cardId;
-  final int priority;
+  final int? cardId;
+  final int? priority;
 
   const NotebookFlashcardModel({
-    required this.cardId,
-    required this.priority,
+    this.cardId,
+    this.priority,
   });
 
   factory NotebookFlashcardModel.fromEntity(NotebookFlashcard flashcard) {
@@ -103,8 +113,8 @@ class NotebookFlashcardModel {
 
   factory NotebookFlashcardModel.empty() {
     return const NotebookFlashcardModel(
-      cardId: 0,
-      priority: 0,
+      cardId: null,
+      priority: null,
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:super_sliver_list/super_sliver_list.dart';
 
 class ContentView extends StatelessWidget {
   final String notebookId;
@@ -81,6 +82,7 @@ class _ContentViewContent extends StatefulWidget {
 }
 
 class _ContentViewContentState extends State<_ContentViewContent> {
+  final ListController _listController = ListController();
   late final ContentViewModel _viewModel;
 
   // DRAWER WIDGET
@@ -119,17 +121,16 @@ class _ContentViewContentState extends State<_ContentViewContent> {
     });
   }
 
-  void _scrollToChapter(GlobalKey key) {
+  void _scrollToChapter(int index) {
     _closeDrawer();
-    final ctx = key.currentContext;
-    if (ctx != null) {
-      Scrollable.ensureVisible(
-        ctx,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-        alignment: 0.0,
-      );
-    }
+
+    _listController.animateToItem(
+      index: index,
+      scrollController: _scrollController, 
+      alignment: 0.0,
+      duration: (estimatedDistance) => Duration(milliseconds: 2000),
+      curve: (estimatedDistance) => Curves.easeInOutCubic,
+    );
   }
 
   @override
@@ -259,84 +260,80 @@ class _ContentViewContentState extends State<_ContentViewContent> {
 
   Widget _buildNotebookContent(List<ChapterModel> chapters, _NotebookColorScheme notebookColors){
     return SafeArea(
-      child: SingleChildScrollView(
+      child: SuperListView.builder(
         controller: _scrollController,
+        listController: _listController,
         padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: chapters.asMap().entries.map((entry) {
-            final index = entry.key;
-            final chapterModel = entry.value;
-            final chapter = chapterModel.chapter;
-        
-            return Container(
-              key: chapterModel.scrollKey,
-              padding: const EdgeInsets.only(bottom: 40),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text("CHAPTER ${index + 1}: "),
+        itemCount: chapters.length,
+        itemBuilder: (context, index) {
+          final chapterModel = chapters[index];
+          final chapter = chapterModel.chapter;
+      
+          return Container(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Text("CHAPTER ${index + 1}: "),
+                ),
+                Container(
+                  width: double.infinity, 
+                  decoration: BoxDecoration(
+                    color: notebookColors.primary,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(40.0), bottomRight: Radius.circular(40.0)),
                   ),
-                  Container(
-                    width: double.infinity, 
-                    decoration: BoxDecoration(
-                      color: notebookColors.primary,
-                      borderRadius: BorderRadius.only(topRight: Radius.circular(40.0), bottomRight: Radius.circular(40.0)),
-                    ),
-                    padding: EdgeInsets.only(left: 10.0, top: 5.0, right: 35.0, bottom: 5.0),
-                    margin: EdgeInsets.only(right: 20.0),
-                    child: Text(
-                      chapter.header.toUpperCase(),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        fontFamily: "LoveYaLikeASister",
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 2,
-                        fontSize: 18,
-                      ),
+                  padding: EdgeInsets.only(left: 10.0, top: 5.0, right: 35.0, bottom: 5.0),
+                  margin: EdgeInsets.only(right: 20.0),
+                  child: Text(
+                    chapter.header.toUpperCase(),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontFamily: "LoveYaLikeASister",
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                      fontSize: 18,
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: MarkdownBody(
-                      data: chapter.body,
-                      selectable: true,
-                      styleSheet: MarkdownStyleSheet(
-                        p: const TextStyle(fontSize: 16, height: 1.5),
-                        listBullet: const TextStyle(fontSize: 16, height: 1.5),
-                        a: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                          ),
-                        blockquote: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-                        blockquoteDecoration: BoxDecoration(
-                          color: notebookColors.secondary,
-                          borderRadius: BorderRadius.circular(15.0),
-                          ),
-                        horizontalRuleDecoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              width: 3.0,
-                              style: BorderStyle.solid,
-                            ),
+                ),
+                const SizedBox(height: 15),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: MarkdownBody(
+                    data: chapter.body,
+                    selectable: true,
+                    styleSheet: MarkdownStyleSheet(
+                      p: const TextStyle(fontSize: 16, height: 1.5),
+                      listBullet: const TextStyle(fontSize: 16, height: 1.5),
+                      a: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                        ),
+                      blockquote: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+                      blockquoteDecoration: BoxDecoration(
+                        color: notebookColors.secondary,
+                        borderRadius: BorderRadius.circular(15.0),
+                        ),
+                      horizontalRuleDecoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            width: 3.0,
+                            style: BorderStyle.solid,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          );
+      }),
     );
   }
 }

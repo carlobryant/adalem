@@ -109,6 +109,17 @@ class ExploreViewState extends State<ExploreView> {
                   ),
                 ),
               ),
+              Material(
+                color: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                child: IconButton(
+                  onPressed: _filterSearch, 
+                  icon: Icon(Icons.select_all,
+                    size: 30,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              ),
             ],
           )
         ], 

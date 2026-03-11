@@ -1,15 +1,21 @@
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebooks/domain/uc_getnotebookcount.dart';
 import 'package:flutter/material.dart';
 
 class CreateViewModel extends ChangeNotifier {
   final CreateNotebook _createNotebook;
   final GetCurrentUser _getCurrentUser;
+  final GetNotebookCount _getNotebookCount;
 
   CreateViewModel({
     required CreateNotebook createNotebook,
     required GetCurrentUser getCurrentUser,
-  }) : _createNotebook = createNotebook, _getCurrentUser = getCurrentUser;
+    required GetNotebookCount getNotebookCount,
+  }) :  _createNotebook = createNotebook,
+        _getCurrentUser = getCurrentUser,
+        _getNotebookCount = getNotebookCount;
+
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController courseController = TextEditingController();
@@ -20,8 +26,8 @@ class CreateViewModel extends ChangeNotifier {
   bool _isCreating = false;
   bool get isCreating => _isCreating;
 
-  String? _createError;
-  String? get createError => _createError;
+  List<String>? _createError;
+  List<String>? get createError => _createError;
 
   bool _isSuccess = false;
   bool get isSuccess => _isSuccess;
@@ -32,32 +38,46 @@ class CreateViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool validateCreate() {
-    final title = titleController.text.trim();
-    final course = courseController.text.trim();
+  // bool validateCreate() {
+  //   final title = titleController.text.trim();
+  //   final course = courseController.text.trim();
 
-    if (title.isEmpty || course.isEmpty) {
-      _createError = "Please Fill in All Fields.";
-      notifyListeners();
-      return false;
-    }
-    return true;
-  }
+  //   if (title.isEmpty || course.isEmpty) {
+  //     _createError = ["Missing Details", "Please fill in all fields."];
+  //     notifyListeners();
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
   Future<void> handleCreate() async {
-    if (!validateCreate()) return;
-
-    _isCreating = true;
-    _createError = null;
-    notifyListeners();
-
     try {
-      final currentUser = _getCurrentUser();
-      
-      if (currentUser == null) {
-        _createError = "No User Authenticated.";
+      final title = titleController.text.trim();
+      final course = courseController.text.trim();
+
+      if (title.isEmpty || course.isEmpty) {
+        _createError = ["Missing Details", "Please fill in all fields."];
+        notifyListeners();
         return;
       }
+
+      final currentUser = _getCurrentUser();
+      if (currentUser == null) {
+        _createError = ["Unexpected Error", "No user is authenticated."];
+        notifyListeners();
+        return;
+      }
+
+      final currentCount = await _getNotebookCount(currentUser.uid);
+      if (currentCount >= 10) {
+        _createError =  ["Limit Reached!", "Notebook creation is limited for now."];
+        notifyListeners();
+        return; 
+      }
+
+      _isCreating = true;
+      _createError = null;
+      notifyListeners();
 
       final params = CreateNotebookParams(
         owner: currentUser.uid,
@@ -70,8 +90,7 @@ class CreateViewModel extends ChangeNotifier {
 
       _isSuccess = true;
     } catch (e) {
-      _createError = "Failed to Create, Please Try Again Later.";
-      //print("$e");
+      _createError = ["Failed to Create", "Please try again later."];
     } finally {
       _isCreating = false;
       notifyListeners();

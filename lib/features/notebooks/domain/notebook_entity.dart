@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Notebook {
   final String id;
   final String owner;
   final Map<String, NotebookUser> users;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final NotebookUpdatedAt updatedAt; 
   final String title;
   final String course;
   final String image;
@@ -24,23 +22,18 @@ class Notebook {
     required this.contentId,
     required this.available,
   });
+}
 
-  factory Notebook.fromMap(Map<String, dynamic> map) {
-    return Notebook(
-      id: map['id'] as String,
-      owner: map['owner'] as String? ?? '',
-      users: (map['users'] as Map<String, dynamic>? ?? {}).map(
-        (key, value) => MapEntry(key, NotebookUser.fromMap(value)),
-      ),
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
-      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
-      title: map['title'] as String? ?? '',
-      course: map['course'] as String? ?? '',
-      image: map['image'] as String? ?? '',
-      contentId: map['contentId'] as String? ?? '',
-      available: map['available'] as bool? ?? false,
-    );
-  }
+class NotebookUpdatedAt {
+  final DateTime? content;
+  final DateTime? flashcard;
+  final DateTime? quiz;
+
+  const NotebookUpdatedAt({
+    this.content,
+    this.flashcard,
+    this.quiz,
+  });
 }
 
 class NotebookUser {
@@ -51,30 +44,34 @@ class NotebookUser {
     required this.mastery,
     required this.flashcards,
   });
-
-  factory NotebookUser.fromMap(Map<String, dynamic> map) {
-    return NotebookUser(
-      mastery: map['mastery'] as int? ?? 0,
-      flashcards: (map['flashcards'] as List<dynamic>? ?? [])
-          .map((e) => NotebookFlashcard.fromMap(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
 }
 
 class NotebookFlashcard {
-  final int cardId;
-  final int priority;
+  final int? cardId; 
+  final int? priority;
 
   const NotebookFlashcard({
-    required this.cardId,
-    required this.priority,
+    this.cardId,     
+    this.priority, 
   });
+}
 
-  factory NotebookFlashcard.fromMap(Map<String, dynamic> map) {
-    return NotebookFlashcard(
-      cardId: map['cardId'] as int? ?? 0,
-      priority: map['priority'] as int? ?? 0,
-    );
-  }
+class NotebookHistory {
+  final String id;
+  final String notebookId;
+  final String uid;
+  final int quizLevel;
+  final double score;
+  final double mastery;
+  final DateTime createdAt;
+
+  const NotebookHistory({
+    required this.id,
+    required this.notebookId,
+    required this.uid,
+    required this.quizLevel,
+    required this.score,
+    required this.mastery,
+    required this.createdAt,
+  });
 }
