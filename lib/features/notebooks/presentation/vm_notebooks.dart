@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
@@ -12,21 +13,31 @@ class NotebookViewModel extends ChangeNotifier {
   StreamSubscription<List<Notebook>>? _subscription;
   final GetNotebooks _getNotebooks;
   final GetCurrentUser _getCurrentUser;
+  final GetUserProfile _getUserProfile;
 
   NotebookViewModel({
     required GetNotebooks getNotebooks,
-    required GetCurrentUser getCurrentUser, 
+    required GetCurrentUser getCurrentUser,
+    required GetUserProfile getUserProfile,
   })  : _getNotebooks = getNotebooks,
-        _getCurrentUser = getCurrentUser;
+        _getCurrentUser = getCurrentUser,
+        _getUserProfile = getUserProfile;
+
+
+  // NOTEBOOK SORT & SEARCH
+  String _searchQuery = "";
+  String get searchQuery => _searchQuery;
 
   String? _streamError;
   String? get streamError => _streamError;
 
-  String _searchQuery = "";
-  String get searchQuery => _searchQuery;
-
   SortOption _currentSort = SortOption.latest;
   SortOption get currentSort => _currentSort;
+
+    void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
 
   void setSortOption(SortOption option) async {
     _isLoading = true;
@@ -38,8 +49,6 @@ class NotebookViewModel extends ChangeNotifier {
   }
 
   List<NotebookModel> _notebooks = [];
-  //List<NotebookModel> get notebooks => _notebooks;
-  
   List<NotebookModel> get filteredNotebooks {
     var list = List<NotebookModel>.from(_notebooks);
     
@@ -63,6 +72,7 @@ class NotebookViewModel extends ChangeNotifier {
     return list;
   }
 
+  // LOAD NOTEBOOKS
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   
@@ -98,9 +108,38 @@ class NotebookViewModel extends ChangeNotifier {
     );
   }
 
-  void setSearchQuery(String query) {
-    _searchQuery = query;
+  // FETCH OWNER
+  AuthUser? _ownerData;
+  AuthUser? get ownerData => _ownerData;
+
+  bool _isLoadingOwner = true;
+  bool get isLoadingOwner => _isLoadingOwner;
+
+  Future<void> fetchOwnerDetails(String ownerId) async {
+    _isLoadingOwner = true;
     notifyListeners();
+
+    _ownerData = await _getUserProfile(ownerId);
+
+    _isLoadingOwner = false;
+    notifyListeners();
+  }
+
+  // CLEARING NOTEBOOKS
+  void clearStreamError() {
+    _streamError = null;
+    notifyListeners();
+  }
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+  
+    @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   void clearData() {
@@ -109,22 +148,6 @@ class NotebookViewModel extends ChangeNotifier {
     _streamError = null;
     _errorMessage = null;
     _subscription?.cancel();
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
-
-  void clearStreamError() {
-    _streamError = null;
-    notifyListeners();
-  }
-
-  void clearError() {
-    _errorMessage = null;
     notifyListeners();
   }
 }

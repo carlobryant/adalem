@@ -7,6 +7,8 @@ class VerticalNotebookCard extends StatelessWidget {
   final String updatedAt;
   final String image;
   final bool isLoading;
+  final VoidCallback? onDelete;
+  final VoidCallback? onShare;
 
   const VerticalNotebookCard({
     super.key,
@@ -15,6 +17,8 @@ class VerticalNotebookCard extends StatelessWidget {
     required this.updatedAt,
     required this.image,
     required this.isLoading,
+    this.onDelete,
+    this.onShare,
   });
 
   @override
@@ -69,23 +73,90 @@ class VerticalNotebookCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 
                 children: [ 
-                  isLoading ?
-                  Container(
-                    height: 20,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ).redacted(context: context, redact: true)
-                  : Text(
-                    title,
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  Stack(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: isLoading ?
+                            Container(
+                              height: 20,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ).redacted(context: context, redact: true)
+                            : Text(
+                              title,
+                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                        ],
+
+                      ),
+
+                      if (!isLoading && (onDelete != null || onShare != null))
+                          Positioned(
+                            right: 0,
+                            child: SizedBox(
+                              width: 30,
+                              child: PopupMenuButton<String>(
+                                icon: Padding(
+                                  padding: EdgeInsetsGeometry.only(left: 10),
+                                  child: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.inverseSurface),
+                                ), 
+                                iconSize: 20,
+                                padding: EdgeInsets.zero,
+                                menuPadding: EdgeInsets.zero,
+                                borderRadius: BorderRadius.circular(40),
+                                onSelected: (value) {
+                                  if (value == "share") {
+                                    onShare!();
+                                  } else if (value == "delete") {
+                                    onDelete!();
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) => [
+                                  if (onShare != null)
+                                  PopupMenuItem(
+                                    value: "share",
+                                    child: ListTile(
+                                      leading: Icon(Icons.outbond_outlined,
+                                        color: Theme.of(context).colorScheme.inverseSurface,
+                                      ),
+                                      title: Text("Share",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.inverseSurface,
+                                        fontWeight: FontWeight.w900
+                                      ))
+                                    ),
+                                  ),
+                                  if (onDelete != null)
+                                  PopupMenuItem(
+                                    value: "delete",
+                                    child: ListTile(
+                                      leading: Icon(Icons.highlight_remove_rounded,
+                                        color: Theme.of(context).colorScheme.error,
+                                      ),
+                                      title: Text("Delete",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.error,
+                                        fontWeight: FontWeight.w900
+                                      ))
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                    ],
                   ),
             
                   Spacer(),

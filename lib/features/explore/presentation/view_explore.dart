@@ -1,7 +1,12 @@
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
+import 'package:adalem/features/notebook_content/domain/content_repo.dart';
+import 'package:adalem/features/notebook_content/domain/uc_deletenotebook.dart';
 import 'package:adalem/features/notebook_content/presentation/view_content.dart';
+import 'package:adalem/features/notebook_content/presentation/view_deletenotebook.dart';
+import 'package:adalem/features/notebook_content/presentation/vm_delete.dart';
+import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 import 'package:adalem/features/notebooks/presentation/view_searchbar.dart';
 import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
@@ -109,17 +114,6 @@ class ExploreViewState extends State<ExploreView> {
                   ),
                 ),
               ),
-              Material(
-                color: Theme.of(context).colorScheme.primary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                child: IconButton(
-                  onPressed: _filterSearch, 
-                  icon: Icon(Icons.select_all,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                ),
-              ),
             ],
           )
         ], 
@@ -195,6 +189,29 @@ class ExploreViewState extends State<ExploreView> {
             updatedAt: notebook.updatedAt,
             image: notebook.image,
             isLoading: viewModel.isLoading,
+            onDelete: () async {
+              await viewModel.fetchOwnerDetails(notebook.owner);
+              if (!context.mounted) return;
+              
+              Navigator.of(context, rootNavigator: true).push(
+                MaterialPageRoute(
+                  builder: (context) => ChangeNotifierProvider(
+                    create: (context) => DeleteViewModel(
+                      deleteNotebook: DeleteNotebook(context.read<ContentRepo>()),
+                      ),
+                    child: DeleteNotebookView(
+                      notebookId: notebook.id,
+                      contentId: notebook.contentId,
+                      title: notebook.title,
+                      course: notebook.course,
+                      image: notebook.image,
+                      ownerName: viewModel.ownerData?.name ?? "Unknown",
+                      ownerImage: viewModel.ownerData?.photoURL ?? "",
+                    ),
+                  ),
+                ),
+              );
+            }
           ),
         );
       },

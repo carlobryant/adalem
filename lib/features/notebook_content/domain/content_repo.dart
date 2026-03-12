@@ -11,4 +11,9 @@ abstract class ContentRepo {
     required String notebookId,
     required String contentId,
   });
+  Future<void> deleteOrLeaveNotebook({
+    required String notebookId,
+    required String contentId,
+    required String userId,
+  });
 }

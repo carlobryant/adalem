@@ -1,20 +1,22 @@
-import 'dart:io';
-import 'package:adalem/core/components/loader_md.dart';
+
 import 'package:adalem/features/auth/data/google_datasource.dart';
 import 'package:adalem/features/auth/data/repo_impl.dart';
+import 'package:adalem/features/auth/domain/auth_repo.dart';
 import 'package:adalem/features/auth/domain/uc_getauthstate.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
 import 'package:adalem/features/auth/domain/uc_signout.dart';
-import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/config/firebase_options.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:adalem/features/notebook_content/data/firestore_datasource.dart';
 import 'package:adalem/features/notebook_content/data/repo_impl.dart';
+import 'package:adalem/features/notebook_content/domain/content_repo.dart';
+import 'package:adalem/features/notebook_content/domain/uc_deletenotebook.dart';
 import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
 import 'package:adalem/features/notebooks/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
+import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebookcount.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
@@ -42,16 +44,23 @@ void main() async {
   final authRepo = AuthRepositoryImpl(dataSource: AuthRemoteDataSourceImpl());
   final notebookRepo = NotebookRepositoryImpl(dataSource: FirestoreDataSourceImpl());
   final contentRepo = ContentRepositoryImpl(dataSource: ContentDataSourceImpl());
+
   final getAuthState = GetAuthState(authRepo);
+  final getUserProfile = GetUserProfile(authRepo);
 
   runApp(
     MultiProvider(
       providers: [
-        Provider.value(value: authRepo),
-        Provider.value(value: notebookRepo),
-        Provider.value(value: contentRepo),
-        Provider.value(value: getAuthState),
+        // INTERFACE PROVIDERS
+        Provider<AuthRepo>.value(value: authRepo),
+        Provider<NotebookRepo>.value(value: notebookRepo),
+        Provider<ContentRepo>.value(value: contentRepo),
 
+        // GLOBAL USE CASES
+        Provider.value(value: getAuthState),
+        Provider.value(value: getUserProfile),
+
+        // GLOBAL VIEWMODELS
         ChangeNotifierProvider(
         create: (_) => LoginViewModel(
           signInWithGoogle: SignInWithGoogle(authRepo),
@@ -60,7 +69,8 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => NotebookViewModel(
             getNotebooks: GetNotebooks(notebookRepo),
-            getCurrentUser: GetCurrentUser(authRepo), 
+            getCurrentUser: GetCurrentUser(authRepo),
+            getUserProfile: getUserProfile,
           )..loadNotebooks(),
         ),
         ChangeNotifierProvider(

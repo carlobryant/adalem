@@ -37,19 +37,7 @@ class CreateViewModel extends ChangeNotifier {
     _createError = null;
     notifyListeners();
   }
-
-  // bool validateCreate() {
-  //   final title = titleController.text.trim();
-  //   final course = courseController.text.trim();
-
-  //   if (title.isEmpty || course.isEmpty) {
-  //     _createError = ["Missing Details", "Please fill in all fields."];
-  //     notifyListeners();
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
+  
   Future<void> handleCreate() async {
     try {
       final title = titleController.text.trim();

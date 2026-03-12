@@ -38,4 +38,17 @@ class ContentRepositoryImpl implements ContentRepo {
       contentId: contentId,
     );
   }
+
+  @override
+  Future<void> deleteOrLeaveNotebook({
+    required String notebookId,
+    required String contentId,
+    required String userId,
+  }) async {
+    await _dataSource.deleteOrLeaveNotebook(
+      notebookId: notebookId,
+      contentId: contentId,
+      userId: userId,
+    );
+  }
 }

@@ -14,8 +14,6 @@ class CreateView extends StatefulWidget {
 }
 
 class _CreateViewState extends State<CreateView> {
-  late final CreateViewModel _createViewModel;
-
   final List<String> _imageOptions = [
     "red",
     "orange",
@@ -26,27 +24,6 @@ class _CreateViewState extends State<CreateView> {
     "pink",
     "grey",
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _createViewModel = context.read<CreateViewModel>();
-    //_createViewModel.addListener(_onViewModelChanged);
-  }
-
-  @override
-  void dispose() {
-    //_createViewModel.removeListener(_onViewModelChanged);
-    super.dispose();
-  }
-
-  // void _onViewModelChanged() {
-  //   final viewModel = context.read<CreateViewModel>();
-  //   if(viewModel.createError != null) {
-  //     ToastCard.error(context, viewModel.createError![0], description: viewModel.createError![1]);
-  //     viewModel.clearCreateError();
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +134,6 @@ class _CreateViewState extends State<CreateView> {
                     context: context,
                     onTap: () async {
                       ToastCard.clearError();
-                      //if (viewModel.validateCreate() == false) return;
                       Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(builder: (context) => const CreatingView()),
                       );

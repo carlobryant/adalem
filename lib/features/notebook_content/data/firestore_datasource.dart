@@ -8,12 +8,19 @@ import 'package:flutter/services.dart';
 abstract class FirestoreContentDataSource {
   Future<NotebookContent?> fetchContent(String notebookId);
   Future<NotebookContent> parseContent();
+
   ({String notebookId, String contentId}) generateIds();
   Future<void> batchCreateNotebookAndContent({
     required CreateNotebookParams params,
     required NotebookContent content,
     required String notebookId,
     required String contentId,
+  });
+
+  Future<void> deleteOrLeaveNotebook({
+    required String notebookId,
+    required String contentId,
+    required String userId,
   });
 }
 
@@ -116,6 +123,42 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
     await batch.commit();
   }
 
+  @override
+  Future<void> deleteOrLeaveNotebook({
+    required String notebookId,
+    required String contentId,
+    required String userId,
+  }) async {
+    final notebookRef = _firestore.collection('notebooks').doc(notebookId);
+
+    DocumentSnapshot<Map<String, dynamic>> snapshot;
+    try {
+      snapshot = await notebookRef.get(const GetOptions(source: Source.serverAndCache));
+    } catch (_) {
+      snapshot = await notebookRef.get(const GetOptions(source: Source.cache));
+    }
+
+    if (!snapshot.exists || snapshot.data() == null) return;
+
+    final data = snapshot.data()!;
+    final usersMap = data['users'] as Map<String, dynamic>? ?? {};
+
+    if (usersMap.length > 1) {
+
+      await notebookRef.update({
+        'users.$userId': FieldValue.delete(),
+      });
+      
+    } else {
+      final batch = _firestore.batch();
+      
+      batch.delete(notebookRef);
+      batch.delete(_firestore.collection('content').doc(contentId));
+      
+      await batch.commit();
+    }
+  }
+  
   Map<String, dynamic> _listToNumberedMap(List<Map<String, dynamic>> list) {
     final map = <String, dynamic>{};
     for (int i = 0; i < list.length; i++) {
