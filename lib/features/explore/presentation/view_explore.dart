@@ -4,9 +4,8 @@ import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
 import 'package:adalem/features/notebook_content/domain/uc_deletenotebook.dart';
 import 'package:adalem/features/notebook_content/presentation/view_content.dart';
-import 'package:adalem/features/notebook_content/presentation/view_deletenotebook.dart';
+import 'package:adalem/features/notebook_content/presentation/view_delete.dart';
 import 'package:adalem/features/notebook_content/presentation/vm_delete.dart';
-import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 import 'package:adalem/features/notebooks/presentation/view_searchbar.dart';
 import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
@@ -56,7 +55,13 @@ class ExploreViewState extends State<ExploreView> {
     );
   }
 
-  void _redirectToContent(String title, String id, String image, bool available, String? contentId) {
+  void _redirectToContent(
+    String title, 
+    String id, 
+    String image, 
+    bool available, 
+    String? contentId
+  ) {
     if(contentId==null) {
       ToastCard.clearError();
       if(!available) {

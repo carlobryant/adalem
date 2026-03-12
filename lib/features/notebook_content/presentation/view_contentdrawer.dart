@@ -1,13 +1,16 @@
 import 'package:adalem/core/components/button_xl.dart';
-import 'package:adalem/core/components/loader_md.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
+import 'package:adalem/features/notebook_content/presentation/vm_content.dart';
+import 'package:adalem/features/study/presentation/view_flashcard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 import 'package:redacted/redacted.dart';
 
 class ContentDrawer extends StatefulWidget {
   final List<ChapterModel>? chapters;
   final Function(int)? onChapterTap;
+  final String notebookId;
   final VoidCallback onBack;
   final Color primary;
   final String notebookTitle;
@@ -16,6 +19,7 @@ class ContentDrawer extends StatefulWidget {
     super.key,
     this.chapters,
     this.onChapterTap,
+    required this.notebookId,
     required this.onBack,
     required this.primary,
     required this.notebookTitle,
@@ -49,7 +53,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
 
    @override
   Widget build(BuildContext context) {
-return Scaffold(
+  return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       
       // DRAWER HEADER
@@ -142,7 +146,21 @@ return Scaffold(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        XLButton(child: Column(
+                        XLButton(
+                          onTap: () {
+                            final viewModel = context.read<ContentViewModel>();
+                            viewModel.loadNotebookContent(
+                              widget.notebookId,
+                              load: {ContentType.flashcards},
+                            );
+
+                            Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(builder: (_) => FlashcardView(
+                                viewModel: viewModel, 
+                              )),
+                            );
+                          },
+                          child: Column(
                           children: [
                             Text(
                               "Flashcards",
@@ -161,9 +179,11 @@ return Scaffold(
                               ),
                             ),
                           ],
-                        ), onTap: () {}),
+                        )),
                         SizedBox(height: 20),
-                        XLButton(child: Column(
+                        XLButton(
+                          onTap: () {},
+                          child: Column(
                           children: [
                             Text(
                               "Start Quiz",
@@ -182,7 +202,7 @@ return Scaffold(
                               ),
                             ),
                           ],
-                        ), onTap: () {}),
+                        )),
                       ],
                     ), 
                   ),

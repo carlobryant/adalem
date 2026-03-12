@@ -1,4 +1,4 @@
-import 'package:adalem/features/notebook_content/data/repo_impl.dart';
+import 'package:adalem/features/notebook_content/domain/content_repo.dart';
 import 'package:adalem/features/notebook_content/domain/uc_getcontent.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
 import 'package:adalem/features/notebook_content/presentation/view_contentdrawer.dart';
@@ -27,14 +27,14 @@ class ContentView extends StatelessWidget {
       create: (context) {
         final viewModel = ContentViewModel(
           getContent: GetContent(
-            context.read<ContentRepositoryImpl>(),
+            context.read<ContentRepo>(),
           ),
         );
 
         Future.microtask(() => viewModel.loadNotebookContent(notebookId));
         return viewModel;
       },
-      child: _ContentViewContent(
+      child: _ContentView(
         notebookId: notebookId,
         notebookTitle: notebookTitle,
         image: image,
@@ -50,21 +50,21 @@ class _NotebookColorScheme {
   const _NotebookColorScheme({
     required this.primary,
     required this.secondary
-    });
+  });
 }
 
-class _ContentViewContent extends StatefulWidget {
+class _ContentView extends StatefulWidget {
   final String notebookId;
   final String notebookTitle;
   final String image;
-  const _ContentViewContent({
+  const _ContentView({
     required this.notebookId,
     required this.notebookTitle,
     required this.image
     });
 
   @override
-  State<_ContentViewContent> createState() => _ContentViewContentState();
+  State<_ContentView> createState() => _ContentViewState();
 
   _NotebookColorScheme _nbColors(String image) {
     switch(image) {
@@ -81,7 +81,7 @@ class _ContentViewContent extends StatefulWidget {
   }
 }
 
-class _ContentViewContentState extends State<_ContentViewContent> {
+class _ContentViewState extends State<_ContentView> {
   final ListController _listController = ListController();
   late final ContentViewModel _viewModel;
 
@@ -142,12 +142,13 @@ class _ContentViewContentState extends State<_ContentViewContent> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ContentViewModel>();
-     final notebookColors = widget._nbColors(widget.image);
+    final notebookColors = widget._nbColors(widget.image);
 
     if(viewModel.isLoading) {
       return Scaffold(
         body: ContentDrawer(
           onBack: () => Navigator.of(context, rootNavigator: true).pop(),
+          notebookId: widget.notebookId,
           primary: notebookColors.primary,
           notebookTitle: widget.notebookTitle,
           ),
@@ -239,6 +240,7 @@ class _ContentViewContentState extends State<_ContentViewContent> {
                 primary: notebookColors.primary,
                 chapters: chapters, 
                 onChapterTap: _scrollToChapter, 
+                notebookId: widget.notebookId,
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
                 ),
             ),
