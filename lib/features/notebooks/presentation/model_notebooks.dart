@@ -97,24 +97,47 @@ class NotebookUserModel {
 
 class NotebookFlashcardModel {
   final int? cardId;
-  final int? priority;
+  final int? quality;
+  final int? repetitions;
+  final double? easeFactor;
+  final int? interval;
+  final DateTime? dueAt;
+  final bool isDue;
 
   const NotebookFlashcardModel({
     this.cardId,
-    this.priority,
+    this.quality,
+    this.repetitions,
+    this.easeFactor,
+    this.interval,
+    this.dueAt,
+    this.isDue = false,
   });
 
   factory NotebookFlashcardModel.fromEntity(NotebookFlashcard flashcard) {
     return NotebookFlashcardModel(
       cardId: flashcard.cardId,
-      priority: flashcard.priority,
+      quality: flashcard.quality,
+      repetitions: flashcard.repetitions,
+      easeFactor: flashcard.easeFactor,
+      interval: flashcard.interval,
+      dueAt: flashcard.dueAt,
+      isDue: flashcard.dueAt != null
+          ? !flashcard.dueAt!.isAfter(DateTime.now())
+          : true,
     );
   }
 
   factory NotebookFlashcardModel.empty() {
-    return const NotebookFlashcardModel(
+    return NotebookFlashcardModel(
       cardId: null,
-      priority: null,
+      quality: null,
+      repetitions: 0,
+      easeFactor: 2.5,
+      interval: 0,
+      dueAt: DateTime.now(),
+      isDue: true,
     );
   }
+
 }

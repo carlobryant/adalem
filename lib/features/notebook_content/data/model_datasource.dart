@@ -25,13 +25,13 @@ class NotebookContentDataModel extends NotebookContent {
 
   static List<T> _parseMapToList<T>(
     dynamic mapData,
-    T Function(Map<String, dynamic>) fromMap,
+    T Function(String key, Map<String, dynamic>) fromMap,
   ) {
     if (mapData == null || mapData is! Map) return [];
     final keys = mapData.keys.toList()
       ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
     return keys.map((key) {
-      return fromMap(Map<String, dynamic>.from(mapData[key]));
+      return fromMap(key, Map<String, dynamic>.from(mapData[key]));
     }).toList();
   }
 }
@@ -39,7 +39,7 @@ class NotebookContentDataModel extends NotebookContent {
 class ChapterDataModel extends Chapter {
   const ChapterDataModel({required super.header, required super.body});
 
-  factory ChapterDataModel.fromMap(Map<String, dynamic> map) {
+  factory ChapterDataModel.fromMap(String _, Map<String, dynamic> map) {
     return ChapterDataModel(
       header: map['header'] as String? ?? '',
       body: (map['body'] as String? ?? '').replaceAll('\\n', '\n'),
@@ -49,13 +49,15 @@ class ChapterDataModel extends Chapter {
 
 class QuizItemDataModel extends QuizItem {
   const QuizItemDataModel({
+    required super.id,
     required super.text,
     required super.answer,
     required super.difficulty,
   });
 
-  factory QuizItemDataModel.fromMap(Map<String, dynamic> map) {
+  factory QuizItemDataModel.fromMap(String key, Map<String, dynamic> map) {
     return QuizItemDataModel(
+      id: int.parse(key),
       text: map['text'] as String? ?? '',
       answer: map['answer'] as String? ?? '',
       difficulty: map['difficulty']?.toInt() ?? 1,
@@ -71,7 +73,7 @@ class ScenarioDataModel extends Scenario {
     required super.difficulty,
   });
 
-  factory ScenarioDataModel.fromMap(Map<String, dynamic> map) {
+  factory ScenarioDataModel.fromMap(String _, Map<String, dynamic> map) {
     return ScenarioDataModel(
       text: map['text'] as String? ?? '',
       options: List<String>.from(map['options'] ?? []),

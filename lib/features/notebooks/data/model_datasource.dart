@@ -69,15 +69,36 @@ class NotebookUserDataModel extends NotebookUser {
 
 class NotebookFlashcardDataModel extends NotebookFlashcard {
   const NotebookFlashcardDataModel({
-    super.cardId,  
-    super.priority,
+    super.cardId,
+    super.quality,
+    super.repetitions,
+    super.easeFactor,
+    super.interval,
+    super.dueAt,
   });
 
   factory NotebookFlashcardDataModel.fromMap(Map<String, dynamic> map) {
     return NotebookFlashcardDataModel(
-      cardId: map['cardId'] as int?,     
-      priority: map['priority'] as int?, 
+      cardId: map['cardId'] as int?,
+      quality: map['quality'] as int?,
+      repetitions: map['repetitions'] as int?,
+      easeFactor: map['easeFactor'] as double?,
+      interval: map['interval'] as int?,
+      dueAt: map['dueAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['dueAt'] as int)
+          : null,
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'cardId': cardId,
+      'quality': quality,
+      'repetitions': repetitions,
+      'easeFactor': easeFactor,
+      'interval': interval,
+      'dueAt': dueAt?.millisecondsSinceEpoch,
+    };
   }
 }
 

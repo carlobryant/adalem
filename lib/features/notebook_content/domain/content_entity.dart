@@ -29,11 +29,13 @@ class Chapter {
 }
 
 class QuizItem {
+  final int id;
   final String text;
   final String answer;
   final int difficulty;
 
   const QuizItem({
+    required this.id,
     required this.text,
     required this.answer,
     required this.difficulty,

@@ -1,5 +1,6 @@
 import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
 import 'package:adalem/features/notebooks/data/model_datasource.dart';
+import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 
 class NotebookRepositoryImpl implements NotebookRepo {
@@ -17,5 +18,18 @@ class NotebookRepositoryImpl implements NotebookRepo {
   @override
   Future<int> getNotebookCount(String uid) {
     return _dataSource.getNotebookCount(uid);
+  }
+
+    @override
+  Future<void> syncFlashcards({
+    required String notebookId,
+    required String uid,
+    required List<NotebookFlashcard> progress,
+  }) {
+    return _dataSource.syncFlashcards(
+      notebookId: notebookId,
+      uid: uid,
+      progress: progress,
+    );
   }
 }

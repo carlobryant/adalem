@@ -125,6 +125,26 @@ class NotebookViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // FETCH PROGRESS
+  List<NotebookFlashcard> getProgressFor(String notebookId, String uid) {
+    final notebook = _notebooks.firstWhere(
+      (n) => n.id == notebookId,
+      orElse: () => NotebookModel.empty(),
+    );
+
+    final userModel = notebook.users[uid];
+    if (userModel == null) return [];
+
+    return userModel.flashcards.map((model) => NotebookFlashcard(
+      cardId: model.cardId,
+      quality: model.quality,
+      repetitions: model.repetitions,
+      easeFactor: model.easeFactor,
+      interval: model.interval,
+      dueAt: model.dueAt,
+    )).toList();
+  }
+
   // CLEARING NOTEBOOKS
   void clearStreamError() {
     _streamError = null;

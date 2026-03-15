@@ -1,6 +1,6 @@
 import 'package:adalem/features/notebook_content/domain/uc_getcontent.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
-import 'package:adalem/features/study/presentation/model_quiz.dart';
+import 'package:adalem/features/flashcards/presentation/model_quiz.dart';
 import 'package:flutter/material.dart';
 
 enum ContentType { chapters, flashcards, quiz }

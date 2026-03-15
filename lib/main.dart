@@ -9,10 +9,10 @@ import 'package:adalem/features/auth/domain/uc_signout.dart';
 import 'package:adalem/config/firebase_options.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
+import 'package:adalem/features/flashcards/domain/uc_syncflashcards.dart';
 import 'package:adalem/features/notebook_content/data/firestore_datasource.dart';
 import 'package:adalem/features/notebook_content/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
-import 'package:adalem/features/notebook_content/domain/uc_deletenotebook.dart';
 import 'package:adalem/features/notebooks/data/firestore_datasource.dart';
 import 'package:adalem/features/notebooks/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
@@ -47,6 +47,7 @@ void main() async {
 
   final getAuthState = GetAuthState(authRepo);
   final getUserProfile = GetUserProfile(authRepo);
+  final syncFlashcards = SyncFlashcards(notebookRepo);
 
   runApp(
     MultiProvider(
@@ -59,6 +60,7 @@ void main() async {
         // GLOBAL USE CASES
         Provider.value(value: getAuthState),
         Provider.value(value: getUserProfile),
+        Provider.value(value: syncFlashcards),
 
         // GLOBAL VIEWMODELS
         ChangeNotifierProvider(

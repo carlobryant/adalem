@@ -51,22 +51,3 @@ ThemeData get darkMode => ThemeData(
     displayColor: Colors.white,
     ),
 );
-  
-// class FontScale {
-//   static const String _fontSizeKey = "font_size_scale";
-//   static final _storage = GetStorage();
-
-//   static const Map<String, double> fontSizeScales = {
-//     'Small': 0.8,
-//     'Normal': 1.0,
-//     'Large': 1.2,
-//     'Extra Large': 1.4,
-//   };
-
-//   static double get currentFontScale => _storage.read(_fontSizeKey) ?? fontSizeScales['Extra Large']!;
-
-//   static Future<void> setFontScale(double scale) async {
-//     await _storage.write(_fontSizeKey, scale);
-//   }
-// }
-

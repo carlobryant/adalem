@@ -47,12 +47,20 @@ class NotebookUser {
 }
 
 class NotebookFlashcard {
-  final int? cardId; 
-  final int? priority;
+  final int? cardId;
+  final int? quality;
+  final int? repetitions;
+  final double? easeFactor;
+  final int? interval;
+  final DateTime? dueAt;    
 
   const NotebookFlashcard({
-    this.cardId,     
-    this.priority, 
+    this.cardId,
+    this.quality,
+    this.repetitions,
+    this.easeFactor,
+    this.interval,
+    this.dueAt,
   });
 }
 
