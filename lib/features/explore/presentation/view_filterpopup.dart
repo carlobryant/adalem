@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adalem/core/components/button_sm.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,7 @@ class _FilterPopupState extends State<FilterPopup> {
             tag: heroFilterTag,
             createRectTween: (begin, end) => PopupTween(begin: begin, end: end),
             child: Material(
+              shadowColor: Colors.transparent,
               color: Theme.of(context).colorScheme.surface,
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -78,26 +80,13 @@ class _FilterPopupState extends State<FilterPopup> {
                             const SizedBox(height: 20),
                             Align(
                               alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.onSurface,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                  child: Text("Cancel",
+                              child: SmallButton(
+                                onBack: () => Navigator.of(context).pop(),
+                                child: Text("Cancel",
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.onPrimary,
                                       fontSize: 16,
-                                      ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
+                                    ),
                                 ),
                               ),
                             ),

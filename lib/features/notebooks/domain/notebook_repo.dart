@@ -8,4 +8,9 @@ abstract class NotebookRepo {
   required String uid,
   required List<NotebookFlashcard> progress,
   });
+  Future<void> syncQuizHistory({
+    required String notebookId,
+    required String uid,
+    required NotebookHistory history,
+  });
 }

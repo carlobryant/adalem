@@ -32,4 +32,17 @@ class NotebookRepositoryImpl implements NotebookRepo {
       progress: progress,
     );
   }
+
+  @override
+  Future<void> syncQuizHistory({
+    required String notebookId,
+    required String uid,
+    required NotebookHistory history,
+  }) {
+    return _dataSource.syncQuizHistory(
+      notebookId: notebookId,
+      uid: uid,
+      history: history,
+    );
+  }
 }

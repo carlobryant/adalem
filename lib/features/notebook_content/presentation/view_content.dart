@@ -155,7 +155,7 @@ class _ContentViewState extends State<_ContentView> {
       );
     }
 
-    if (viewModel.errorMessage != null) {
+    if (viewModel.error != null) {
       return Scaffold(
         body: Center(
           child: Column(
@@ -163,7 +163,8 @@ class _ContentViewState extends State<_ContentView> {
             children: [
               const Icon(Icons.error_outline, color: Colors.red, size: 50),
               const SizedBox(height: 16),
-              Text(viewModel.errorMessage!),
+              Text(viewModel.error!.header),
+              Text(viewModel.error!.description),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => _viewModel.loadNotebookContent(widget.notebookId),

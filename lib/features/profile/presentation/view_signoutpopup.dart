@@ -1,3 +1,4 @@
+import 'package:adalem/core/components/button_sm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -22,12 +23,14 @@ class _SignOutPopupState extends State<SignOutPopup> {
   @override
   Widget build(BuildContext context) {
     final cardWidth = MediaQuery.of(context).size.width - 64;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Hero(
           tag: heroSignoutTag,
           child: Material(
+            shadowColor: Colors.transparent,
             color: Theme.of(context).colorScheme.surface,
             elevation: 4,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -77,59 +80,34 @@ class _SignOutPopupState extends State<SignOutPopup> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.onSurface,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                  child: Text("Cancel",
+                              SmallButton(
+                                onBack: () => Navigator.of(context).pop(),
+                                child: Text("Cancel",
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.onPrimary,
                                       fontSize: 16,
                                       ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
                                 ),
                               ),
 
                               const SizedBox(width: 12),
 
-                              TextButton(
-                                onPressed: () {
+                              SmallButton(
+                                onTap: () {
                                   Navigator.of(context).pop();
                                   widget.onConfirm();
-                                  },
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  child: Text("Confirm",
+                                },
+                                child: Text("Confirm",
                                     style: TextStyle(
                                       color: Theme.of(context).colorScheme.onPrimary,
                                       fontSize: 16,
-                                      ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
+                                    ),
                                 ),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      
                     ),
                   ],
                 ),

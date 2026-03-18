@@ -2,7 +2,6 @@ import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/notebook_content/presentation/vm_delete.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
-import 'package:adalem/shell.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,13 +55,6 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
       ToastCard.error(context, _viewModel.deleteError![0], description: _viewModel.deleteError![1]);
       _viewModel.clearDeleteError();
     }
-    // else if (!_viewModel.isDeleting) {
-    //   ToastCard.success(context, "Notebook Deleted");
-    //   Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-    //     MaterialPageRoute(builder: (context) => const Shell(initIndex: 1)),
-    //     (route) => false,
-    //   );
-    // }
   }
 
   @override
@@ -77,6 +69,7 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Spacer(),
             Text(
               "Permanently delete ${widget.title}?",
               textAlign: TextAlign.center,
@@ -119,7 +112,7 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
               ],
             ),
             
-            const Spacer(),
+            const Spacer(flex: 2),
             
             XLButton(
               onTap: viewModel.isDeleting ?
@@ -134,7 +127,10 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
                   Navigator.pop(context);
                 },
               child: Text("Delete ${widget.title}",
-                style: TextStyle(fontWeight: FontWeight.w900),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w900,
+                  ),
               ),
             ),
             const SizedBox(height: 80),

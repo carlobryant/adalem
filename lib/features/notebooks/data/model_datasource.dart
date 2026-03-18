@@ -113,15 +113,26 @@ class NotebookHistoryDataModel extends NotebookHistory {
     required super.createdAt,
   });
 
-  factory NotebookHistoryDataModel.fromMap(Map<String, dynamic> map) {
+  Map<String, dynamic> toMap() {
+    return {
+      'notebookId': notebookId,
+      'uid': uid,
+      'quizLevel': quizLevel,
+      'score': score,
+      'mastery': mastery,
+      'createdAt': createdAt.millisecondsSinceEpoch,
+    };
+  }
+
+  factory NotebookHistoryDataModel.fromMap(String id, Map<String, dynamic> map) {
     return NotebookHistoryDataModel(
-      id: map['id'] as String,
-      notebookId: map['notebookId'] as String? ?? '',
-      uid: map['uid'] as String? ?? '',
-      quizLevel: map['quizLevel'] as int? ?? 1,
-      score: (map['score'] as num? ?? 0).toDouble(),
-      mastery: (map['mastery'] as num? ?? 0).toDouble(),
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      id: id,
+      notebookId: map['notebookId'] as String,
+      uid: map['uid'] as String,
+      quizLevel: map['quizLevel'] as int,
+      score: (map['score'] as num).toDouble(),
+      mastery: (map['mastery'] as num).toDouble(),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
     );
   }
 }

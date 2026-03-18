@@ -1,4 +1,5 @@
 import 'package:adalem/core/components/loader_md.dart';
+import 'package:adalem/features/flashcards/presentation/view_flashcardexit.dart';
 import 'package:adalem/features/flashcards/presentation/vm_flashcard.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,6 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool _answerRevealed = false;
   bool _infoRevealed = false;
   bool _switchSide = false;
-  //int _currentIndex = 0;
   
 
   @override
@@ -48,8 +48,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       widget.viewModel.saveProgressEarly(widget.notebookId, widget.uid);
     }
   }
@@ -96,39 +95,62 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
             );
           }
 
-          if(vm.status == FlashcardSessionStatus.complete) {
+          if(vm.status == FlashcardSessionStatus.complete
+          || vm.status == FlashcardSessionStatus.caughtUp) {
             return Scaffold(
-              body: Text("Session Complete"),
+              appBar: AppBar(
+                title:Text(""),
+              ),
+              body: FlashcardExitView(
+                onBack: () => Navigator.of(context, rootNavigator: true).pop(),
+                onAgain: vm.status == FlashcardSessionStatus.complete ? () {
+                  setState(() {
+                    _answerRevealed = false;
+                    _infoRevealed = false;
+                    _switchSide = false;
+                    _controller.reset();
+                  });
+                  vm.startNextSession();
+                } : null,
+              ),
             );
           }
 
           final currentItem = vm.currentItem!;
+          final int toReview = vm.sessionItems.length - vm.currentIndex + 1;
           return Scaffold(
             appBar: AppBar(
-              title:Text('${vm.currentIndex + 1} / ${vm.sessionItems.length}'),
+              title: toReview > 0 ? Text("Flashcards to review: $toReview")
+              : Text("Flashcards to Review: 0"),
             ),
             body: Stack(
               children: [
                 // FLASHCARD
-                Center(
-                  child: GestureDetector(
-                    onTap: _toggleCard,
-                    child: AnimatedBuilder(
-                      animation: _animation,
-                      builder: (context, child) {
-                        return Transform(
-                          transform: Matrix4.rotationY(_animation.value * 3.14159),
-                          alignment: Alignment.center,
-                          child: _animation.value < 0.5 ?
-                            _buildCard(false, currentItem)
-                            : Transform.scale(
-                            scaleX: -1,
-                            child: _buildCard(true, currentItem),
-                          ),
-                        );
-                      }
+                Column(
+                  children: [
+                    Spacer(),
+                    Center(
+                      child: GestureDetector(
+                        onTap: _toggleCard,
+                        child: AnimatedBuilder(
+                          animation: _animation,
+                          builder: (context, child) {
+                            return Transform(
+                              transform: Matrix4.rotationY(_animation.value * 3.14159),
+                              alignment: Alignment.center,
+                              child: _animation.value < 0.5 ?
+                                _buildCard(false, currentItem)
+                                : Transform.scale(
+                                scaleX: -1,
+                                child: _buildCard(true, currentItem),
+                              ),
+                            );
+                          }
+                        ),
+                      ),
                     ),
-                  ),
+                    Spacer(flex: 2),
+                  ],
                 ),
           
                 // QUALITY BUTTONS
@@ -158,21 +180,24 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
                       top: false,
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Do you recall this?",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              SizedBox(width: 10),
-                              IconButton(onPressed: () => setState(()
-                                => _infoRevealed = !_infoRevealed
-                              ), 
-                              icon: Icon( _infoRevealed ?
-                                Icons.close : Icons.info_outline_rounded,
-                                color: Theme.of(context).colorScheme.onSurface
-                              )),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Do you recall this?",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                                Spacer(),
+                                IconButton(onPressed: () => setState(()
+                                  => _infoRevealed = !_infoRevealed
+                                ), 
+                                icon: Icon( _infoRevealed ?
+                                  Icons.close : Icons.info_outline_rounded,
+                                  color: Theme.of(context).colorScheme.onSurface
+                                )),
+                              ],
+                            ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -188,7 +213,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
                           ),
       
                           SizedBox(height: 20),
-      
+                          // QUALITY LEGEND
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -238,7 +263,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   Widget _buildCard(bool answer, QuizItem item) {
     return Container(
       width: 300,
-      height: 300,
+      height: 350,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: answer ?
@@ -246,30 +271,32 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
         : Theme.of(context).colorScheme.primary,
       ),
       alignment: Alignment.center,
-      child: answer ?
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("ANSWER:",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontSize: 10,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: answer ?
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("ANSWER:",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 10,
+              ),
             ),
-          ),
-          Text(item.answer,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.surface,
-              fontSize: 30,
+            Text(item.answer,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.surface,
+                fontSize: 30,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
-      )
-      : Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Spacer(),
-          Expanded(
-            child: Center(
+          ],
+        )
+        : Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Spacer(),
+            Center(
               child: Text(item.text,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
@@ -277,16 +304,16 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
                 ),
               ),
             ),
-          ),
-          Spacer(),
-          Text("TAP FLASHCARD TO SHOW ANSWER",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.inversePrimary,
-              fontSize: 10,
+            Spacer(),
+            Text("TAP FLASHCARD TO SHOW ANSWER",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inversePrimary,
+                fontSize: 10,
+              ),
             ),
-          ),
-        SizedBox(height: 5),
-        ],
+          SizedBox(height: 5),
+          ],
+        ),
       ),
     );
   }

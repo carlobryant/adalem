@@ -78,23 +78,26 @@ class VerticalNotebookCard extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: isLoading ?
-                            Container(
-                              height: 20,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(15),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: isLoading ?
+                              Container(
+                                height: 20,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ).redacted(context: context, redact: true)
+                              : Text(
+                                title,
+                                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ).redacted(context: context, redact: true)
-                            : Text(
-                              title,
-                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           SizedBox(width: 10),
@@ -116,6 +119,7 @@ class VerticalNotebookCard extends StatelessWidget {
                                 padding: EdgeInsets.zero,
                                 menuPadding: EdgeInsets.zero,
                                 borderRadius: BorderRadius.circular(40),
+                                color: Theme.of(context).colorScheme.surface,
                                 onSelected: (value) {
                                   if (value == "share") {
                                     onShare!();

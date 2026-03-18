@@ -21,6 +21,7 @@ import 'package:adalem/features/notebooks/domain/uc_getnotebookcount.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
+import 'package:adalem/features/quiz/domain/uc_syncquiz.dart';
 import 'package:adalem/nav/authgate_nav.dart';
 import 'package:adalem/shell.dart';
 import 'package:adalem/core/theme_mode.dart';
@@ -48,6 +49,7 @@ void main() async {
   final getAuthState = GetAuthState(authRepo);
   final getUserProfile = GetUserProfile(authRepo);
   final syncFlashcards = SyncFlashcards(notebookRepo);
+  final syncQuizHistory = SyncQuizHistory(notebookRepo);
 
   runApp(
     MultiProvider(
@@ -61,6 +63,7 @@ void main() async {
         Provider.value(value: getAuthState),
         Provider.value(value: getUserProfile),
         Provider.value(value: syncFlashcards),
+        Provider.value(value: syncQuizHistory),
 
         // GLOBAL VIEWMODELS
         ChangeNotifierProvider(

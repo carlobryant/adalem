@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 const String _globalFont = "GoogleSans";
 Color _primary = Colors.green.shade900;
 Color _inPrimary = Colors.green.shade400;
+Color _conPrimary = const Color.fromARGB(255, 28, 60, 31);
 Color _onPrimary = Colors.grey.shade300;
 Color _onSurface = Colors.grey.shade600;
-Color _error = Color.fromARGB(255, 186, 84, 71);
-Color _onError = Color.fromARGB(255, 75, 2, 2);
+Color _conSurface = Colors.grey.shade800;
+Color _error = const Color.fromARGB(255, 186, 84, 71);
+Color _onError = const Color.fromARGB(255, 75, 2, 2);
 
 ThemeData get lightMode => ThemeData(
   fontFamily: _globalFont,
@@ -14,11 +16,13 @@ ThemeData get lightMode => ThemeData(
     surface: Colors.grey.shade300,
     inverseSurface: Colors.grey.shade900,
     onSurface: _onSurface,
+    surfaceContainer: _conSurface,
     shadow: Colors.grey.shade900,
     primary: _primary,
     secondary: Colors.grey.shade400,
     inversePrimary: _inPrimary,
     onPrimary: _onPrimary,
+    primaryContainer: _conPrimary,
     error: _error,
     onError: _onError,
   ),
@@ -36,11 +40,13 @@ ThemeData get darkMode => ThemeData(
     surface: Colors.grey.shade900,
     inverseSurface: Colors.grey.shade300,
     onSurface: _onSurface,
+    surfaceContainer: _conSurface,
     shadow: Colors.grey.shade600,
     primary: _primary,
     secondary: Colors.grey.shade700,
     inversePrimary: _inPrimary,
     onPrimary: _onPrimary,
+    primaryContainer: _conPrimary,
     error: _error,
     onError: _onError,
   ),

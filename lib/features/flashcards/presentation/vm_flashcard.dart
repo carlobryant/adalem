@@ -5,13 +5,14 @@ import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:flutter/foundation.dart';
 
-enum FlashcardSessionStatus { idle, active, complete, syncError, error }
+enum FlashcardSessionStatus { idle, active, complete, caughtUp, syncError, error }
 
 class FlashcardViewModel extends ChangeNotifier {
   final SM2Algorithm _sm2;
   final FlashcardSession _sessionService;
   final SyncFlashcards _syncFlashcards;
 
+  List<QuizItem> _allItems = [];
   List<QuizItem> _sessionItems = [];
   List<QuizItem> get sessionItems => _sessionItems;
 
@@ -51,6 +52,7 @@ class FlashcardViewModel extends ChangeNotifier {
       return;
     }
 
+    _allItems = allItems;
     _currentProgress = List.from(progress); 
     _currentIndex = 0;
 
@@ -64,7 +66,7 @@ class FlashcardViewModel extends ChangeNotifier {
         .toList();
 
     if (_sessionItems.isEmpty) {
-      _status = FlashcardSessionStatus.complete;
+      _status = FlashcardSessionStatus.caughtUp;
       notifyListeners();
       return;
     }
@@ -72,6 +74,9 @@ class FlashcardViewModel extends ChangeNotifier {
     _status = FlashcardSessionStatus.active;
     notifyListeners();
   }
+
+  void startNextSession() => initSession(_allItems, _currentProgress);
+  
 
   Future<void> rateCard(String notebookId, String uid, int quality) async {
     if (_sessionItems.isEmpty || _status != FlashcardSessionStatus.active) return;
