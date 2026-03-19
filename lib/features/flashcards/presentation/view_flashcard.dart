@@ -1,5 +1,5 @@
-import 'package:adalem/core/components/loader_md.dart';
-import 'package:adalem/features/flashcards/presentation/view_flashcardexit.dart';
+import 'package:adalem/core/components/animation_loader.dart';
+import 'package:adalem/features/flashcards/presentation/view_flashcardresults.dart';
 import 'package:adalem/features/flashcards/presentation/vm_flashcard.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 class FlashcardView extends StatefulWidget {
   final FlashcardViewModel viewModel;
   final String notebookId;
+  final int mastery;
   final String uid;
   const FlashcardView({
     super.key,
     required this.viewModel,
     required this.notebookId,
+    required this.mastery,
     required this.uid,
   });
 
@@ -91,17 +93,14 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
           || vm.status == FlashcardSessionStatus.error
           || vm.status == FlashcardSessionStatus.syncError) {
             return Scaffold(
-              body: SafeArea(child: MediumLoader(loading: ["Loading Flashcards"])),
+              body: SafeArea(child: LoaderAnimation(loading: ["Loading Flashcards"])),
             );
           }
 
           if(vm.status == FlashcardSessionStatus.complete
           || vm.status == FlashcardSessionStatus.caughtUp) {
             return Scaffold(
-              appBar: AppBar(
-                title:Text(""),
-              ),
-              body: FlashcardExitView(
+              body: FlashcardResultsView(
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
                 onAgain: vm.status == FlashcardSessionStatus.complete ? () {
                   setState(() {
@@ -112,6 +111,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
                   });
                   vm.startNextSession();
                 } : null,
+                prevMastery: widget.mastery,
               ),
             );
           }

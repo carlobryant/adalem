@@ -1,4 +1,3 @@
-
 import 'package:adalem/features/auth/data/google_datasource.dart';
 import 'package:adalem/features/auth/data/repo_impl.dart';
 import 'package:adalem/features/auth/domain/auth_repo.dart';
@@ -110,8 +109,8 @@ class MyApp extends StatelessWidget {
       theme: lightMode,
       darkTheme: darkMode,
       
-      //home: SmallLoader(),
-      home: const AuthGate(), //Add view: ADALEM is only available on Android
+      home: const AuthGate(), 
+      //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
       routes: {

@@ -1,4 +1,4 @@
-import 'package:adalem/core/components/loader_md.dart';
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getauthstate.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
@@ -18,7 +18,7 @@ class AuthGate extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: MediumLoader(),
+            body: LoaderAnimation(),
           );
         }
 

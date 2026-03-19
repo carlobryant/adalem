@@ -1,3 +1,4 @@
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/features/notebook_content/presentation/model_quizitem.dart';
@@ -10,12 +11,14 @@ import 'package:flutter/material.dart';
 class QuizSessionView extends StatefulWidget {
   final QuizViewModel viewModel;
   final String notebookId;
+  final int mastery;
   final String uid;
 
   const QuizSessionView({
     super.key,
     required this.viewModel,
     required this.notebookId,
+    required this.mastery,
     required this.uid,
   });
 
@@ -24,6 +27,7 @@ class QuizSessionView extends StatefulWidget {
 }
 
 class _QuizSessionViewState extends State<QuizSessionView> {
+  int noItems = 0;
 
   Future<bool> _onWillPop() async {
   final vm = widget.viewModel;
@@ -46,6 +50,7 @@ class _QuizSessionViewState extends State<QuizSessionView> {
 }
 
   void _submitAnswer(bool isCorrect) {
+    setState(() => noItems++);
     widget.viewModel.submitAnswer(
       notebookId: widget.notebookId,
       uid: widget.uid,
@@ -55,6 +60,7 @@ class _QuizSessionViewState extends State<QuizSessionView> {
 
   @override
   Widget build(BuildContext context) {
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -85,9 +91,11 @@ class _QuizSessionViewState extends State<QuizSessionView> {
           // QUIZ RESULTS
           if (vm.status == QuizSessionStatus.complete) {
             return QuizResultView(
-              calculatedQuizLevel: vm.calculatedQuizLevel,
-              calculatedMastery: vm.calculatedMastery,
-              sessionScore: vm.sessionScore
+                aveDifficulty: vm.difficultyLabel,
+                sessionAccuracy: vm.sessionAccuracy,
+                sessionScore: vm.sessionScore,
+                prevMastery: widget.mastery,
+                noItems: noItems,
               );
           }
 
@@ -135,11 +143,11 @@ class _QuizSessionViewState extends State<QuizSessionView> {
                     child: _buildQuestionContent(vm),
                   ),
                 ),
-                // Processing Overlay
+
                 if (vm.isProcessing)
                   Container(
                     color: Colors.black26,
-                    child: const Center(child: CircularProgressIndicator()),
+                    child: const Center(child: LoaderAnimation(loading: ["Loading Quiz"])),
                   ),
               ],
             ),
@@ -149,7 +157,6 @@ class _QuizSessionViewState extends State<QuizSessionView> {
     );
   }
 
-  // ── UI Dispatcher ─────────────────────────────────────────────
   Widget _buildQuestionContent(QuizViewModel vm) {
     if (vm.isScenario && vm.currentScenarioModel != null) {
       return _buildScenario(vm.currentScenarioModel!);
@@ -167,7 +174,6 @@ class _QuizSessionViewState extends State<QuizSessionView> {
   // ── Multiple Choice / Scenario Builders ─────────────────────────
   Widget _buildMultipleChoice(QuizItemModel model) {
     return Column(
-      //crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           child: Center(

@@ -12,11 +12,9 @@ class QuizViewModel extends ChangeNotifier {
 
   StaircaseAlgorithm? _algorithm;
 
-  // Current question — either QuizItem or Scenario
   dynamic _currentQuestion;
   dynamic get currentQuestion => _currentQuestion;
 
-  // Wrapped presentation model for the View
   QuizItemModel? _currentQuizItemModel;
   QuizItemModel? get currentQuizItemModel => _currentQuizItemModel;
 
@@ -28,25 +26,47 @@ class QuizViewModel extends ChangeNotifier {
   QuizSessionStatus _status = QuizSessionStatus.idle;
   QuizSessionStatus get status => _status;
 
+  int _prevMastery = 0;
+  int get prevMastery => _prevMastery;
+
   ErrorModel? _error;
   ErrorModel? get error => _error;
 
   bool _isProcessing = false;
   bool get isProcessing => _isProcessing;
 
-  // Exposed for the summary screen
   int get itemsServed => _algorithm?.itemsServedThisSession ?? 0;
-  double get sessionScore => _algorithm?.sessionScore ?? 0.0;
-  double get calculatedMastery => _algorithm?.calculatedMastery ?? 0.0;
-  int get calculatedQuizLevel => _algorithm?.calculatedQuizLevel ?? 1;
+  int get sessionScore => _algorithm?.sessionScore ?? 0; 
+  double get sessionAccuracy => _algorithm?.sessionAccuracy ?? 0.0; 
+  double get sessionAveDifficulty => _algorithm?.sessionAveDifficulty ?? 1.0; 
   Map<String, dynamic> get diagnostics => _algorithm?.diagnostics ?? {};
+
+  String get difficultyLabel {
+    final diff = sessionAveDifficulty;
+    if (diff < 1.4) {
+      return "Very Easy";
+    } 
+    else if (diff < 1.8) {
+      return "Easy";
+    } 
+    else if (diff < 2.2) {
+      return "Moderate";
+    } 
+    else if (diff < 2.6) {
+      return "Hard";
+    } 
+    else {
+      return "Very Hard";
+    }
+  }
 
   QuizViewModel({required SyncQuizHistory syncQuizHistory})
       : _syncQuizHistory = syncQuizHistory;
 
-  // ── Session Init ────────────────────────────────────────────
-
-  void initSession(NotebookContent content) {
+  void initSession(NotebookContent content, {
+    double initialDifficulty = 1.0,
+    int currentMastery = 0,
+    }) {
     if (content.items.isEmpty && content.scenarios.isEmpty) {
       _status = QuizSessionStatus.error;
       _error = const ErrorModel(
@@ -57,14 +77,18 @@ class QuizViewModel extends ChangeNotifier {
       return;
     }
 
-    _algorithm = StaircaseAlgorithm(content: content);
+    _prevMastery = currentMastery;
+
+    _algorithm = StaircaseAlgorithm(
+      content: content, 
+      initialDifficulty: initialDifficulty,
+    );
     _status = QuizSessionStatus.active;
     _loadNextQuestion();
     notifyListeners();
   }
 
-  // ── Answer Submission ───────────────────────────────────────
-
+  // ANSWER SUBMISSION
   Future<void> submitAnswer({
     required String notebookId,
     required String uid,
@@ -103,8 +127,7 @@ class QuizViewModel extends ChangeNotifier {
     }
   }
 
-  // ── Early Exit ──────────────────────────────────────────────
-
+  // SUDDEN EXIT
   Future<void> endSessionEarly({
     required String notebookId,
     required String uid,
@@ -117,8 +140,6 @@ class QuizViewModel extends ChangeNotifier {
     await _saveQuizHistory(notebookId: notebookId, uid: uid);
   }
 
-  // ── Reset ───────────────────────────────────────────────────
-
   void resetSession() {
     _algorithm?.resetSession();
     _status = QuizSessionStatus.idle;
@@ -130,8 +151,6 @@ class QuizViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Private Helpers ─────────────────────────────────────────
-
   void _loadNextQuestion() {
     if (_algorithm == null) return;
 
@@ -141,12 +160,13 @@ class QuizViewModel extends ChangeNotifier {
       final item = _currentQuestion as QuizItem;
       final formatLevel = _algorithm!.targetFormat;
 
-      // Format 3 = Identification, Format 1 = Multiple Choice
+      // 1 - MULTIPLE CHOICE
+      // 3 - IDENTIFICATION
       final mode = formatLevel == 3
           ? QuizMode.identification
           : QuizMode.multipleChoice;
 
-      // Generate options for MC — pull distractors from content
+      // GENERATE MULTIPLE CHOICES
       List<String>? options;
       if (mode == QuizMode.multipleChoice) {
         final content = _algorithm!.content;
@@ -189,9 +209,9 @@ class QuizViewModel extends ChangeNotifier {
       await _syncQuizHistory(
         notebookId: notebookId,
         uid: uid,
-        quizLevel: calculatedQuizLevel,
-        score: sessionScore,
-        mastery: calculatedMastery,
+        score: sessionScore, 
+        aveDifficulty: sessionAveDifficulty,
+        accuracy: sessionAccuracy,
       );
     } catch (e) {
       _status = QuizSessionStatus.syncError;

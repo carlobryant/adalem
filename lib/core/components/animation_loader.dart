@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class MediumLoader extends StatefulWidget {
+class LoaderAnimation extends StatefulWidget {
   final List<String>? loading;
 
-  const MediumLoader({super.key, this.loading});
+  const LoaderAnimation({super.key, this.loading});
 
   @override
-  State<MediumLoader> createState() => _MediumLoaderState();
+  State<LoaderAnimation> createState() => _LoaderAnimationState();
 }
 
-class _MediumLoaderState extends State<MediumLoader> 
+class _LoaderAnimationState extends State<LoaderAnimation> 
   with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late CurvedAnimation _curved;

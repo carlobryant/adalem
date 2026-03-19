@@ -145,6 +145,18 @@ class NotebookViewModel extends ChangeNotifier {
     )).toList();
   }
 
+  // FETCH MASTERY
+  int getMasteryFor(String notebookId, String uid) {
+    final notebook = _notebooks.firstWhere(
+      (n) => n.id == notebookId,
+      orElse: () => NotebookModel.empty(),
+    );
+
+    final userModel = notebook.users[uid];
+    if (userModel == null) return 0;
+    return userModel.mastery;
+  }
+
   // CLEARING NOTEBOOKS
   void clearStreamError() {
     _streamError = null;

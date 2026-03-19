@@ -107,9 +107,9 @@ class NotebookHistoryDataModel extends NotebookHistory {
     required super.id,
     required super.notebookId,
     required super.uid,
-    required super.quizLevel,
     required super.score,
-    required super.mastery,
+    required super.aveDifficulty,
+    required super.accuracy,
     required super.createdAt,
   });
 
@@ -117,9 +117,9 @@ class NotebookHistoryDataModel extends NotebookHistory {
     return {
       'notebookId': notebookId,
       'uid': uid,
-      'quizLevel': quizLevel,
       'score': score,
-      'mastery': mastery,
+      'aveDifficulty': aveDifficulty,
+      'accuracy': accuracy,
       'createdAt': createdAt.millisecondsSinceEpoch,
     };
   }
@@ -129,9 +129,9 @@ class NotebookHistoryDataModel extends NotebookHistory {
       id: id,
       notebookId: map['notebookId'] as String,
       uid: map['uid'] as String,
-      quizLevel: map['quizLevel'] as int,
-      score: (map['score'] as num).toDouble(),
-      mastery: (map['mastery'] as num).toDouble(),
+      score: map['score'] as int,
+      aveDifficulty: (map['aveDifficulty'] as num).toDouble(),
+      accuracy: (map['accuracy'] as num).toDouble(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
     );
   }

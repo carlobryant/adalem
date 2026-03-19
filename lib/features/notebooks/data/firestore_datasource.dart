@@ -10,6 +10,7 @@ abstract class FirestoreDataSource {
     required String notebookId,
     required String uid,
     required List<NotebookFlashcard> progress,
+    required bool isEarly,
   });
   Future<void> syncQuizHistory({
     required String notebookId,
@@ -51,11 +52,12 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
   }
 
 
-  @override
+@override
   Future<void> syncFlashcards({
     required String notebookId,
     required String uid,
     required List<NotebookFlashcard> progress,
+    required bool isEarly,
   }) async {
     final flashcards = progress.map((card) => {
       'cardId': card.cardId,
@@ -66,9 +68,15 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       'dueAt': card.dueAt?.millisecondsSinceEpoch,
     }).toList();
 
-    await _firestore.collection('notebooks').doc(notebookId).update({
+    final Map<String, dynamic> updateData = {
       'users.$uid.flashcards': flashcards,
-    });
+      'updatedAt.flashcard': FieldValue.serverTimestamp(),
+    };
+
+    if (!isEarly) {
+      updateData['users.$uid.mastery'] = FieldValue.increment(30);
+    }
+    await _firestore.collection('notebooks').doc(notebookId).update(updateData);
   }
 
   @override
@@ -77,37 +85,24 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required String uid,
     required NotebookHistory history,
   }) async {
-    final batch = _firestore.batch();
+    final notebookRef = _firestore.collection('notebooks').doc(notebookId);
     final historyRef = _firestore.collection('history').doc();
+    
+    final batch = _firestore.batch();
+    batch.update(notebookRef, {
+      'users.$uid.mastery': FieldValue.increment(history.score),
+      'updatedAt.quiz': FieldValue.serverTimestamp(),
+    });
+
     batch.set(historyRef, NotebookHistoryDataModel(
       id: historyRef.id,
       notebookId: history.notebookId,
       uid: history.uid,
-      quizLevel: history.quizLevel,
       score: history.score,
-      mastery: history.mastery,
+      aveDifficulty: history.aveDifficulty,
+      accuracy: history.accuracy,
       createdAt: history.createdAt,
     ).toMap());
-
-    final historySnapshot = await _firestore
-        .collection('history')
-        .where('notebookId', isEqualTo: notebookId)
-        .where('uid', isEqualTo: uid)
-        .get(const GetOptions(source: Source.serverAndCache));
-
-    final allMasteries = historySnapshot.docs
-        .map((doc) => (doc.data()['mastery'] as num).toDouble())
-        .toList()
-      ..add(history.mastery);
-
-    final averageMastery = allMasteries.reduce((a, b) => a + b) / allMasteries.length;
-
-    final notebookRef = _firestore.collection('notebooks').doc(notebookId);
-    batch.update(notebookRef, {
-      'users.$uid.mastery': averageMastery.round(),
-      'updatedAt.quiz': FieldValue.serverTimestamp(),
-    });
-
     await batch.commit();
   }
 }

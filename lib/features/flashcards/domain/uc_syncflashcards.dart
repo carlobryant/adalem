@@ -10,11 +10,13 @@ class SyncFlashcards {
     required String notebookId,
     required String uid,
     required List<NotebookFlashcard> progress,
+    required bool isEarly,
   }) async {
     await _notebookRepo.syncFlashcards(
       notebookId: notebookId,
       uid: uid,
       progress: progress,
+      isEarly: isEarly,
     );
   }
 }

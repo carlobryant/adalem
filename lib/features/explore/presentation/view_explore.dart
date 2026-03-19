@@ -56,8 +56,8 @@ class ExploreViewState extends State<ExploreView> {
   }
 
   void _redirectToContent(
+    String id,
     String title, 
-    String id, 
     String image, 
     bool available, 
     String? contentId
@@ -76,7 +76,11 @@ class ExploreViewState extends State<ExploreView> {
     }
     Navigator.of(context, rootNavigator: true)
       .push(MaterialPageRoute(
-        builder: (context) => ContentView(notebookId: id, notebookTitle: title, image: image)
+        builder: (context) => ContentView(
+          notebookId: id,
+          notebookTitle: title,
+          image: image,
+          ),
         ));
   }
 
@@ -182,8 +186,8 @@ class ExploreViewState extends State<ExploreView> {
         return GestureDetector(
           onTap: isLoading ? null 
           : () => _redirectToContent(
-            notebook.title,
             notebook.id, 
+            notebook.title,
             notebook.image,
             notebook.available,
             notebook.contentId,

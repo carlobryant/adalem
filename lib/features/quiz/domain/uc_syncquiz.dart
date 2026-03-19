@@ -9,17 +9,17 @@ class SyncQuizHistory {
   Future<void> call({
     required String notebookId,
     required String uid,
-    required int quizLevel,
-    required double score,
-    required double mastery,
+    required int score,
+    required double aveDifficulty,
+    required double accuracy,
   }) async {
     final history = NotebookHistory(
       id: "", 
       notebookId: notebookId,
       uid: uid,
-      quizLevel: quizLevel,
       score: score,
-      mastery: mastery,
+      aveDifficulty: aveDifficulty,
+      accuracy: accuracy,
       createdAt: DateTime.now(),
     );
 

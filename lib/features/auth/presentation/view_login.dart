@@ -1,7 +1,7 @@
 import 'package:adalem/core/components/card_network.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/core/components/button_xl.dart';
-import 'package:adalem/core/components/loader_md.dart';
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/shell.dart';
@@ -74,7 +74,7 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: viewModel.isLoading ? 
-      MediumLoader(loading: ["Connecting to Google", "Just a Moment", "Authenticating Account"])
+      LoaderAnimation(loading: ["Connecting to Google", "Just a Moment", "Authenticating Account"])
       : Center(
         child: Padding(
           padding: const EdgeInsets.all(25.0),

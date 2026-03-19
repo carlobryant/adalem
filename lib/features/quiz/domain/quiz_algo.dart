@@ -10,12 +10,16 @@ class StaircaseAlgorithm {
   final NotebookContent content;
   final Random _random = Random();
 
-  final AxisState _contentAxis = AxisState(name: 'content');
-  final AxisState _formatAxis  = AxisState(name: 'format');
+  final AxisState _contentAxis;
+  final AxisState _formatAxis;
 
   bool shouldEndSession = false;
+  
+  // ── Session Tracking Counters ──
   int _totalItemsThisSession = 0;
   int _totalCorrectThisSession = 0;
+  int _sessionScoreXp = 0;
+  double _accumulatedDifficulty = 0.0;
 
   // CLT-derived session caps:
   // Hard content  → 6 items  (Cowan's 4±1 chunks)
@@ -23,7 +27,13 @@ class StaircaseAlgorithm {
   // Easy content   → 12 items
   static const Map<int, int> _sessionCaps = {1: 12, 2: 9, 3: 6};
 
-  StaircaseAlgorithm({required this.content});
+  /// [initialDifficulty] is passed from the user's previous history 'aveDifficulty'.
+  /// If the user is new and has no history, default it to 1.0.
+  StaircaseAlgorithm({
+    required this.content,
+    double initialDifficulty = 1.0, 
+  })  : _contentAxis = AxisState(name: 'content', difficulty: initialDifficulty),
+        _formatAxis = AxisState(name: 'format', difficulty: initialDifficulty);
 
   // ── Public Getters ──────────────────────────────────────────
 
@@ -43,7 +53,22 @@ class StaircaseAlgorithm {
     required int contentLevel,
     required int formatLevel,
   }) {
-    if (isCorrect) _totalCorrectThisSession++;
+    // Track the difficulty of the specific question that was just answered
+    _accumulatedDifficulty += ((contentLevel + formatLevel) / 2.0);
+
+    if (isCorrect) {
+      _totalCorrectThisSession++;
+      
+      // Award XP based on the format difficulty
+      if (formatLevel == 1) {
+        _sessionScoreXp += 10; // Multiple Choice
+      } else if (formatLevel == 2) {
+        _sessionScoreXp += 10; // Scenario
+      } else if (formatLevel == 3) {
+        _sessionScoreXp += 30; // Identification
+      }
+    }
+
     final attribution = attributeError(contentLevel, formatLevel, isCorrect);
 
     bool contentOverload = false;
@@ -52,27 +77,24 @@ class StaircaseAlgorithm {
     switch (attribution) {
       case Attribution.contentOnly:
         contentOverload = _contentAxis.recordResult(isCorrect, level: contentLevel);
-        // Track format exposure without moving the axis
-        _formatAxis.totalPerLevel[formatLevel] =
-            (_formatAxis.totalPerLevel[formatLevel] ?? 0) + 1;
+        _formatAxis.totalPerLevel[formatLevel] = (_formatAxis.totalPerLevel[formatLevel] ?? 0) + 1;
         if (isCorrect) {
-          _formatAxis.correctPerLevel[formatLevel] =
-              (_formatAxis.correctPerLevel[formatLevel] ?? 0) + 1;
+          _formatAxis.correctPerLevel[formatLevel] = (_formatAxis.correctPerLevel[formatLevel] ?? 0) + 1;
         }
+        break;
 
       case Attribution.formatOnly:
         formatOverload = _formatAxis.recordResult(isCorrect, level: formatLevel);
-        // Track content exposure without moving the axis
-        _contentAxis.totalPerLevel[contentLevel] =
-            (_contentAxis.totalPerLevel[contentLevel] ?? 0) + 1;
+        _contentAxis.totalPerLevel[contentLevel] = (_contentAxis.totalPerLevel[contentLevel] ?? 0) + 1;
         if (isCorrect) {
-          _contentAxis.correctPerLevel[contentLevel] =
-              (_contentAxis.correctPerLevel[contentLevel] ?? 0) + 1;
+          _contentAxis.correctPerLevel[contentLevel] = (_contentAxis.correctPerLevel[contentLevel] ?? 0) + 1;
         }
+        break;
 
       case Attribution.both:
         contentOverload = _contentAxis.recordResult(isCorrect, level: contentLevel);
         formatOverload  = _formatAxis.recordResult(isCorrect,  level: formatLevel);
+        break;
     }
 
     _totalItemsThisSession++;
@@ -89,28 +111,32 @@ class StaircaseAlgorithm {
     }
   }
 
-  // ── Final Gamified Metrics ──────────────────────────────────
+  // ── Final DB Sync Metrics ──────────────────────────────────
 
-  /// Raw percentage score (0.0 to 1.0)
-  double get sessionScore {
+  /// Experience Points (XP) earned in this session. Replaces the old percentage score.
+  int get sessionScore => _sessionScoreXp;
+
+  /// The percentage of questions answered correctly (0.0 to 1.0).
+  double get sessionAccuracy {
     if (_totalItemsThisSession == 0) return 0.0;
     return _totalCorrectThisSession / _totalItemsThisSession;
   }
 
-  /// Continuous mastery percentage based on 2D adaptive grid (0.0 to 1.0)
-  double get calculatedMastery {
-    final combinedDifficulty = _contentAxis.difficulty + _formatAxis.difficulty;
-    return (combinedDifficulty - 2.0) / 4.0;
+  /// The average difficulty of all questions served in this session.
+  /// Used to populate the DB field and "Warm Start" the next session.
+  double get sessionAveDifficulty {
+    if (_totalItemsThisSession == 0) return 1.0;
+    return _accumulatedDifficulty / _totalItemsThisSession;
   }
 
-  /// Discrete gamified tier (1 through 9)
-  int get calculatedQuizLevel {
-    return ((targetContent - 1) * 3) + targetFormat;
-  }
+  // 👇 ADD THIS BACK IN FOR THE UI SUMMARY SCREEN 👇
+  /// Discrete gamified tier (1 through 9) representing the current difficulty level
+  // int get calculatedQuizLevel {
+  //   return ((targetContent - 1) * 3) + targetFormat;
+  // }
 
-  /// Returns the next [QuizItem] or [Scenario] entity based on current
-  /// 2D difficulty coordinates. The caller (ViewModel or use case) is
-  /// responsible for wrapping this in a presentation model.
+  // ───────────────────────────────────────────────────────────
+
   dynamic getNextQuestion() {
     final contentLevel = targetContent;
     final formatLevel  = targetFormat;
@@ -118,30 +144,30 @@ class StaircaseAlgorithm {
     return switch (formatLevel) {
       1 => _getQuizItem(contentLevel),
       2 => _getScenario(contentLevel),
-      3 => _getQuizItem(contentLevel), // identification uses same pool
+      3 => _getQuizItem(contentLevel), 
       _ => _getQuizItem(contentLevel),
     };
   }
 
-  /// Resets session-scoped state. Call at the start of each new quiz session.
-  /// Preserves learned difficulty so the next session continues where it left off.
   void resetSession() {
     shouldEndSession = false;
     _totalItemsThisSession = 0;
+    _totalCorrectThisSession = 0;
+    _sessionScoreXp = 0;
+    _accumulatedDifficulty = 0.0;
     _contentAxis.resetSession();
     _formatAxis.resetSession();
   }
 
-  /// Full reset including learned difficulty. Use only for a fresh start.
   void resetFull() {
-    shouldEndSession = false;
-    _totalItemsThisSession = 0;
+    resetSession();
     _contentAxis.resetFull();
     _formatAxis.resetFull();
   }
 
-  // ── Diagnostics ─────────────────────────────────────────────
-
+  // Diagnostics and private item selectors remain unchanged...
+  // (Included below just for completeness if you are copy-pasting)
+  
   Map<String, dynamic> get diagnostics => {
     'contentDifficulty': _contentAxis.difficulty,
     'formatDifficulty':  _formatAxis.difficulty,
@@ -159,10 +185,6 @@ class StaircaseAlgorithm {
     },
   };
 
-  // ── Private Item Selectors ───────────────────────────────────
-
-  /// Returns a [QuizItem] entity matching the target content difficulty.
-  /// Falls back to the full pool if no items match.
   QuizItem _getQuizItem(int contentLevel) {
     List<QuizItem> pool = content.items
         .where((item) => item.difficulty == contentLevel)
@@ -172,8 +194,6 @@ class StaircaseAlgorithm {
     return pool[_random.nextInt(pool.length)];
   }
 
-  /// Returns a [Scenario] entity matching the target content difficulty.
-  /// Falls back to the full pool if no scenarios match.
   Scenario _getScenario(int contentLevel) {
     List<Scenario> pool = content.scenarios
         .where((s) => s.difficulty == contentLevel)

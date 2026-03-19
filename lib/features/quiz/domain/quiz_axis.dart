@@ -16,7 +16,7 @@ class AxisState {
   int _consecutiveIncorrect = 0;
   int _lastDirection = 0; // 1 = Up, -1 = Down, 0 = Initial
 
-  // Accuracy tracking per level
+  // ACCURACY TRACKING
   final Map<int, int> correctPerLevel = {1: 0, 2: 0, 3: 0};
   final Map<int, int> totalPerLevel   = {1: 0, 2: 0, 3: 0};
 

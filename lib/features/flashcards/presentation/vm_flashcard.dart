@@ -76,7 +76,6 @@ class FlashcardViewModel extends ChangeNotifier {
   }
 
   void startNextSession() => initSession(_allItems, _currentProgress);
-  
 
   Future<void> rateCard(String notebookId, String uid, int quality) async {
     if (_sessionItems.isEmpty || _status != FlashcardSessionStatus.active) return;
@@ -110,7 +109,7 @@ class FlashcardViewModel extends ChangeNotifier {
     } catch (e) {
       _status = FlashcardSessionStatus.error;
       _error = ErrorModel(
-        header: 'Something went wrong',
+        header: "Something Went Wrong",
         description: e.toString(),
       );
 
@@ -120,18 +119,19 @@ class FlashcardViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _saveSessionProgress(String notebookId, String uid) async {
+  Future<void> _saveSessionProgress(String notebookId, String uid, {bool early = false}) async {
     try {
       await _syncFlashcards(
         notebookId: notebookId,
         uid: uid,
         progress: _currentProgress,
+        isEarly: early,
       );
     } catch (e) {
       _status = FlashcardSessionStatus.syncError;
       _error = const ErrorModel(
-        header: 'Sync Failed',
-        description: 'Failed to sync progress. Your results may not be saved.',
+        header: "Sync Failed",
+        description: "Failed to sync progress. Your results may not be saved.",
       );
       notifyListeners();
     }
@@ -140,7 +140,7 @@ class FlashcardViewModel extends ChangeNotifier {
   Future<void> saveProgressEarly(String notebookId, String uid) async {
     if (_currentIndex > 0 && _status == FlashcardSessionStatus.active) {
       _status = FlashcardSessionStatus.complete;
-      await _saveSessionProgress(notebookId, uid);
+      await _saveSessionProgress(notebookId, uid, early: true);
     }
   }
 

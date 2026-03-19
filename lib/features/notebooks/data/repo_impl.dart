@@ -25,11 +25,13 @@ class NotebookRepositoryImpl implements NotebookRepo {
     required String notebookId,
     required String uid,
     required List<NotebookFlashcard> progress,
+    required bool isEarly,
   }) {
     return _dataSource.syncFlashcards(
       notebookId: notebookId,
       uid: uid,
       progress: progress,
+      isEarly: isEarly,
     );
   }
 

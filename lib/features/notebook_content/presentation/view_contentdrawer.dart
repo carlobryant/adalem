@@ -18,19 +18,27 @@ import 'package:redacted/redacted.dart';
 class ContentDrawer extends StatefulWidget {
   final List<ChapterModel>? chapters;
   final Function(int)? onChapterTap;
+
+  final String notebookTitle;
   final String notebookId;
+  final int mastery;
+
   final VoidCallback onBack;
   final Color primary;
-  final String notebookTitle;
+  
 
   const ContentDrawer({
     super.key,
     this.chapters,
     this.onChapterTap,
+
+    required this.notebookTitle,
     required this.notebookId,
+    required this.mastery,
+
     required this.onBack,
     required this.primary,
-    required this.notebookTitle,
+    
   });
 
   @override
@@ -72,7 +80,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
         shadowColor: Colors.black45,
         leading: IconButton(
           onPressed: widget.onBack,
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          icon: const Icon(Icons.close, size: 30),
         ),
         title: Text(
           widget.notebookTitle,
@@ -183,6 +191,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                                     viewModel: flashcardvm,
                                     notebookId: widget.notebookId,
                                     uid: currentUser.uid,
+                                    mastery: widget.mastery,
                                   ),
                                 ),
                               ),
@@ -242,19 +251,14 @@ class _ContentDrawerState extends State<ContentDrawer> {
                                   child: QuizSessionView(
                                     viewModel: quizvm,
                                     notebookId: widget.notebookId,
+                                    mastery: widget.mastery,
                                     uid: currentUser.uid,
                                   ),
                                 ),
                               ),
                             );
 
-                            // if (contentvm.quizItemModels.isEmpty) {
-                            //   await contentvm.loadNotebookContent(
-                            //     widget.notebookId,
-                            //     load: {ContentType.quiz},
-                            //   );
-                            // }
-                            quizvm.initSession(contentvm.content!);
+                            quizvm.initSession(contentvm.content!, currentMastery: widget.mastery);
                           },
                           child: Column(
                           children: [

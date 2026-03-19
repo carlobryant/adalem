@@ -68,18 +68,18 @@ class NotebookHistory {
   final String id;
   final String notebookId;
   final String uid;
-  final int quizLevel;
-  final double score;
-  final double mastery;
+  final int score;
+  final double aveDifficulty;
+  final double accuracy;
   final DateTime createdAt;
 
   const NotebookHistory({
     required this.id,
     required this.notebookId,
     required this.uid,
-    required this.quizLevel,
     required this.score,
-    required this.mastery,
+    required this.aveDifficulty,
+    required this.accuracy,
     required this.createdAt,
   });
 }

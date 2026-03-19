@@ -7,6 +7,7 @@ abstract class NotebookRepo {
   required String notebookId,
   required String uid,
   required List<NotebookFlashcard> progress,
+  required bool isEarly,
   });
   Future<void> syncQuizHistory({
     required String notebookId,

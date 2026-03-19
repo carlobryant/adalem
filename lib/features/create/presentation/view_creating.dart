@@ -1,5 +1,5 @@
 import 'package:adalem/core/components/card_toast.dart';
-import 'package:adalem/core/components/loader_md.dart';
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:adalem/shell.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +58,7 @@ class _CreatingViewState extends State<CreatingView> {
     return PopScope(
       canPop: _createError,
       child: const Scaffold(
-        body: MediumLoader(loading: ["Creating Structured Summary", "Generating Flashcards and Quiz", "Applying Cognitive Load Principles"]),
+        body: LoaderAnimation(loading: ["Creating Structured Summary", "Generating Flashcards and Quiz", "Applying Cognitive Load Principles"]),
       ),
     );
   }

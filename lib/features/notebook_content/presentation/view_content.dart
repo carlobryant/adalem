@@ -1,8 +1,10 @@
+import 'package:adalem/features/auth/domain/auth_repo.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
 import 'package:adalem/features/notebook_content/domain/uc_getcontent.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
 import 'package:adalem/features/notebook_content/presentation/view_contentdrawer.dart';
 import 'package:adalem/features/notebook_content/presentation/vm_content.dart';
+import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -57,10 +59,11 @@ class _ContentView extends StatefulWidget {
   final String notebookId;
   final String notebookTitle;
   final String image;
+
   const _ContentView({
     required this.notebookId,
     required this.notebookTitle,
-    required this.image
+    required this.image,
     });
 
   @override
@@ -144,11 +147,17 @@ class _ContentViewState extends State<_ContentView> {
     final viewModel = context.watch<ContentViewModel>();
     final notebookColors = widget._nbColors(widget.image);
 
+    final notebookVM = context.read<NotebookViewModel>();
+    final currentUser = context.read<AuthRepo>().getCurrentUser();
+    final int mastery = currentUser != null ? 
+    notebookVM.getMasteryFor(widget.notebookId, currentUser.uid) : 0;
+
     if(viewModel.isLoading) {
       return Scaffold(
         body: ContentDrawer(
           onBack: () => Navigator.of(context, rootNavigator: true).pop(),
           notebookId: widget.notebookId,
+          mastery: mastery,
           primary: notebookColors.primary,
           notebookTitle: widget.notebookTitle,
           ),
@@ -242,6 +251,7 @@ class _ContentViewState extends State<_ContentView> {
                 chapters: chapters, 
                 onChapterTap: _scrollToChapter, 
                 notebookId: widget.notebookId,
+                mastery: mastery,
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
                 ),
             ),
