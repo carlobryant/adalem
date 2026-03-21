@@ -118,14 +118,16 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
               onTap: viewModel.isDeleting ?
               null : () {
                   viewModel.confirmDelete(
-                    notebookId: widget.notebookId,
-                    contentId: widget.contentId,
-                    userId: currentUser,
-                    context: context,
-                    );
-                  ToastCard.success(context, "Notebook Deleted");
-                  Navigator.pop(context);
-                },
+                  notebookId: widget.notebookId,
+                  contentId: widget.contentId,
+                  userId: currentUser,
+                  context: context,
+                  );
+                
+                ToastCard.success(context, "Notebook Deleted");
+                //Navigator.pop(context);
+                //Navigator.of(context, rootNavigator: true).pop();
+              },
               child: Text("Delete ${widget.title}",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,

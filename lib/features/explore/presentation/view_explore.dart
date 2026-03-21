@@ -57,7 +57,8 @@ class ExploreViewState extends State<ExploreView> {
 
   void _redirectToContent(
     String id,
-    String title, 
+    String title,
+    String course, 
     String image, 
     bool available, 
     String? contentId
@@ -79,6 +80,7 @@ class ExploreViewState extends State<ExploreView> {
         builder: (context) => ContentView(
           notebookId: id,
           notebookTitle: title,
+          notebookCourse: course,
           image: image,
           ),
         ));
@@ -188,6 +190,7 @@ class ExploreViewState extends State<ExploreView> {
           : () => _redirectToContent(
             notebook.id, 
             notebook.title,
+            notebook.course,
             notebook.image,
             notebook.available,
             notebook.contentId,

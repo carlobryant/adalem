@@ -100,7 +100,7 @@ class VerticalNotebookCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 10, height: 30),
                         ],
 
                       ),
@@ -194,7 +194,7 @@ class VerticalNotebookCard extends StatelessWidget {
                         ).redacted(context: context, redact: true)
                         : Text(
                           course,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          style: TextStyle(
                               fontSize: 14,
                           ),
                           maxLines: 1,

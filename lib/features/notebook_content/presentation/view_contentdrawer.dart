@@ -1,4 +1,5 @@
 import 'package:adalem/core/components/button_xl.dart';
+import 'package:adalem/core/components/model_mastery.dart';
 import 'package:adalem/features/auth/domain/auth_repo.dart';
 import 'package:adalem/features/flashcards/domain/flashcard_algo.dart';
 import 'package:adalem/features/flashcards/domain/uc_syncflashcards.dart';
@@ -20,9 +21,12 @@ class ContentDrawer extends StatefulWidget {
   final String notebookTitle;
   final String notebookId;
   final Color primary;
+  final String course;
+  final String image;
   final int mastery;
 
-  final bool autoRedirectToFlashcard;
+  final bool toQuiz;
+  final bool toFlashcard;
   final Function(int)? onChapterTap;
   final VoidCallback onBack;
   
@@ -31,10 +35,13 @@ class ContentDrawer extends StatefulWidget {
     this.chapters,
     required this.notebookTitle,
     required this.notebookId,
-    required this.mastery,
     required this.primary,
+    required this.course,
+    required this.image,
+    required this.mastery,
     
-    this.autoRedirectToFlashcard = false,
+    this.toQuiz = false,
+    this.toFlashcard = false,
     this.onChapterTap,
     required this.onBack,
   });
@@ -58,8 +65,8 @@ class _ContentDrawerState extends State<ContentDrawer> {
       }
     });
 
-    if (widget.autoRedirectToFlashcard) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _redirectToStudy());
+    if (widget.toFlashcard || widget.toQuiz) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _redirectToStudy(isQuiz: widget.toQuiz));
     }
   }
 
@@ -103,6 +110,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
             child: FlashcardView(viewModel: flashcardvm,
               notebookId: widget.notebookId, 
               uid: uid, mastery: mastery,
+              onAgain: () => WidgetsBinding.instance.addPostFrameCallback((_) => _redirectToStudy()),
             ),
           ),
         ),
@@ -129,7 +137,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
       
       // DRAWER HEADER
       appBar: AppBar(
-        backgroundColor: widget.primary,
+        backgroundColor: _darken(widget.primary),
         foregroundColor: Theme.of(context).colorScheme.onPrimary, 
         elevation: 4, 
         shadowColor: Colors.black45,
@@ -149,58 +157,61 @@ class _ContentDrawerState extends State<ContentDrawer> {
       // DRAWER LIST
       body: Stack(
         children: [
-          ListView.builder(
-              controller: _scrollController,
-              itemCount: widget.chapters == null ? 10 : widget.chapters!.length,
-              itemBuilder: (context, index) {
-                final isLoading = widget.chapters == null || widget.onChapterTap == null;
-              
-                final headerText = isLoading 
-                ? "Fetching Chapters of ${widget.notebookTitle}..." 
-                : widget.chapters![index].chapter.header;
-        
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  title: Row(
-                    children: [
-                      Text(
-                        "${index + 1}. ",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20,
-                        ),
-                      ).redacted(context: context, redact: isLoading),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(headerText,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 80),
+            child: ListView.builder(
+                controller: _scrollController,
+                itemCount: widget.chapters == null ? 10 : widget.chapters!.length,
+                itemBuilder: (context, index) {
+                  final isLoading = widget.chapters == null || widget.onChapterTap == null;
+                
+                  final headerText = isLoading 
+                  ? "Fetching Chapters of ${widget.notebookTitle}..." 
+                  : widget.chapters![index].chapter.header;
+                    
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    title: Row(
+                      children: [
+                        Text(
+                          "${index + 1}. ",
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                            fontSize: 20,
                           ),
-                          maxLines: 2,
                         ).redacted(context: context, redact: isLoading),
-                      ),
-                    ],
-                  ),
-                  trailing: const Icon(Icons.chevron_right, size: 20),
-                  onTap: isLoading ? null : () => widget.onChapterTap!(index),
-                );
-              },
-            ),
+                        SizedBox(width: 5),
+                        Expanded(
+                          child: Text(headerText,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                            maxLines: 2,
+                          ).redacted(context: context, redact: isLoading),
+                        ),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    onTap: isLoading ? null : () => widget.onChapterTap!(index),
+                  );
+                },
+              ),
+          ),
 
             // DRAWER BUTTONS
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutCubic,
-              bottom: _isBottomBarVisible ? 0 : -225, 
+              bottom: _isBottomBarVisible ? 0 : -(MediaQuery.sizeOf(context).height * 0.28),
               left: 0,
               right: 0,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
+                  color: widget.primary,
                   border: BoxBorder.fromLTRB(top: BorderSide(
                     width: 3,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: _darken(widget.primary),
                     )),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   boxShadow: const [
@@ -218,9 +229,52 @@ class _ContentDrawerState extends State<ContentDrawer> {
                     child: Column(
                       children: [
 
+                        // NOTEBOOK INFO
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadiusGeometry.circular(5),
+                              child: Image(
+                                image: AssetImage("assets/nb_${widget.image}.jpg"),
+                                fit: BoxFit.cover,
+                                alignment: AlignmentGeometry.center,
+                                width: 22,
+                                height: 22,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(widget.course,
+                              style: TextStyle(
+                                color: _darken(widget.primary),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Spacer(),
+                            Text(MasteryLevel.fromXp(widget.mastery).label.toUpperCase(),
+                              style: TextStyle(
+                                color: _darken(widget.primary),
+                                fontFamily: "LoveYaLikeASister",
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                                fontSize: 18,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Image(
+                              image: AssetImage(MasteryLevel.fromXp(widget.mastery).asset),
+                              width: 20,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 30),
+
                         // FLASHCARD BUTTON
                         XLButton(
                           onTap: () => _redirectToStudy(),
+                          surfacecolor: widget.primary,
                           child: Column(
                           children: [
                             Text(
@@ -241,11 +295,12 @@ class _ContentDrawerState extends State<ContentDrawer> {
                             ),
                           ],
                         )),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
 
                         // QUIZ BUTTON
                         XLButton(
                           onTap: () => _redirectToStudy(isQuiz: true),
+                          surfacecolor: widget.primary,
                           child: Column(
                           children: [
                             Text(
@@ -276,5 +331,14 @@ class _ContentDrawerState extends State<ContentDrawer> {
         ],
       ),
     );
+  }
+
+  Color _darken(Color color, [double amount = 0.4]) {
+    assert(amount >= 0 && amount <= 1);
+
+    final hsl = HSLColor.fromColor(color);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
   }
 }

@@ -113,9 +113,9 @@ class MyApp extends StatelessWidget {
       //Add view: ADALEM is only available on Android
       //view for new user/tutorial
 
-      routes: {
-        '/home': (context) => const Shell(),
-      }
+      // routes: {
+      //   '/home': (context) => const Shell(),
+      // }
     );
   }
 }

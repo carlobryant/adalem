@@ -14,12 +14,18 @@ import 'package:super_sliver_list/super_sliver_list.dart';
 class ContentView extends StatelessWidget {
   final String notebookId;
   final String notebookTitle;
+  final String notebookCourse;
+  final bool toFlashcard;
+  final bool toQuiz;
   final String image;
 
   const ContentView({
     super.key, 
     required this.notebookId,
     required this.notebookTitle,
+    required this.notebookCourse,
+    this.toFlashcard = false,
+    this.toQuiz = false,
     required this.image,
     });
 
@@ -39,7 +45,11 @@ class ContentView extends StatelessWidget {
       child: _ContentView(
         notebookId: notebookId,
         notebookTitle: notebookTitle,
+        notebookCourse: notebookCourse,
+        toFlaschard: toFlashcard,
+        toQuiz: toQuiz,
         image: image,
+
       ),
     );
   }
@@ -58,11 +68,17 @@ class _NotebookColorScheme {
 class _ContentView extends StatefulWidget {
   final String notebookId;
   final String notebookTitle;
+  final String notebookCourse;
+  final bool toFlaschard;
+  final bool toQuiz;
   final String image;
 
   const _ContentView({
     required this.notebookId,
     required this.notebookTitle,
+    required this.notebookCourse,
+    this.toFlaschard = false,
+    this.toQuiz = false,
     required this.image,
     });
 
@@ -71,16 +87,16 @@ class _ContentView extends StatefulWidget {
 
   _NotebookColorScheme _nbColors(String image) {
     switch(image) {
-      case "red": return _NotebookColorScheme(primary: Color(0xFF270506), secondary: Color.fromARGB(255, 156, 64, 92));
-      case "orange": return _NotebookColorScheme(primary: Color(0xFF2f1a05), secondary: Color(0xFFce4d25));
-      case "yellow": return _NotebookColorScheme(primary: Color(0xFF373006), secondary: Color(0xFFc88e06));
-      case "green": return _NotebookColorScheme(primary: Color(0xFF092d07), secondary: Color.fromARGB(255, 84, 109, 3));
-      case "blue": return _NotebookColorScheme(primary: Color(0xFF00224f), secondary: Color(0xFF15599a));
-      case "purple": return _NotebookColorScheme(primary: Color(0xFF210132), secondary: Color(0xFF5e4dfe));
-      case "pink": return _NotebookColorScheme(primary: Color(0xFFd319de), secondary: Color(0xFF460a3d));
-      case "grey": return _NotebookColorScheme(primary: Color(0xFF333333), secondary: Color.fromARGB(255, 100, 100, 100));
+      case "red": return _NotebookColorScheme(primary: Color(0xFFbb8997), secondary: Color(0xFF9a1a87));
+      case "orange": return _NotebookColorScheme(primary: Color(0xFFbf9588), secondary: Color(0xFF960e00));
+      case "yellow": return _NotebookColorScheme(primary: Color(0xFFcaae7c), secondary: Color(0xFFc58002));
+      case "green": return _NotebookColorScheme(primary: Color(0xFFa4ba73), secondary: Color(0xFF998b16));
+      case "blue": return _NotebookColorScheme(primary: Color(0xFF7597be), secondary: Color(0xFF147b41));
+      case "purple": return _NotebookColorScheme(primary: Color(0xFF8d88bf), secondary: Color(0xFF1358a5));
+      case "pink": return _NotebookColorScheme(primary: Color(0xFFaf7eb2), secondary: Color(0xFF860fa8));
+      case "grey": return _NotebookColorScheme(primary: Color(0xFFa4a4a4), secondary: Color(0xFF757575));
     }
-    return _NotebookColorScheme(primary: Color(0xFF373006), secondary: Color(0xFFc88e06));
+    return _NotebookColorScheme(primary: Color(0xFFcaae7c), secondary: Color(0xFFc58002));
   }
 }
 
@@ -158,8 +174,12 @@ class _ContentViewState extends State<_ContentView> {
           onBack: () => Navigator.of(context, rootNavigator: true).pop(),
           notebookId: widget.notebookId,
           mastery: mastery,
+          image: widget.image,
+          course: widget.notebookCourse,
           primary: notebookColors.primary,
           notebookTitle: widget.notebookTitle,
+          toFlashcard: widget.toFlaschard,
+          toQuiz: widget.toQuiz,
           ),
       );
     }
@@ -251,8 +271,12 @@ class _ContentViewState extends State<_ContentView> {
                 chapters: chapters, 
                 onChapterTap: _scrollToChapter, 
                 notebookId: widget.notebookId,
+                course: widget.notebookCourse,
                 mastery: mastery,
+                image: widget.image,
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
+                toFlashcard: widget.toFlaschard,
+                toQuiz: widget.toQuiz,
                 ),
             ),
 
@@ -303,7 +327,7 @@ class _ContentViewState extends State<_ContentView> {
                   child: Text(
                     chapter.header.toUpperCase(),
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: _darken(notebookColors.primary),
                       fontFamily: "LoveYaLikeASister",
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2,
@@ -348,5 +372,14 @@ class _ContentViewState extends State<_ContentView> {
           );
       }),
     );
+  }
+
+  Color _darken(Color color, [double amount = 0.4]) {
+    assert(amount >= 0 && amount <= 1);
+
+    final hsl = HSLColor.fromColor(color);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
   }
 }

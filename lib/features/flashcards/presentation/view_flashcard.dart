@@ -6,13 +6,16 @@ import 'package:flutter/material.dart';
 
 class FlashcardView extends StatefulWidget {
   final FlashcardViewModel viewModel;
+  final VoidCallback onAgain;
   final String notebookId;
   final int mastery;
   final String uid;
+  
   const FlashcardView({
     super.key,
     required this.viewModel,
     required this.notebookId,
+    required this.onAgain,
     required this.mastery,
     required this.uid,
   });
@@ -103,14 +106,9 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
               body: FlashcardResultsView(
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
                 onAgain: (vm.status == FlashcardSessionStatus.complete 
-                && vm.hasMoreCardsForToday) ? () {
-                  setState(() {
-                    _answerRevealed = false;
-                    _infoRevealed = false;
-                    _switchSide = false;
-                    _controller.reset();
-                  });
-                  vm.startNextSession();
+                && vm.hasMoreCardsForToday) ? () async {
+                  await Navigator.of(context, rootNavigator: true).maybePop();
+                  widget.onAgain();
                 } : null,
                 prevMastery: widget.mastery,
               ),
