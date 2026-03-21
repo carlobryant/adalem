@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class IdentificationView extends StatefulWidget {
   final String questionText;
   final String correctAnswer;
-  final ValueChanged<bool> onSubmit;
+  final Future<void> Function(bool, String) onSubmit;
 
   const IdentificationView({
     required this.questionText,
@@ -23,10 +23,9 @@ class _IdentificationViewState extends State<IdentificationView> {
   void _submit() {
     final typedAnswer = _controller.text.trim().toLowerCase();
     final correctAnswer = widget.correctAnswer.trim().toLowerCase();
-    
-    // Clear controller for the next potential question
+
     _controller.clear(); 
-    widget.onSubmit(typedAnswer == correctAnswer);
+    widget.onSubmit(typedAnswer == correctAnswer, correctAnswer);
   }
 
   @override
@@ -37,21 +36,45 @@ class _IdentificationViewState extends State<IdentificationView> {
 
   @override
   Widget build(BuildContext context) {
+    final parts = widget.questionText.split('?:');
+    final question = parts[0].trim();
+    final hint = parts.length > 1 ? parts[1].trim() : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      
       children: [
+        Spacer(),
         Expanded(
           child: Center(
             child: SingleChildScrollView(
-              child: Text(
-                widget.questionText,
-                style: Theme.of(context).textTheme.headlineSmall,
-                textAlign: TextAlign.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    question,
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
+                  if (hint != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      hint,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 5),
         TextField(
           controller: _controller,
           decoration: const InputDecoration(
@@ -62,15 +85,6 @@ class _IdentificationViewState extends State<IdentificationView> {
           onSubmitted: (_) => _submit(),
         ),
         const SizedBox(height: 16),
-        // ElevatedButton(
-        //   onPressed: _submit,
-        //   style: ElevatedButton.styleFrom(
-        //     padding: const EdgeInsets.all(16.0),
-        //     backgroundColor: Theme.of(context).colorScheme.primary,
-        //     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        //   ),
-        //   child: const Text("Submit Answer", style: TextStyle(fontSize: 16)),
-        // ),
         XLButton(
           onTap: _submit,
           child: Text("Submit Answer",
@@ -79,6 +93,7 @@ class _IdentificationViewState extends State<IdentificationView> {
             color: Theme.of(context).colorScheme.onPrimary,
           )),
         ),
+        Spacer(),
       ],
     );
   }

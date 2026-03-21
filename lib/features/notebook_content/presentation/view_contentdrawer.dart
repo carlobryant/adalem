@@ -17,28 +17,26 @@ import 'package:redacted/redacted.dart';
 
 class ContentDrawer extends StatefulWidget {
   final List<ChapterModel>? chapters;
-  final Function(int)? onChapterTap;
-
   final String notebookTitle;
   final String notebookId;
+  final Color primary;
   final int mastery;
 
+  final bool autoRedirectToFlashcard;
+  final Function(int)? onChapterTap;
   final VoidCallback onBack;
-  final Color primary;
   
-
   const ContentDrawer({
     super.key,
     this.chapters,
-    this.onChapterTap,
-
     required this.notebookTitle,
     required this.notebookId,
     required this.mastery,
-
-    required this.onBack,
     required this.primary,
     
+    this.autoRedirectToFlashcard = false,
+    this.onChapterTap,
+    required this.onBack,
   });
 
   @override
@@ -59,6 +57,63 @@ class _ContentDrawerState extends State<ContentDrawer> {
         if (!_isBottomBarVisible) setState(() => _isBottomBarVisible = true);
       }
     });
+
+    if (widget.autoRedirectToFlashcard) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _redirectToStudy());
+    }
+  }
+
+  void _redirectToStudy({bool isQuiz = false}) async {
+    final currentUser = context.read<AuthRepo>().getCurrentUser();
+    if (currentUser == null) return;
+
+    final contentvm = context.read<ContentViewModel>();
+    final notebookvm = context.read<NotebookViewModel>();
+    
+    final uid = currentUser.uid;
+    final mastery = notebookvm.getMasteryFor(widget.notebookId, uid);
+
+    if (isQuiz) {
+      final quizvm = QuizViewModel(syncQuizHistory: context.read<SyncQuizHistory>());
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(value: quizvm,
+            child: QuizSessionView(viewModel: quizvm, 
+              notebookId: widget.notebookId, 
+              mastery: mastery, uid: uid,
+            ),
+          ),
+        ),
+      );
+
+      quizvm.initSession(contentvm.content!, currentMastery: mastery);
+    } else {
+      final userProgress = notebookvm.getProgressFor(widget.notebookId, uid);
+      final flashcardvm = FlashcardViewModel(
+        sm2: const SM2Algorithm(),
+        sessionService: const FlashcardSession(),
+        syncFlashcardProgress: context.read<SyncFlashcards>(),
+      );
+      
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(value: flashcardvm,
+            child: FlashcardView(viewModel: flashcardvm,
+              notebookId: widget.notebookId, 
+              uid: uid, mastery: mastery,
+            ),
+          ),
+        ),
+      );
+
+      if (contentvm.quizItemModels.isEmpty) {
+        await contentvm.loadNotebookContent(widget.notebookId, load: {ContentType.flashcards});
+      }
+      final allItems = contentvm.quizItemModels.map((q) => q.quizItem).toList();
+      flashcardvm.initSession(allItems, userProgress);
+    }
   }
 
   @override
@@ -165,51 +220,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
 
                         // FLASHCARD BUTTON
                         XLButton(
-                          onTap: () async {
-                            final contentvm = context.read<ContentViewModel>();
-                            final notebookvm = context.read<NotebookViewModel>();
-                            final currentUser = context.read<AuthRepo>().getCurrentUser();
-                            if (currentUser == null) return;
-
-                            final userProgress = notebookvm.getProgressFor(
-                              widget.notebookId,
-                              currentUser.uid,
-                            );
-
-                            final flashcardvm = FlashcardViewModel(
-                              sm2: const SM2Algorithm(),
-                              sessionService: const FlashcardSession(),
-                              syncFlashcardProgress: context.read<SyncFlashcards>(),
-                            );
-
-                            if (!context.mounted) return;
-                            Navigator.of(context, rootNavigator: true).push(
-                              MaterialPageRoute(
-                                builder: (_) => ChangeNotifierProvider.value(
-                                  value: flashcardvm,
-                                  child: FlashcardView(
-                                    viewModel: flashcardvm,
-                                    notebookId: widget.notebookId,
-                                    uid: currentUser.uid,
-                                    mastery: widget.mastery,
-                                  ),
-                                ),
-                              ),
-                            );
-
-                            if (contentvm.quizItemModels.isEmpty) {
-                              await contentvm.loadNotebookContent(
-                                widget.notebookId,
-                                load: {ContentType.flashcards},
-                              );
-                            }
-
-                            final allItems = contentvm.quizItemModels
-                                .map((q) => q.quizItem)
-                                .toList();
-
-                            flashcardvm.initSession(allItems, userProgress);
-                          },
+                          onTap: () => _redirectToStudy(),
                           child: Column(
                           children: [
                             Text(
@@ -234,32 +245,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
 
                         // QUIZ BUTTON
                         XLButton(
-                          onTap: () async {
-                            final contentvm = context.read<ContentViewModel>();
-                            final currentUser = context.read<AuthRepo>().getCurrentUser();
-                            if (currentUser == null) return;
-
-                            final quizvm = QuizViewModel(
-                              syncQuizHistory: context.read<SyncQuizHistory>(),
-                            );
-
-                            if (!context.mounted) return;
-                            Navigator.of(context, rootNavigator: true).push(
-                              MaterialPageRoute(
-                                builder: (_) => ChangeNotifierProvider.value(
-                                  value: quizvm,
-                                  child: QuizSessionView(
-                                    viewModel: quizvm,
-                                    notebookId: widget.notebookId,
-                                    mastery: widget.mastery,
-                                    uid: currentUser.uid,
-                                  ),
-                                ),
-                              ),
-                            );
-
-                            quizvm.initSession(contentvm.content!, currentMastery: widget.mastery);
-                          },
+                          onTap: () => _redirectToStudy(isQuiz: true),
                           child: Column(
                           children: [
                             Text(

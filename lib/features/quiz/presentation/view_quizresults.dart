@@ -45,75 +45,74 @@ class QuizResultView extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-              Positioned(
-                bottom: 150,
-                child: MasteryAnimation(mastery: currentLevel.id)
+            Positioned(
+              bottom: 150,
+              child: MasteryAnimation(
+                addPts: sessionScore,
+                currPts: relativeXp,
+                maxPts: relativeMaxXp,
+                mastery: currentLevel.id,
+                progress: progress,
+                )
+              ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  border: BoxBorder.fromLTRB(top: BorderSide(
+                    width: 3,
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    )),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      offset: Offset(0, -3),
+                    ),
+                  ],
                 ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Spacer(),
-                  const SizedBox(height: 40),
-
-                  // MASTERY PROGRESS
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 5),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 24,
-                          backgroundColor: Theme.of(context).colorScheme.onSurface,
-                          color: Theme.of(context).colorScheme.primary,
+                child: SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 2),
+                        _buildStatRow("Quiz Difficulty", aveDifficulty, context),
+                        Divider(color: Theme.of(context).colorScheme.inversePrimary),
+                        const SizedBox(height: 8),
+                        _buildStatRow("Accuracy", "$accuracyPercent%", context),
+                        const SizedBox(height: 5),
+                        _buildStatRow("Number of Items", "$noItems", context),
+                        const SizedBox(height: 5),
+                        Text("(Adjusts based on performance and difficulty of items)",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "+$sessionScore Points",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          Text(
-                            "$relativeXp / $relativeMaxXp Points",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                        const SizedBox(height: 30),
+                        XLButton(onTap: () => Navigator.of(context).pop(),
+                        inversed: true,
+                        surfacecolor: Theme.of(context).colorScheme.primary,
+                        child: Text("Done", 
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ))),
+                      ],
+                    ),
                   ),
-
-                  Divider(color: Theme.of(context).colorScheme.onSurface),
-                  const SizedBox(height: 25),
-                  _buildStatRow("Quiz Difficulty", aveDifficulty, context),
-                  const SizedBox(height: 8),
-                  _buildStatRow("Number of Items", "$noItems", context),
-                  const SizedBox(height: 8),
-                  _buildStatRow("Accuracy", "$accuracyPercent%", context),
-                  const SizedBox(height: 50),
-                  XLButton(onTap: () => Navigator.of(context).pop(),
-                  child: Text("Done", 
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    ))),
-                ],
+                ),
               ),
             ),
           ],
@@ -130,17 +129,17 @@ class QuizResultView extends StatelessWidget {
         children: [
           Text("${label.toUpperCase()}: ", 
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
           )),
           Text(value.toUpperCase(), 
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontFamily: "LoveYaLikeASister",
               letterSpacing: 2,
               fontWeight: FontWeight.w900,
-              color: Theme.of(context).colorScheme.primary,
+              color: Theme.of(context).colorScheme.onPrimary,
           )),
         ],
       ),

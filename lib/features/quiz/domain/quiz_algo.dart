@@ -14,52 +14,40 @@ class StaircaseAlgorithm {
   final AxisState _formatAxis;
 
   bool shouldEndSession = false;
-  
-  // ── Session Tracking Counters ──
   int _totalItemsThisSession = 0;
   int _totalCorrectThisSession = 0;
   int _sessionScoreXp = 0;
   double _accumulatedDifficulty = 0.0;
 
-  // CLT-derived session caps:
-  // Hard content  → 6 items  (Cowan's 4±1 chunks)
-  // Medium content → 9 items
-  // Easy content   → 12 items
+  final Set<int> _servedItemIds = {};
+  final Set<int> _servedScenarioIds = {};
+
+  // COWAN'S 4±1 CHUNKS (CLT-DERIVED):
+  // EASY: 12 ITEMS, MEDIUM: 9 ITEMS, HARD: 6 ITEMS
   static const Map<int, int> _sessionCaps = {1: 12, 2: 9, 3: 6};
 
-  /// [initialDifficulty] is passed from the user's previous history 'aveDifficulty'.
-  /// If the user is new and has no history, default it to 1.0.
+  /// FROM USER'S PREVIOUS AVERAGE DIFFICULTY
   StaircaseAlgorithm({
     required this.content,
     double initialDifficulty = 1.0, 
   })  : _contentAxis = AxisState(name: 'content', difficulty: initialDifficulty),
         _formatAxis = AxisState(name: 'format', difficulty: initialDifficulty);
 
-  // ── Public Getters ──────────────────────────────────────────
-
-  /// Current content difficulty (1 = Easy, 2 = Medium, 3 = Hard)
+  // CONTENT DIFFICULTY (EASY: 1, MEDIUM: 2, HARD: 3)
   int get targetContent => _contentAxis.target;
-
-  /// Current format difficulty (1 = MC, 2 = Scenario, 3 = Identification)
+  // FORMAT DIFFICULTY (MC: 1, SCENARIO: 2, IDENTIFICATION: 3)
   int get targetFormat => _formatAxis.target;
-
   int get itemsServedThisSession => _totalItemsThisSession;
 
-  // ── Core Methods ────────────────────────────────────────────
-
-  /// Records the result of a completed item and updates both axes.
   void recordResult(
     bool isCorrect, {
     required int contentLevel,
     required int formatLevel,
   }) {
-    // Track the difficulty of the specific question that was just answered
     _accumulatedDifficulty += ((contentLevel + formatLevel) / 2.0);
 
     if (isCorrect) {
       _totalCorrectThisSession++;
-      
-      // Award XP based on the format difficulty
       if (formatLevel == 1) {
         _sessionScoreXp += 10; // Multiple Choice
       } else if (formatLevel == 2) {
@@ -140,7 +128,12 @@ class StaircaseAlgorithm {
   dynamic getNextQuestion() {
     final contentLevel = targetContent;
     final formatLevel  = targetFormat;
-
+    if (formatLevel == 2 && content.scenarios.isEmpty) {
+      return _getQuizItem(contentLevel);
+    }
+    if ((formatLevel == 1 || formatLevel == 3) && content.items.isEmpty) {
+      return _getScenario(contentLevel);
+    }
     return switch (formatLevel) {
       1 => _getQuizItem(contentLevel),
       2 => _getScenario(contentLevel),
@@ -155,6 +148,8 @@ class StaircaseAlgorithm {
     _totalCorrectThisSession = 0;
     _sessionScoreXp = 0;
     _accumulatedDifficulty = 0.0;
+    _servedItemIds.clear();
+    _servedScenarioIds.clear();
     _contentAxis.resetSession();
     _formatAxis.resetSession();
   }
@@ -164,9 +159,6 @@ class StaircaseAlgorithm {
     _contentAxis.resetFull();
     _formatAxis.resetFull();
   }
-
-  // Diagnostics and private item selectors remain unchanged...
-  // (Included below just for completeness if you are copy-pasting)
   
   Map<String, dynamic> get diagnostics => {
     'contentDifficulty': _contentAxis.difficulty,
@@ -189,18 +181,56 @@ class StaircaseAlgorithm {
     List<QuizItem> pool = content.items
         .where((item) => item.difficulty == contentLevel)
         .toList();
-    if (pool.isEmpty) pool = List.from(content.items);
 
-    return pool[_random.nextInt(pool.length)];
+    if (pool.isEmpty) pool = List.from(content.items);
+     final unseenPool = pool.where((item) => !_servedItemIds.contains(item.id)).toList();
+    final finalPool = unseenPool.isNotEmpty ? unseenPool : pool;
+    if (unseenPool.isEmpty) {
+      _servedItemIds.removeAll(pool.map((item) => item.id));
+    }
+
+    final item = finalPool[_random.nextInt(finalPool.length)];
+    _servedItemIds.add(item.id);
+
+      if (targetFormat == 3) {
+        return QuizItem(
+          id: item.id,
+          text: '${item.text}?:Give the full answer in ${_identificationHint(item.answer)}',
+          answer: item.answer,
+          difficulty: item.difficulty,
+        );
+      }
+
+      return item;
   }
 
   Scenario _getScenario(int contentLevel) {
     List<Scenario> pool = content.scenarios
         .where((s) => s.difficulty == contentLevel)
         .toList();
-    if (pool.isEmpty) pool = List.from(content.scenarios);
 
-    return pool[_random.nextInt(pool.length)];
+    if (pool.isEmpty) pool = List.from(content.scenarios);
+    final indexedPool = pool.asMap().entries.toList();
+    final unseenPool = indexedPool
+        .where((entry) => !_servedScenarioIds.contains(entry.key))
+        .toList();
+
+    final finalPool = unseenPool.isNotEmpty ? unseenPool : indexedPool;
+    if (unseenPool.isEmpty) {
+      _servedScenarioIds.removeAll(indexedPool.map((e) => e.key));
+    }
+
+    final entry = finalPool[_random.nextInt(finalPool.length)];
+    _servedScenarioIds.add(entry.key);
+
+    final targetScenario = entry.value;
+    final shuffledOptions = List<String>.from(targetScenario.options)..shuffle(_random);
+    return Scenario(
+      text: targetScenario.text,
+      options: shuffledOptions,
+      answer: targetScenario.answer,
+      difficulty: targetScenario.difficulty,
+    );
   }
 }
 
@@ -217,4 +247,58 @@ Attribution attributeError(int contentLevel, int formatLevel, bool isCorrect) {
 
   // Ambiguous — penalise both
   return Attribution.both;
+}
+
+String _identificationHint(String answer) {
+  final trimmed = answer.trim();
+  final abbrEnd   = RegExp(r'^(.+)\s+\(([A-Z0-9\-\/\.]+)\)\s*$');
+  final abbrStart = RegExp(r'^\(([A-Z0-9\-\/\.]+)\)\s+(.+)$');
+
+  if (abbrStart.hasMatch(trimmed)) {
+    final textPart = abbrStart.firstMatch(trimmed)!.group(2)!;
+    final format = _caseFormat(textPart);
+    return "'(ABBREVIATION) $format'";
+  }
+  if (abbrEnd.hasMatch(trimmed)) {
+    final textPart = abbrEnd.firstMatch(trimmed)!.group(1)!;
+    final format = _caseFormat(textPart);
+    return "'$format (ABBREVIATION)'";
+  }
+  if (trimmed == trimmed.toUpperCase() && trimmed.contains(RegExp(r'[A-Z]'))) {
+    return "'UPPERCASE FORMAT'";
+  }
+  if (trimmed == trimmed.toLowerCase() && trimmed.contains(RegExp(r'[a-z]'))) {
+    return "'lowercase format'";
+  }
+  return "'${_caseFormat(trimmed)}'";
+}
+
+String _caseFormat(String text) {
+  final words = text.trim().split(RegExp(r'\s+'));
+  if (words.isEmpty) return "Title Case Format";
+
+  const minorWords = {'a', 'an', 'the', 'and', 'but', 'or', 'for',
+      'nor', 'on', 'at', 'to', 'by', 'in', 'of', 'up', 'as'};
+  int capitalizedMajor = 0;
+  int totalMajor = 0;
+
+  for (int i = 0; i < words.length; i++) {
+    final word = words[i];
+    if (word.isEmpty) continue;
+    final isMinor = minorWords.contains(word.toLowerCase());
+    final isMajor = !isMinor || i == 0 || i == words.length - 1;
+    if (isMajor) {
+      totalMajor++;
+      if (word[0] == word[0].toUpperCase() && word[0].contains(RegExp(r'[A-Z]'))) {
+        capitalizedMajor++;
+      }
+    }
+  }
+  if (capitalizedMajor == 1 && words[0][0].contains(RegExp(r'[A-Z]'))) {
+    return "Sentence case format";
+  }
+  if (totalMajor > 0 && capitalizedMajor == totalMajor) {
+    return "Title Case Format";
+  }
+  return "Title Case Format";
 }

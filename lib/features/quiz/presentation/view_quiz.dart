@@ -27,35 +27,49 @@ class QuizSessionView extends StatefulWidget {
 }
 
 class _QuizSessionViewState extends State<QuizSessionView> {
+  bool _isAnswerLocked = false;
+  String? _selectedAnswer;
   int noItems = 0;
 
   Future<bool> _onWillPop() async {
-  final vm = widget.viewModel;
-  if (vm.status == QuizSessionStatus.complete) return true;
+    final vm = widget.viewModel;
+    if (vm.status == QuizSessionStatus.complete) return true;
 
-  final shouldExit = await Navigator.of(context).push<bool>(
-    PopupHeroDialog(builder: (context) => QuizExitPopup(
-      onConfirm: () {
-        Navigator.of(context).pop(true);
-      },
-      onCancel: () => Navigator.of(context).pop(false),
-    ))
-  );
+    final shouldExit = await Navigator.of(context).push<bool>(
+      PopupHeroDialog(builder: (context) => QuizExitPopup(
+        onConfirm: () => Navigator.of(context).pop(true),
+        onCancel: () => Navigator.of(context).pop(false),
+      ))
+    );
 
-  if (shouldExit == true && context.mounted) {
-    await vm.endSessionEarly(notebookId: widget.notebookId, uid: widget.uid);
-    return true;
+    if (shouldExit == true && context.mounted) {
+      await vm.endSessionEarly();
+      return true;
+    }
+    return false;
   }
-  return false;
-}
 
-  void _submitAnswer(bool isCorrect) {
-    setState(() => noItems++);
+  Future<void> _submitAnswer(bool isCorrect, String answer) async {
+    if (_isAnswerLocked) return;
+    setState(() {
+      _isAnswerLocked = true;
+      _selectedAnswer = answer;
+      noItems++;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    if (!mounted) return;
     widget.viewModel.submitAnswer(
       notebookId: widget.notebookId,
       uid: widget.uid,
       isCorrect: isCorrect,
     );
+
+    setState(() {
+      _isAnswerLocked = false;
+      _selectedAnswer = null;
+    });
   }
 
   @override
@@ -66,6 +80,7 @@ class _QuizSessionViewState extends State<QuizSessionView> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldPop = await _onWillPop();
+
         if (shouldPop && context.mounted) {
           Navigator.of(context).pop();
         }
@@ -77,7 +92,7 @@ class _QuizSessionViewState extends State<QuizSessionView> {
 
           // LOADING OR ERROR
           if (vm.status == QuizSessionStatus.idle) {
-            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+            return const Scaffold(body: Center(child: LoaderAnimation(loading: ["Loading Quiz"])));
           }
           if (vm.status == QuizSessionStatus.error || vm.status == QuizSessionStatus.syncError) {
             return Scaffold(
@@ -179,7 +194,9 @@ class _QuizSessionViewState extends State<QuizSessionView> {
           child: Center(
             child: Text(
               model.quizItem.text,
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: TextStyle(
+                fontSize: 22,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -188,7 +205,10 @@ class _QuizSessionViewState extends State<QuizSessionView> {
         ...?model.generatedOptions?.map((option) => Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: XLButton(
-                onTap: () => _submitAnswer(option == model.quizItem.answer), 
+                onTap: () => _submitAnswer(option == model.quizItem.answer, model.quizItem.answer),
+                isItem: true,
+                isLocked: !_isAnswerLocked,
+                isCorrect: _selectedAnswer == option,
                 child: Text(option, 
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
@@ -218,7 +238,10 @@ class _QuizSessionViewState extends State<QuizSessionView> {
         ...model.scenario.options.map((option) => Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: XLButton(
-                onTap: () => _submitAnswer(option == model.scenario.answer), 
+                onTap: () => _submitAnswer(option == model.scenario.answer, model.scenario.answer), 
+                isItem: true,
+                isLocked: _isAnswerLocked,
+                isCorrect: _selectedAnswer == option,
                 child: Text(option, 
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
@@ -233,7 +256,6 @@ class _QuizSessionViewState extends State<QuizSessionView> {
   }
 
   Widget _buildIdentification(QuizItemModel model) {
-    // Delegates to a separate Stateful widget to handle text input lifecycle
     return IdentificationView(
       questionText: model.quizItem.text,
       correctAnswer: model.quizItem.answer,

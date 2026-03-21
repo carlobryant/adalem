@@ -71,7 +71,7 @@ class _QuizExitPopupState extends State<QuizExitPopup> {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text("Answered items will be saved, but ending will start a new quiz session.",
+                                  child: Text("Current quiz session and points earned will not be saved.",
                                     style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.center,

@@ -102,7 +102,8 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
             return Scaffold(
               body: FlashcardResultsView(
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
-                onAgain: vm.status == FlashcardSessionStatus.complete ? () {
+                onAgain: (vm.status == FlashcardSessionStatus.complete 
+                && vm.hasMoreCardsForToday) ? () {
                   setState(() {
                     _answerRevealed = false;
                     _infoRevealed = false;
@@ -120,7 +121,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
           final int toReview = vm.sessionItems.length - vm.currentIndex + 1;
           return Scaffold(
             appBar: AppBar(
-              title: toReview > 0 ? Text("Flashcards to review: $toReview")
+              title: toReview > 0 ? Text("Flashcards to review: ${toReview - 1}")
               : Text("Flashcards to Review: 0"),
             ),
             body: Stack(

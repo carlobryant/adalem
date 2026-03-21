@@ -1,9 +1,9 @@
 enum MasteryLevel {
   level1(id: 1, minXp: 0, label: "Novice", asset: "assets/ic_mastery1.png"),
   level2(id: 2, minXp: 100, label: "Advanced Beginner", asset: "assets/ic_mastery2.png"),
-  level3(id: 3, minXp: 500, label: "Competent", asset: "assets/ic_mastery3.png"),
-  level4(id: 4, minXp: 1000, label: "Proficient", asset: "assets/ic_mastery4.png"),
-  level5(id: 5, minXp: 1500, maxXp: 2000, label: "Expert", asset: "assets/ic_mastery5.png");
+  level3(id: 3, minXp: 600, label: "Competent", asset: "assets/ic_mastery3.png"),
+  level4(id: 4, minXp: 1400, label: "Proficient", asset: "assets/ic_mastery4.png"),
+  level5(id: 5, minXp: 2400, maxXp: 12400, label: "Expert", asset: "assets/ic_mastery5.png");
 
   final int id;
   final int minXp;

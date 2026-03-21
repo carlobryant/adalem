@@ -119,6 +119,17 @@ class FlashcardViewModel extends ChangeNotifier {
     }
   }
 
+  bool get hasMoreCardsForToday {
+    if (_allItems.isEmpty) return false;
+    
+    final nextSessionIds = _sessionService.buildSession(
+      allItems: _allItems,
+      progress: _currentProgress,
+    );
+    
+    return nextSessionIds.isNotEmpty;
+  }
+
   Future<void> _saveSessionProgress(String notebookId, String uid, {bool early = false}) async {
     try {
       await _syncFlashcards(

@@ -1,5 +1,5 @@
 import 'package:adalem/core/components/animation_mastery.dart';
-import 'package:adalem/core/components/button_sm.dart';
+import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/model_mastery.dart';
 import 'package:flutter/material.dart';
 
@@ -42,112 +42,84 @@ class FlashcardResultsView extends StatelessWidget {
         children: [
           Positioned(
                 bottom: 150,
-                child: MasteryAnimation (mastery: currentLevel.id)
+                child: MasteryAnimation (
+                  addPts: onAgain != null ? flashcardXp : null,
+                  currPts: relativeXp,
+                  maxPts: relativeMaxXp,
+                  mastery: currentLevel.id,
+                  progress: progress,
+                  )
                 ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Spacer(),
-                const SizedBox(height: 40),
-
-                  // MASTERY PROGRESS
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 5),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: LinearProgressIndicator(
-                        value: progress,
-                        minHeight: 24,
-                        backgroundColor: Theme.of(context).colorScheme.onSurface,
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                border: BoxBorder.fromLTRB(top: BorderSide(
+                  width: 3,
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  )),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, -3),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(onAgain != null ? "(30 points is rewarded for every completed flashcard session)"
+                      : "(Flashcards are displayed at calculated intervals to reduce extraneous cognitive load)",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Divider(color: Theme.of(context).colorScheme.inversePrimary),
+                      const SizedBox(height: 15),
+                      Text(onAgain != null ? "Ready for more?"
+                        : "All caught up! Check back later.",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 30),
+                      onAgain != null ?
+                      XLButton(onTap: onAgain, inversed: true,
+                      surfacecolor: Theme.of(context).colorScheme.primary,
+                      child: Text("Start Again",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        flashcardXp > 0 ?
-                        Text(
-                          "+$flashcardXp Points",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        )
-                        : Spacer(),
-                        Text(
-                          "$relativeXp / $relativeMaxXp Points",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-                Divider(color: Theme.of(context).colorScheme.onSurface),
-                SizedBox(height: 30),
-
-                onAgain != null ? 
-                Text("30 Points is rewarded for every completed flashcard session",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
+                      ))) : const SizedBox.shrink(),
+                      SizedBox(height: 10),
+                      XLButton(onTap: onBack, inversed: true,
+                      surfacecolor: Theme.of(context).colorScheme.primary,
+                      child: Text("Done", 
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ))),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                )
-                : SizedBox(height: 20),
-                SizedBox(height: 50),
-                Text(onAgain != null ? "Ready for more?"
-                  : "All caught up! Check back later.",
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 10),
-            
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SmallButton(
-                      onBack: onBack,
-                      child:  Text("Return",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-            
-                    if (onAgain != null)
-                    SizedBox(width: 30),
-            
-                    if (onAgain != null)
-                    SmallButton(
-                      onTap: onAgain,
-                      child: Text("Ready",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 50),
-              ],
+              ),
             ),
           ),
         ],

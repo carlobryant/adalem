@@ -95,7 +95,6 @@ class QuizViewModel extends ChangeNotifier {
     required bool isCorrect,
   }) async {
     if (_status != QuizSessionStatus.active || _algorithm == null) return;
-
     _isProcessing = true;
     notifyListeners();
 
@@ -128,16 +127,13 @@ class QuizViewModel extends ChangeNotifier {
   }
 
   // SUDDEN EXIT
-  Future<void> endSessionEarly({
-    required String notebookId,
-    required String uid,
-  }) async {
+  Future<void> endSessionEarly() async {
     if (_algorithm == null || _algorithm!.itemsServedThisSession == 0) return;
     if (_status != QuizSessionStatus.active) return;
 
-    _status = QuizSessionStatus.complete;
+    _algorithm?.resetSession();
+    _status = QuizSessionStatus.idle;
     notifyListeners();
-    await _saveQuizHistory(notebookId: notebookId, uid: uid);
   }
 
   void resetSession() {
@@ -171,7 +167,7 @@ class QuizViewModel extends ChangeNotifier {
       if (mode == QuizMode.multipleChoice) {
         final content = _algorithm!.content;
         final distractors = content.items
-            .where((i) => i.id != item.id)
+            .where((i) => i.id != item.id && i.answer.toLowerCase().trim() != item.answer.toLowerCase().trim())
             .toList()
           ..shuffle();
         options = [item.answer, ...distractors.take(3).map((i) => i.answer)]

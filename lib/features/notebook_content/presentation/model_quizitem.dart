@@ -15,7 +15,7 @@ class QuizItemModel {
     required this.quizItem,
     required this.mode,
     this.generatedOptions,
-    this.userTypedAnswer = '',
+    this.userTypedAnswer = "",
     this.selectedOption,
     this.isRevealed = false,
   });
@@ -57,7 +57,7 @@ class QuizItemModel {
       quizItem: quizItem,
       mode: mode,
       generatedOptions: generatedOptions,
-      userTypedAnswer: '',
+      userTypedAnswer: "",
       selectedOption: null,
       isRevealed: false,
     );
