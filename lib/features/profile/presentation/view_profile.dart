@@ -5,6 +5,7 @@ import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/view_signoutpopup.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +47,7 @@ class _ProfileViewState extends State<ProfileView> {
     if(profilevm.errorMessage != null) return;
 
     context.read<NotebookViewModel>().clearData();
-    context.read<LoginViewModel>().reset();
+    //context.read<LoginViewModel>().reset();
 
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
     MaterialPageRoute(builder: (context) => const LoginView()),
@@ -58,7 +59,6 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
     final user = viewModel.user!;
-    final username = user.name.isNotEmpty ? user.name : "User";
 
     return Scaffold(
       body: NestedScrollView(
@@ -66,8 +66,24 @@ class _ProfileViewState extends State<ProfileView> {
           SliverAppBar(
             floating: true,
             snap: true,
+            leadingWidth: 45,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Center(
+                child: CircleAvatar(
+                  foregroundImage: user.photoURL.isNotEmpty ? 
+                  CachedNetworkImageProvider(user.photoURL) : null,
+                  backgroundColor: Theme.of(context).colorScheme.onSurface,
+                  child: Image(
+                    image: const AssetImage("assets/ic_error.png"),
+                    color: Theme.of(context).colorScheme.surface,
+                    width: 18,
+                  ),
+                ),
+              ),
+            ),
             title: Text(
-            username,
+            user.name,
             style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -82,7 +98,7 @@ class _ProfileViewState extends State<ProfileView> {
                     onPressed: () {
                       Navigator.of(context).push(
                         PopupHeroDialog(builder: (context) => SignOutPopup(
-                          username: username,
+                          username: user.name,
                           onConfirm: _handleSignOut,
                         ))
                       );
@@ -97,7 +113,92 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           )
         ],
-        body: Text("test")),
+        body: _buildBody(),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    final notebookvm = context.read<NotebookViewModel>();
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildRow("Course: ", "BS in Information Techonology"),
+            ),
+          ),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              _buildRow("Total Notebooks", "${notebookvm.notebookCount}", Icons.library_books), 
+              SizedBox(height: 20),
+              _buildRow("Shared Notebooks", "${notebookvm.sharedNotebookCount}", Icons.switch_account_rounded),
+              SizedBox(height: 20),
+              _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", Icons.collections_bookmark),
+              SizedBox(height:  10),
+            ],
+          )
+        ),
+
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("test"),
+            ),
+          ),
+        ),
+
+        Container(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("test"),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRow(String title, String end, [IconData? icon]){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        if(icon != null)
+        Icon(icon,
+          size: 40,
+        ),
+        if(icon != null)
+        SizedBox(width: 10),
+        Text(title,
+          style: TextStyle(
+            fontSize: 15,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        Spacer(),
+        Text(end,
+          style: TextStyle(
+            fontSize: 18,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }

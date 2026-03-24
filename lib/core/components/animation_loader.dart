@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class LoaderAnimation extends StatefulWidget {
   final List<String>? loading;
+  final bool onBlack;
 
-  const LoaderAnimation({super.key, this.loading});
+  const LoaderAnimation({super.key, this.loading, this.onBlack = false});
 
   @override
   State<LoaderAnimation> createState() => _LoaderAnimationState();
@@ -49,6 +50,9 @@ class _LoaderAnimationState extends State<LoaderAnimation>
 
   @override
   Widget build(BuildContext context) {
+    final color = widget.onBlack == true ? 
+    Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -68,14 +72,14 @@ class _LoaderAnimationState extends State<LoaderAnimation>
                 child: Image(
                   image: AssetImage("assets/ic_loadergear.png"),
                   width: 80,
-                  color: Colors.grey.shade600,
+                  color: color,
                   ),
                 ),
           
                 Image(
                   image: AssetImage("assets/ic_loader.png"),
                   width: 80,
-                  color: Colors.grey.shade600,
+                  color: color,
                   ),
             ],
           ),

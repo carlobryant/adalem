@@ -49,7 +49,7 @@ class _SignOutPopupState extends State<SignOutPopup> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(20.0),
                       child: Center(
-                        child: Text("Sign Out Account",
+                        child: Text("Sign Out",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onPrimary,
@@ -67,12 +67,22 @@ class _SignOutPopupState extends State<SignOutPopup> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text("Sign out ${widget.username}?",
-                                  style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                                const SizedBox(width: 10),
+                                Image(image: AssetImage("assets/ic_warning.png"), 
+                                color: Theme.of(context).colorScheme.inverseSurface,
+                                width: 30,
                                 ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text("Sign out ${widget.username} account?",
+                                    style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ), 
+                                const SizedBox(width: 10),
                               ],
                             ),
                           ),

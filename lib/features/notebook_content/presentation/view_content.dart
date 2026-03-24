@@ -1,3 +1,4 @@
+import 'package:adalem/core/app_theme.dart';
 import 'package:adalem/features/auth/domain/auth_repo.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
 import 'package:adalem/features/notebook_content/domain/uc_getcontent.dart';
@@ -275,6 +276,7 @@ class _ContentViewState extends State<_ContentView> {
                 mastery: mastery,
                 image: widget.image,
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
+                onClose: _closeDrawer,
                 toFlashcard: widget.toFlaschard,
                 toQuiz: widget.toQuiz,
                 ),
@@ -327,7 +329,7 @@ class _ContentViewState extends State<_ContentView> {
                   child: Text(
                     chapter.header.toUpperCase(),
                     style: TextStyle(
-                      color: _darken(notebookColors.primary),
+                      color: Recolor.darken(notebookColors.primary),
                       fontFamily: "LoveYaLikeASister",
                       fontWeight: FontWeight.w900,
                       letterSpacing: 2,
@@ -372,14 +374,5 @@ class _ContentViewState extends State<_ContentView> {
           );
       }),
     );
-  }
-
-  Color _darken(Color color, [double amount = 0.4]) {
-    assert(amount >= 0 && amount <= 1);
-
-    final hsl = HSLColor.fromColor(color);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-
-    return hslDark.toColor();
   }
 }

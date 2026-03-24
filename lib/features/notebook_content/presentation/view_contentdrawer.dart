@@ -1,5 +1,6 @@
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/model_mastery.dart';
+import 'package:adalem/core/app_theme.dart';
 import 'package:adalem/features/auth/domain/auth_repo.dart';
 import 'package:adalem/features/flashcards/domain/flashcard_algo.dart';
 import 'package:adalem/features/flashcards/domain/uc_syncflashcards.dart';
@@ -28,6 +29,7 @@ class ContentDrawer extends StatefulWidget {
   final bool toQuiz;
   final bool toFlashcard;
   final Function(int)? onChapterTap;
+  final VoidCallback? onClose; 
   final VoidCallback onBack;
   
   const ContentDrawer({
@@ -43,6 +45,7 @@ class ContentDrawer extends StatefulWidget {
     this.toQuiz = false,
     this.toFlashcard = false,
     this.onChapterTap,
+    this.onClose,
     required this.onBack,
   });
 
@@ -137,7 +140,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
       
       // DRAWER HEADER
       appBar: AppBar(
-        backgroundColor: _darken(widget.primary),
+        backgroundColor: Recolor.darken(widget.primary),
         foregroundColor: Theme.of(context).colorScheme.onPrimary, 
         elevation: 4, 
         shadowColor: Colors.black45,
@@ -152,51 +155,68 @@ class _ContentDrawerState extends State<ContentDrawer> {
             fontSize: 18,
           ),
         ),
+        actions: [
+          if (widget.onClose != null)
+            IconButton(
+              onPressed: widget.onClose,
+              icon: const Icon(Icons.menu_open, size: 28),
+            ),
+        ],
       ),
      
       // DRAWER LIST
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 80),
-            child: ListView.builder(
-                controller: _scrollController,
-                itemCount: widget.chapters == null ? 10 : widget.chapters!.length,
-                itemBuilder: (context, index) {
-                  final isLoading = widget.chapters == null || widget.onChapterTap == null;
-                
-                  final headerText = isLoading 
-                  ? "Fetching Chapters of ${widget.notebookTitle}..." 
-                  : widget.chapters![index].chapter.header;
-                    
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    title: Row(
-                      children: [
-                        Text(
-                          "${index + 1}. ",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20,
-                          ),
-                        ).redacted(context: context, redact: isLoading),
-                        SizedBox(width: 5),
-                        Expanded(
-                          child: Text(headerText,
-                            style: const TextStyle(
+          NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification is OverscrollNotification) {
+                setState(() => _isBottomBarVisible = notification.overscroll < 0);
+              }
+              return false;
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: ListView.builder(
+                  controller: _scrollController,
+                  physics: AlwaysScrollableScrollPhysics(),
+                  itemCount: widget.chapters == null ? 10 : widget.chapters!.length,
+                  itemBuilder: (context, index) {
+                    final isLoading = widget.chapters == null || widget.onChapterTap == null;
+                  
+                    final headerText = isLoading ? "Fetching Chapters of ${widget.notebookTitle}..." 
+                    : widget.chapters![index].chapter.header;
+                      
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      title: Row(
+                        children: [
+                          Text(
+                            "${index + 1}. ",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inverseSurface,
                               fontWeight: FontWeight.w600,
-                              fontSize: 15,
+                              fontSize: 20,
                             ),
-                            maxLines: 2,
                           ).redacted(context: context, redact: isLoading),
-                        ),
-                      ],
-                    ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
-                    onTap: isLoading ? null : () => widget.onChapterTap!(index),
-                  );
-                },
-              ),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: Text(headerText,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.inverseSurface,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                              maxLines: 2,
+                            ).redacted(context: context, redact: isLoading),
+                          ),
+                        ],
+                      ),
+                      trailing: const Icon(Icons.chevron_right, size: 20),
+                      onTap: isLoading ? null : () => widget.onChapterTap!(index),
+                    );
+                  },
+                ),
+            ),
           ),
 
             // DRAWER BUTTONS
@@ -211,7 +231,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                   color: widget.primary,
                   border: BoxBorder.fromLTRB(top: BorderSide(
                     width: 3,
-                    color: _darken(widget.primary),
+                    color: Recolor.darken(widget.primary),
                     )),
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   boxShadow: const [
@@ -225,7 +245,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                 child: SafeArea(
                   top: false, 
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
                     child: Column(
                       children: [
 
@@ -246,7 +266,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                             SizedBox(width: 8),
                             Text(widget.course,
                               style: TextStyle(
-                                color: _darken(widget.primary),
+                                color: Recolor.darken(widget.primary),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                               ),
@@ -255,7 +275,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                             Spacer(),
                             Text(MasteryLevel.fromXp(widget.mastery).label.toUpperCase(),
                               style: TextStyle(
-                                color: _darken(widget.primary),
+                                color: Recolor.darken(widget.primary),
                                 fontFamily: "LoveYaLikeASister",
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 2,
@@ -331,14 +351,5 @@ class _ContentDrawerState extends State<ContentDrawer> {
         ],
       ),
     );
-  }
-
-  Color _darken(Color color, [double amount = 0.4]) {
-    assert(amount >= 0 && amount <= 1);
-
-    final hsl = HSLColor.fromColor(color);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-
-    return hslDark.toColor();
   }
 }

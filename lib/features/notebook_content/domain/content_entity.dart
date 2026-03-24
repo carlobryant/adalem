@@ -1,7 +1,6 @@
 class NotebookContent {
   final String id;
   final String title;
-  final int chapterTotal;
   final String notebookId;
   final List<Chapter> chapters;
   final List<QuizItem> items;
@@ -10,12 +9,29 @@ class NotebookContent {
   const NotebookContent({
     required this.id,
     required this.title,
-    required this.chapterTotal,
     required this.notebookId,
     required this.chapters,
     required this.items,
     required this.scenarios,
   });
+
+  NotebookContent copyWith({
+    String? id,
+    String? title,
+    String? notebookId,
+    List<Chapter>? chapters,
+    List<QuizItem>? items,
+    List<Scenario>? scenarios,
+  }) {
+    return NotebookContent(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      notebookId: notebookId ?? this.notebookId,
+      chapters: chapters ?? this.chapters,
+      items: items ?? this.items,
+      scenarios: scenarios ?? this.scenarios,
+    );
+  }
 }
 
 class Chapter {

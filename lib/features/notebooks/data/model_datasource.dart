@@ -30,7 +30,7 @@ class NotebookDataModel extends Notebook {
       course: map['course'] as String? ?? '',
       image: map['image'] as String? ?? '',
       contentId: map['contentId'] as String? ?? '',
-      available: map['available'] as bool? ?? false,
+      available: map['available'] as String? ?? '',
     );
   }
 }
@@ -44,9 +44,9 @@ class NotebookUpdatedAtDataModel extends NotebookUpdatedAt {
 
   factory NotebookUpdatedAtDataModel.fromMap(Map<String, dynamic> map) {
     return NotebookUpdatedAtDataModel(
-      content:   (map['content']   as Timestamp?)?.toDate(),
+      content: (map['content'] as Timestamp?)?.toDate(),
       flashcard: (map['flashcard'] as Timestamp?)?.toDate(),
-      quiz:      (map['quiz']      as Timestamp?)?.toDate(),
+      quiz: (map['quiz'] as Timestamp?)?.toDate(),
     );
   }
 }
@@ -54,12 +54,20 @@ class NotebookUpdatedAtDataModel extends NotebookUpdatedAt {
 class NotebookUserDataModel extends NotebookUser {
   const NotebookUserDataModel({
     required super.mastery,
+    required super.quizStreak,
+    required super.flashcardStreak,
+    required super.quizSession,
+    required super.flashcardSession,
     required super.flashcards,
   });
 
   factory NotebookUserDataModel.fromMap(Map<String, dynamic> map) {
     return NotebookUserDataModel(
       mastery: map['mastery'] as int? ?? 0,
+      quizStreak: map['quizStreak'] as int? ?? 0,
+      flashcardStreak: map['flashcardStreak'] as int? ?? 0,
+      quizSession: (map['quizSession'] as Timestamp?)?.toDate(),
+      flashcardSession: (map['flashcardSession'] as Timestamp?)?.toDate(),
       flashcards: (map['flashcards'] as List<dynamic>? ?? [])
           .map((e) => NotebookFlashcardDataModel.fromMap(e as Map<String, dynamic>))
           .toList(),

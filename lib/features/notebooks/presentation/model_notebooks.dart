@@ -11,7 +11,7 @@ class NotebookModel {
   final String course;
   final String image;
   final String contentId; 
-  final bool available; 
+  final String available; 
 
   const NotebookModel({
     required this.id,
@@ -64,7 +64,7 @@ class NotebookModel {
       course: '',
       image: '',
       contentId: '',
-      available: false,
+      available: '',
     );
   }
 }

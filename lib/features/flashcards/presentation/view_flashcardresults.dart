@@ -43,7 +43,7 @@ class FlashcardResultsView extends StatelessWidget {
           Positioned(
                 bottom: 150,
                 child: MasteryAnimation (
-                  addPts: onAgain != null ? flashcardXp : null,
+                  addPts: flashcardXp,
                   currPts: relativeXp,
                   maxPts: relativeMaxXp,
                   mastery: currentLevel.id,

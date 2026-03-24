@@ -35,12 +35,12 @@ class _CreatingViewState extends State<CreatingView> {
 
   void _onViewModelChanged() {
     if (_createViewModel.isCreating) return;
-    if (_createViewModel.createError != null) {
+    if (_createViewModel.error != null) {
       setState(() {
         _createError = true;
       });
       Navigator.of(context, rootNavigator: true).pop();
-      ToastCard.error(context, _createViewModel.createError![0], description: _createViewModel.createError![1]);
+      ToastCard.error(context, _createViewModel.error!.header, description: _createViewModel.error!.description);
       _createViewModel.clearCreateError();
     }
     else if (_createViewModel.isSuccess) {

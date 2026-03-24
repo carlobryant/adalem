@@ -2,6 +2,7 @@ import 'package:adalem/core/components/card_network.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/animation_loader.dart';
+import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
 import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/shell.dart';
@@ -9,14 +10,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => LoginViewModel(
+        signInWithGoogle: context.read<SignInWithGoogle>(),
+      ),
+      child: const _LoginViewContent(),
+    );
+  }
 }
 
-class _LoginViewState extends State<LoginView> {
+class _LoginViewContent extends StatefulWidget {
+  const _LoginViewContent();
+
+  @override
+  State<_LoginViewContent> createState() => _LoginViewContentState();
+}
+
+class _LoginViewContentState extends State<_LoginViewContent> {
   late final LoginViewModel _viewModel;
 
   @override
@@ -38,22 +53,10 @@ class _LoginViewState extends State<LoginView> {
 
     if (result.success && result.user != null) {
       final user = result.user!;
-      ToastCard.success(
-        context,
-        "Hello ${user.name.isNotEmpty ? user.name : 'User'}!",
-        description: user.email,
-        icon: CircleAvatar(
-          radius: 25,
-          backgroundImage: NetworkImage(user.photoURL),
-          backgroundColor: Colors.grey.shade600,
-        ),
-      );
-
       context.read<NotebookViewModel>().loadNotebooks();
-
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const Shell()),
+        MaterialPageRoute(builder: (context) => Shell(welcomeUser: user)),
         (route) => false,
       );
     } else {
@@ -66,7 +69,7 @@ class _LoginViewState extends State<LoginView> {
       );
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<LoginViewModel>();

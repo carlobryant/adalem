@@ -1,22 +1,23 @@
-import 'dart:convert';
 import 'package:adalem/features/notebook_content/data/model_datasource.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 
 abstract class FirestoreContentDataSource {
   Future<NotebookContent?> fetchContent(String notebookId);
-  Future<NotebookContent> parseContent();
-
+  //Future<NotebookContent> parseContent();
   ({String notebookId, String contentId}) generateIds();
-  Future<void> batchCreateNotebookAndContent({
+  Future<void> createNotebook({
     required CreateNotebookParams params,
+    required String notebookId,
+    required String contentId,
+  });
+  Future<void> generateContent({
     required NotebookContent content,
     required String notebookId,
     required String contentId,
   });
-
+  Future<void> generateFailed({required String notebookId});
   Future<void> deleteOrLeaveNotebook({
     required String notebookId,
     required String contentId,
@@ -55,12 +56,12 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
     }
   }
 
-  @override
-  Future<NotebookContent> parseContent() async {
-    final jsonString = await rootBundle.loadString('assets/dummy.json');
-    final map = json.decode(jsonString) as Map<String, dynamic>;
-    return NotebookContentDataModel.fromMap({'id': '', ...map});
-  }
+  // @override
+  // Future<NotebookContent> parseContent() async {
+  //   final jsonString = await rootBundle.loadString("assets/dummy.json");
+  //   final map = json.decode(jsonString) as Map<String, dynamic>;
+  //   return NotebookContentDataModel.fromMap({'id': '', ...map});
+  // }
 
   @override
   ({String notebookId, String contentId}) generateIds() {
@@ -70,15 +71,12 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
   }
 
   @override
-  Future<void> batchCreateNotebookAndContent({
+  Future<void> createNotebook({
     required CreateNotebookParams params,
-    required NotebookContent content,
     required String notebookId,
     required String contentId,
   }) async {
-    final batch = _firestore.batch();
-
-    batch.set(_firestore.collection('notebooks').doc(notebookId), {
+    await _firestore.collection('notebooks').doc(notebookId).set({
       'owner': params.owner,
       'users': {
         params.owner: {'mastery': 0, 'flashcards': []},
@@ -93,12 +91,19 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
         'flashcard': FieldValue.serverTimestamp(),
         'quiz': FieldValue.serverTimestamp(),
       },
-      'available': true,
+      'available': "generating",
     });
+  }
 
+  @override
+  Future<void> generateContent({
+    required NotebookContent content,
+    required String notebookId,
+    required String contentId,
+  }) async {
+    final batch = _firestore.batch();
     batch.set(_firestore.collection('content').doc(contentId), {
       'title': content.title,
-      'chapterTotal': content.chapterTotal,
       'notebook': notebookId,
       'chapters': _listToNumberedMap(
         content.chapters.map((c) => {'header': c.header, 'body': c.body}).toList(),
@@ -119,8 +124,27 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
         }).toList(),
       ),
     });
+
+    batch.update(_firestore.collection('notebooks').doc(notebookId), {
+      'available': "ready",
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': {
+        'content': FieldValue.serverTimestamp(),
+        'flashcard': FieldValue.serverTimestamp(),
+        'quiz': FieldValue.serverTimestamp(),
+      },
+    });
     
     await batch.commit();
+  }
+
+  @override
+  Future<void> generateFailed({
+    required String notebookId,
+  }) async {
+    await _firestore.collection('notebooks').doc(notebookId).update({
+      'available': "failed",
+    });
   }
 
   @override
@@ -130,7 +154,6 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
     required String userId,
   }) async {
     final notebookRef = _firestore.collection('notebooks').doc(notebookId);
-
     DocumentSnapshot<Map<String, dynamic>> snapshot;
     try {
       snapshot = await notebookRef.get(const GetOptions(source: Source.serverAndCache));
@@ -143,20 +166,22 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
     final data = snapshot.data()!;
     final usersMap = data['users'] as Map<String, dynamic>? ?? {};
 
+    final historySnapshot = await _firestore
+      .collection('history')
+      .where('notebookId', isEqualTo: notebookId)
+      .where('uid', isEqualTo: userId)
+      .get(const GetOptions(source: Source.serverAndCache));
+    
+    final batch = _firestore.batch();
+    for (final doc in historySnapshot.docs) {batch.delete(doc.reference);}
+    
     if (usersMap.length > 1) {
-
-      await notebookRef.update({
-        'users.$userId': FieldValue.delete(),
-      });
-      
+      batch.update(notebookRef, {'users.$userId': FieldValue.delete()});
     } else {
-      final batch = _firestore.batch();
-      
       batch.delete(notebookRef);
       batch.delete(_firestore.collection('content').doc(contentId));
-      
-      await batch.commit();
     }
+      await batch.commit();
   }
   
   Map<String, dynamic> _listToNumberedMap(List<Map<String, dynamic>> list) {

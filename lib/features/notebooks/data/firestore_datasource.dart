@@ -1,3 +1,4 @@
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/features/notebooks/data/model_datasource.dart';
 import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -51,7 +52,6 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     return aggregateQuery.count ?? 0;
   }
 
-
 @override
   Future<void> syncFlashcards({
     required String notebookId,
@@ -59,6 +59,19 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required List<NotebookFlashcard> progress,
     required bool isEarly,
   }) async {
+    final docRef = _firestore.collection('notebooks').doc(notebookId);
+    final snapshot = await docRef.get();
+    if (!snapshot.exists) return;
+
+    final data = snapshot.data()!;
+    final users = data['users'] as Map<String, dynamic>? ?? {};
+    final userData = users[uid] as Map<String, dynamic>? ?? {};
+
+    final lastSessionTs = userData['flashcardSession'] as Timestamp?;
+    final currentStreak = userData['flashcardStreak'] as int? ?? 0;
+
+    final newStreak = _calculateNewStreak(lastSessionTs, currentStreak);
+
     final flashcards = progress.map((card) => {
       'cardId': card.cardId,
       'quality': card.quality,
@@ -70,13 +83,14 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
 
     final Map<String, dynamic> updateData = {
       'users.$uid.flashcards': flashcards,
-      'updatedAt.flashcard': FieldValue.serverTimestamp(),
+      'users.$uid.flashcardSession': FieldValue.serverTimestamp(),
+      'users.$uid.flashcardStreak': newStreak,
     };
 
     if (!isEarly) {
-      updateData['users.$uid.mastery'] = FieldValue.increment(30);
+      updateData['users.$uid.mastery'] = FieldValue.increment(Constraint.flashcardPts.value);
     }
-    await _firestore.collection('notebooks').doc(notebookId).update(updateData);
+    await docRef.update(updateData);
   }
 
   @override
@@ -87,11 +101,24 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
   }) async {
     final notebookRef = _firestore.collection('notebooks').doc(notebookId);
     final historyRef = _firestore.collection('history').doc();
-    
+
+    final snapshot = await notebookRef.get();
+    if (!snapshot.exists) return;
+
+    final data = snapshot.data()!;
+    final users = data['users'] as Map<String, dynamic>? ?? {};
+    final userData = users[uid] as Map<String, dynamic>? ?? {};
+
+    final lastSessionTs = userData['quizSession'] as Timestamp?;
+    final currentStreak = userData['quizStreak'] as int? ?? 0;
+
+    final newStreak = _calculateNewStreak(lastSessionTs, currentStreak);
     final batch = _firestore.batch();
+
     batch.update(notebookRef, {
       'users.$uid.mastery': FieldValue.increment(history.score),
-      'updatedAt.quiz': FieldValue.serverTimestamp(),
+      'users.$uid.quizSession': FieldValue.serverTimestamp(),
+      'users.$uid.quizStreak': newStreak,
     });
 
     batch.set(historyRef, NotebookHistoryDataModel(
@@ -103,6 +130,26 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       accuracy: history.accuracy,
       createdAt: history.createdAt,
     ).toMap());
+
     await batch.commit();
+  }
+
+  int _calculateNewStreak(Timestamp? lastSessionTs, int currentStreak) {
+    if (lastSessionTs == null) return 1;
+
+    final now = DateTime.now();
+    final lastSession = lastSessionTs.toDate();
+    
+    final today = DateTime(now.year, now.month, now.day);
+    final lastDate = DateTime(lastSession.year, lastSession.month, lastSession.day);
+    
+    final difference = today.difference(lastDate).inDays;
+
+    if (difference == 1) {
+      return currentStreak + 1; 
+    } else if (difference > 1) {
+      return 1; 
+    }
+    return currentStreak;
   }
 }

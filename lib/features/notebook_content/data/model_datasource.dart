@@ -4,7 +4,6 @@ class NotebookContentDataModel extends NotebookContent {
   const NotebookContentDataModel({
     required super.id,
     required super.title,
-    required super.chapterTotal,
     required super.notebookId,
     required super.chapters,
     required super.items,
@@ -15,7 +14,6 @@ class NotebookContentDataModel extends NotebookContent {
     return NotebookContentDataModel(
       id: map['id'] as String? ?? '',
       title: map['title'] as String? ?? '',
-      chapterTotal: map['chapterTotal']?.toInt() ?? 0,
       notebookId: map['notebook'] as String? ?? '',
       chapters: _parseMapToList(map['chapters'], ChapterDataModel.fromMap),
       items: _parseMapToList(map['items'], QuizItemDataModel.fromMap),

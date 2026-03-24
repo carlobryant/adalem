@@ -1,3 +1,4 @@
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/explore/presentation/view_filterpopup.dart';
@@ -60,21 +61,24 @@ class ExploreViewState extends State<ExploreView> {
     String title,
     String course, 
     String image, 
-    bool available, 
+    String available, 
     String? contentId
   ) {
-    if(contentId==null) {
-      ToastCard.clearError();
-      if(!available) {
-        ToastCard.error(context, "Try Again Later",
-        description: "$title is still processing.");
-        return;
-      } else {
-        ToastCard.error(context, "Notebook Missing",
-        description: "$title not found.");
-        return;
-      }
+    ToastCard.clearError();
+    if(available == "generating") {
+      ToastCard.error(context, "Try Again Later",
+      description: "$title is still processing.");
+      return;
+    } else if(available == "failed") {
+      ToastCard.error(context, "Notebook Creation Failed.",
+      description: "$title failed to process. You can delete this notebook.");
+      return;
+    } else if(available != "ready") {
+      ToastCard.error(context, "Notebook Missing",
+      description: "$title not found. You can delete this notebook.");
+      return;
     }
+
     Navigator.of(context, rootNavigator: true)
       .push(MaterialPageRoute(
         builder: (context) => ContentView(
@@ -144,8 +148,19 @@ class ExploreViewState extends State<ExploreView> {
   }
 
   Widget _buildBody(NotebookViewModel viewModel) {
-    if (viewModel.streamError != null) {
-      return Center(child: Text(viewModel.streamError!));
+    if(viewModel.error != null) {
+      return Center(
+        child: Column(
+          children: [
+            LoaderAnimation(loading: [viewModel.error!.header]),
+            Text(viewModel.error!.description),
+          ],
+        )
+        );
+    }
+
+    if(viewModel.backendLoading){
+      return Center(child: LoaderAnimation());
     }
 
     final isLoading = viewModel.isLoading;
@@ -201,6 +216,7 @@ class ExploreViewState extends State<ExploreView> {
             updatedAt: notebook.updatedAt,
             image: notebook.image,
             isLoading: viewModel.isLoading,
+            isProcessing: notebook.available == "generating" ? true : false,
             onDelete: () async {
               await viewModel.fetchOwnerDetails(notebook.owner);
               if (!context.mounted) return;

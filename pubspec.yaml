@@ -13,16 +13,17 @@ dependencies:
   redacted: ^1.0.13
   provider: ^6.1.5+1
   flutter_svg: ^2.2.3
-  firebase_core: ^4.4.0
+  firebase_core: ^4.5.0
   firebase_auth: ^6.1.4
   google_sign_in: ^7.2.0
   toastification: ^3.0.3
   cloud_firestore: ^6.1.2
   super_sliver_list: ^0.4.1
   connectivity_plus: ^7.0.0
-  cached_network_image: ^3.3.1
+  cached_network_image: ^3.4.1
   flutter_markdown_plus: ^1.0.7
   flutter_launcher_icons: ^0.14.4
+  firebase_ai: ^3.9.0
 
 dev_dependencies:
   flutter_test:

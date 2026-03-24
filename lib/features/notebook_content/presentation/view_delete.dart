@@ -2,6 +2,7 @@ import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/notebook_content/presentation/vm_delete.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -92,14 +93,18 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Original owner:   ", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                Text("Original owner: ", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                const SizedBox(width: 5),
                 CircleAvatar(
                   radius: 12,
-                  foregroundImage: widget.ownerImage.isNotEmpty 
-                      ? NetworkImage(widget.ownerImage) 
-                      : null,
-                  backgroundImage: AssetImage("assets/ic_error.png"),
-                  backgroundColor: Theme.of(context).colorScheme.onSurface
+                  foregroundImage: widget.ownerImage.isNotEmpty ? 
+                  CachedNetworkImageProvider(widget.ownerImage) : null,
+                  backgroundColor: Theme.of(context).colorScheme.onSurface,
+                  child: Image(
+                    image: AssetImage("assets/ic_error.png"),
+                    color: Theme.of(context).colorScheme.surface,
+                    width: 18,
+                    ),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -125,14 +130,13 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
                   );
                 
                 ToastCard.success(context, "Notebook Deleted");
-                //Navigator.pop(context);
-                //Navigator.of(context, rootNavigator: true).pop();
               },
               child: Text("Delete ${widget.title}",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.w900,
                   ),
+                  textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 80),

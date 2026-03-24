@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
@@ -23,13 +24,12 @@ class NotebookViewModel extends ChangeNotifier {
         _getCurrentUser = getCurrentUser,
         _getUserProfile = getUserProfile;
 
-
   // NOTEBOOK SORT & SEARCH
   String _searchQuery = "";
   String get searchQuery => _searchQuery;
 
-  String? _streamError;
-  String? get streamError => _streamError;
+  ErrorModel? _error;
+  ErrorModel? get error => _error;
 
   SortOption _currentSort = SortOption.latest;
   SortOption get currentSort => _currentSort;
@@ -75,9 +75,9 @@ class NotebookViewModel extends ChangeNotifier {
   // LOAD NOTEBOOKS
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  
-  String? _errorMessage;
-  String? get errorMessage => _errorMessage;
+
+  bool _backendLoding = false;
+  bool get backendLoading => _backendLoding;
 
   void loadNotebooks() {
   _subscription?.cancel();
@@ -87,7 +87,11 @@ class NotebookViewModel extends ChangeNotifier {
     final currentUser = _getCurrentUser();
 
     if (currentUser == null) {
-      _streamError = "User not logged in";
+      _error = const ErrorModel(
+        header: "No User Found", 
+        description: "Unexpected error, no user signed in."
+      );
+      _backendLoding = false;
       _isLoading = false;
       notifyListeners();
       return;
@@ -97,16 +101,28 @@ class NotebookViewModel extends ChangeNotifier {
     (notebooks) {
       _notebooks = notebooks.map(NotebookModel.fromEntity).toList();
       _isLoading = false;
-      _streamError = null;
+      _backendLoding = false;
+      _error = null;
       notifyListeners();
     },
     onError: (e) {
-        _streamError = "Service Unavailable, Please Check Your Connection";
+        _backendLoding = true;
         _isLoading = false;
         notifyListeners();
       },
     );
   }
+
+  // NOTEBOOK COUNT
+  int get notebookCount => _notebooks.length;
+
+  int get sharedNotebookCount => _notebooks.where(
+    (n) => n.owner == _getCurrentUser()?.uid && n.users.length > 1
+    ).length;
+
+  int get receivedNotebookCount => _notebooks.where(
+    (n) => n.owner != _getCurrentUser()?.uid
+  ).length;
 
   // FETCH OWNER
   AuthUser? _ownerData;
@@ -158,13 +174,8 @@ class NotebookViewModel extends ChangeNotifier {
   }
 
   // CLEARING NOTEBOOKS
-  void clearStreamError() {
-    _streamError = null;
-    notifyListeners();
-  }
-
   void clearError() {
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
   }
   
@@ -177,8 +188,7 @@ class NotebookViewModel extends ChangeNotifier {
   void clearData() {
     _notebooks =[];
     _searchQuery = "";
-    _streamError = null;
-    _errorMessage = null;
+    _error = null;
     _subscription?.cancel();
     notifyListeners();
   }

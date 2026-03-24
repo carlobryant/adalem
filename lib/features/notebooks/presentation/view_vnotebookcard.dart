@@ -1,3 +1,4 @@
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:redacted/redacted.dart';
 
@@ -7,6 +8,7 @@ class VerticalNotebookCard extends StatelessWidget {
   final String updatedAt;
   final String image;
   final bool isLoading;
+  final bool isProcessing;
   final VoidCallback? onDelete;
   final VoidCallback? onShare;
 
@@ -17,6 +19,7 @@ class VerticalNotebookCard extends StatelessWidget {
     required this.updatedAt,
     required this.image,
     required this.isLoading,
+    required this.isProcessing,
     this.onDelete,
     this.onShare,
   });
@@ -29,7 +32,6 @@ class VerticalNotebookCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       shadowColor: Theme.of(context).colorScheme.shadow,
       elevation: 5,
-      
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,40 +45,56 @@ class VerticalNotebookCard extends StatelessWidget {
               width: double.infinity,
               color: Colors.grey.shade300,
             ).redacted(context: context, redact: true)
-            : Image(
-              image: AssetImage("assets/nb_$image.jpg"),
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
+            : Stack(
+              children: [
+                Image(
+                  image: AssetImage("assets/nb_$image.jpg"),
                   height: 150,
-                  color: Colors.grey.shade400,
-                  child: Center(
-                    child: Image(
-                      image: AssetImage("assets/ic_error.png"),
-                      color: Colors.grey.shade700,
-                      width: 50,
-                      )
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 150,
+                      color: Colors.grey.shade400,
+                      child: Center(
+                        child: Image(
+                          image: AssetImage("assets/ic_error.png"),
+                          color: Colors.grey.shade700,
+                          width: 50,
+                          )
+                        ),
+                    );
+                  },
+                ),
+
+                if(isProcessing)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
                     ),
-                );
-              },
+                  ),
+                ),
+                if(isProcessing)
+                Positioned.fill(child: LoaderAnimation(onBlack: true)),
+              ],
             ),
           ),
 
           SizedBox(
             height: 75,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(4.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 
-                children: [ 
+                children: [
                   Stack(
                     children: [
                       Row(
                         children: [
+                          SizedBox(width: 4),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(right: 10),
@@ -91,7 +109,7 @@ class VerticalNotebookCard extends StatelessWidget {
                               ).redacted(context: context, redact: true)
                               : Text(
                                 title,
-                                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -173,8 +191,8 @@ class VerticalNotebookCard extends StatelessWidget {
                         child: isLoading ?
                         const SizedBox()
                         : Text(
-                          displayDate,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          isProcessing ? "Generating..." : displayDate,
+                          style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey.shade600,
                           ),

@@ -14,11 +14,11 @@ class AppConfig {
     }
   }
 
-  /* API BASE URL
-  static const String apiBaseUrl = String.fromEnvironment(
-    'API_BASE_URL',
+  // GEN AI APIs
+  static const String apiKey = String.fromEnvironment(
+    'GEMINI_API_KEY',
     //defaultValue: 'https://api.adalem.com',
-  );*/
+  );
 
   // ENVIRONMENT
   static const String environment = String.fromEnvironment(

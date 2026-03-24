@@ -1,3 +1,5 @@
+import 'package:adalem/core/components/card_toast.dart';
+import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/explore/presentation/view_explore.dart';
 import 'package:adalem/nav/create_nav.dart';
 import 'package:adalem/nav/explore_nav.dart';
@@ -9,7 +11,8 @@ import 'package:flutter/services.dart';
 
 class Shell extends StatefulWidget {
   final int initIndex;
-  const Shell({super.key, this.initIndex = 0});
+  final AuthUser? welcomeUser;
+  const Shell({super.key, this.initIndex = 0, this.welcomeUser});
 
   @override
   State<Shell> createState() => _ShellState();
@@ -28,6 +31,27 @@ class _ShellState extends State<Shell> {
     GlobalKey<NavigatorState>(), // 3 : SHARE
     GlobalKey<NavigatorState>(), // 4 : PROFILE
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.welcomeUser != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final user = widget.welcomeUser!;
+        ToastCard.success(
+          context,
+          "Hello ${user.name.isNotEmpty ? user.name : 'User'}!",
+          description: user.email,
+          icon: CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(user.photoURL),
+            backgroundColor: Colors.grey.shade600,
+          ),
+        );
+      });
+    }
+  }
 
   void _handleSystemRet() {
     _selectedIndex != 0 ? setState(() {
@@ -108,7 +132,7 @@ class _ShellState extends State<Shell> {
                   navigatorKey: _navigatorKeys[1],
                   exploreKey: _exploreKey,
                   ),
-                Create(),
+                Create(navigatorKey: _navigatorKeys[2],),
                 Share(),
                 Profile(navigatorKey: _navigatorKeys[4]),
               ],

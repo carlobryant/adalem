@@ -1,21 +1,19 @@
 import 'package:adalem/features/create/presentation/view_create.dart';
 import 'package:flutter/material.dart';
 
-class Create extends StatefulWidget {
-  const Create({super.key});
-
-  @override
-  State<Create> createState() => _CreateState();
-}
-
-class _CreateState extends State<Create> {
-
-  GlobalKey<NavigatorState> createNavigatorKey = GlobalKey<NavigatorState>();
+class Create extends StatelessWidget {
+  final GlobalKey<NavigatorState> navigatorKey;
   
+  const Create({
+    super.key,
+    required this.navigatorKey,
+    });
+
   @override
   Widget build(BuildContext context) {
     return Navigator(
-      key: createNavigatorKey,
+      key: navigatorKey,
+      observers: [HeroController()],
       onGenerateRoute: (RouteSettings settings){
         return MaterialPageRoute(
           settings: settings,

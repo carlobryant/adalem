@@ -1,3 +1,4 @@
+
 import 'package:adalem/features/notebook_content/data/firestore_datasource.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
@@ -5,9 +6,9 @@ import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 
 class ContentRepositoryImpl implements ContentRepo {
   final FirestoreContentDataSource _dataSource;
-
-  ContentRepositoryImpl({required FirestoreContentDataSource dataSource})
-      : _dataSource = dataSource;
+  ContentRepositoryImpl({
+    required FirestoreContentDataSource dataSource
+  }) : _dataSource = dataSource;
 
   @override
   Future<NotebookContent?> fetchContent(String notebookId) {
@@ -19,23 +20,44 @@ class ContentRepositoryImpl implements ContentRepo {
     return _dataSource.generateIds();
   }
 
+  // @override
+  // Future<NotebookContent> parseContent() {
+  //   return _dataSource.parseContent();
+  // }
+
   @override
-  Future<NotebookContent> parseContent() {
-    return _dataSource.parseContent();
+  Future<void> createNotebook({
+    required CreateNotebookParams params,
+    required String notebookId,
+    required String contentId,
+  }) {
+    return _dataSource.createNotebook(
+      params: params,
+      notebookId: notebookId,
+      contentId: contentId,
+      
+    );
   }
 
   @override
-  Future<void> batchCreateNotebookAndContent({
-    required CreateNotebookParams params,
+  Future<void> generateContent({
     required NotebookContent content,
     required String notebookId,
     required String contentId,
   }) {
-    return _dataSource.batchCreateNotebookAndContent(
-      params: params,
+    return _dataSource.generateContent(
       content: content,
       notebookId: notebookId,
       contentId: contentId,
+    );
+  }
+
+  @override
+  Future<void> generateFailed({
+    required String notebookId,
+  }) {
+    return _dataSource.generateFailed(
+      notebookId: notebookId,
     );
   }
 

@@ -8,7 +8,7 @@ class Notebook {
   final String course;
   final String image;
   final String contentId; 
-  final bool available; 
+  final String available; 
 
   const Notebook({
     required this.id,
@@ -38,10 +38,18 @@ class NotebookUpdatedAt {
 
 class NotebookUser {
   final int mastery;
+  final int quizStreak;
+  final int flashcardStreak;
+  final DateTime? quizSession;
+  final DateTime? flashcardSession;
   final List<NotebookFlashcard> flashcards;
 
   const NotebookUser({
     required this.mastery,
+    required this.quizStreak,
+    required this.flashcardStreak,
+    required this.quizSession,
+    required this.flashcardSession,
     required this.flashcards,
   });
 }
