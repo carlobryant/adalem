@@ -1,38 +1,8 @@
 import 'dart:async';
-
+import 'dart:typed_data';
 import 'package:adalem/features/create/domain/ai_repo.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
-
-// class CreateNotebook {
-//   final ContentRepo _contentRepo;
-//   final AIRepo _aiRepo;
-
-//   CreateNotebook({
-//     required ContentRepo contentRepo,
-//     required AIRepo aiRepo,
-//     }) : _contentRepo = contentRepo, _aiRepo = aiRepo;
-
-//   Future<void> call(CreateNotebookParams params) async {
-//     //final content = await _contentRepo.parseContent();
-//     final ids = _contentRepo.generateIds();
-
-//     NotebookContent content = await _aiRepo.generateStudyMaterial(
-//       params.filetype,
-//       params.title,
-//       params.description,
-//     );
-//     content = content.copyWith(id: ids.contentId);
-    
-    
-//     await _contentRepo.createNotebook(
-//       params: params,
-//       content: content,
-//       notebookId: ids.notebookId,
-//       contentId: ids.contentId,
-//     );
-//   }
-// }
 
 class CreateNotebook {
   final ContentRepo _contentRepo;
@@ -54,7 +24,9 @@ class CreateNotebook {
 
     unawaited(
       _generateAndSaveBackground(
-        topic: params.title, 
+        files: params.files,
+        topic: params.title,
+        description: params.description,
         notebookId: ids.notebookId, 
         contentId: ids.contentId,
       )
@@ -63,13 +35,15 @@ class CreateNotebook {
   }
 
   Future<void> _generateAndSaveBackground({
+    required List<({Uint8List bytes, String mimeType})> files,
     required String topic,
+    required String? description,
     required String notebookId,
     required String contentId,
   }) async {
     try {
       NotebookContent content = await _aiRepo.generateStudyMaterial(
-        [], topic, null
+        files, topic, description
       );
       
       content = content.copyWith(id: contentId, notebookId: notebookId);
@@ -90,15 +64,15 @@ class CreateNotebookParams {
   final String title;
   final String course;
   final String image;
-  final List<String> filetype;
   final String? description;
+  final List<({Uint8List bytes, String mimeType})> files; 
 
   CreateNotebookParams({
     required this.owner,
     required this.title, 
     required this.course,
     required this.image,
-    required this.filetype,
     this.description,
+    required this.files,
   });
 }

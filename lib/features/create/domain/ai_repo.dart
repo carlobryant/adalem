@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 
 abstract class AIRepo {
   Future<NotebookContent> generateStudyMaterial(
-    List<String> filetype, 
+    List<({Uint8List bytes, String mimeType})> files, 
     String title,
     String? description,
   );

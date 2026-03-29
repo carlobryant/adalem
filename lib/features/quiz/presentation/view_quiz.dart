@@ -117,10 +117,9 @@ class _QuizSessionViewState extends State<QuizSessionView> {
           // QUIZ ACTIVE
           return Scaffold(
             appBar: AppBar(
-              title: Text("Quiz Item ${vm.itemsServed + 1}".toUpperCase(),
+              title: Text("Quiz Item ${vm.itemsServed + 1}",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
-                  fontFamily: "LoveYaLikeASister",
                   ),
               ),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -149,14 +148,23 @@ class _QuizSessionViewState extends State<QuizSessionView> {
                   ),
                 ),
               ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Text("Score: ${vm.sessionScore}",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
+                      fontFamily: "LoveYaLikeASister",
+                      fontSize: 18,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: Stack(
               children: [
                 SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: _buildQuestionContent(vm),
-                  ),
+                  child: _buildQuestionContent(vm),
                 ),
 
                 if (vm.isProcessing)
@@ -173,93 +181,97 @@ class _QuizSessionViewState extends State<QuizSessionView> {
   }
 
   Widget _buildQuestionContent(QuizViewModel vm) {
-    if (vm.isScenario && vm.currentScenarioModel != null) {
-      return _buildScenario(vm.currentScenarioModel!);
-    } else if (vm.currentQuizItemModel != null) {
-      final qm = vm.currentQuizItemModel!;
-      if (qm.mode == QuizMode.multipleChoice) {
-        return _buildMultipleChoice(qm);
-      } else {
-        return _buildIdentification(qm);
-      }
+  if (vm.isScenario && vm.currentScenarioModel != null) {
+    final s = vm.currentScenarioModel!.scenario;
+    return _buildChoices(questionText: s.text, options: s.options, answer: s.answer);
+  } 
+  
+  if (vm.currentQuizItemModel != null) {
+    final qm = vm.currentQuizItemModel!;
+    if (qm.mode == QuizMode.multipleChoice) {
+      return _buildChoices(
+        questionText: qm.quizItem.text,
+        options: qm.generatedOptions ?? [],
+        answer: qm.quizItem.answer,
+      );
     }
-    return const Center(child: Text("Loading question..."));
-  }
-
-  // ── Multiple Choice / Scenario Builders ─────────────────────────
-  Widget _buildMultipleChoice(QuizItemModel model) {
-    return Column(
-      children: [
-        Expanded(
-          child: Center(
-            child: Text(
-              model.quizItem.text,
-              style: TextStyle(
-                fontSize: 22,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        ...?model.generatedOptions?.map((option) => Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: XLButton(
-                onTap: () => _submitAnswer(option == model.quizItem.answer, model.quizItem.answer),
-                isItem: true,
-                isLocked: !_isAnswerLocked,
-                isCorrect: _selectedAnswer == option,
-                child: Text(option, 
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: option.length > 35 ? 12 : 16,
-                  ),
-                textAlign: TextAlign.center,
-                ),
-                ),
-            )),
-      ],
-    );
-  }
-
-  Widget _buildScenario(ScenarioModel model) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Text(
-              model.scenario.text,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        ...model.scenario.options.map((option) => Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: XLButton(
-                onTap: () => _submitAnswer(option == model.scenario.answer, model.scenario.answer), 
-                isItem: true,
-                isLocked: _isAnswerLocked,
-                isCorrect: _selectedAnswer == option,
-                child: Text(option, 
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontSize: option.length > 35 ? 12 : 16,
-                  ),
-                textAlign: TextAlign.center,
-                ),
-              ),
-            )),
-      ],
-    );
-  }
-
-  Widget _buildIdentification(QuizItemModel model) {
     return IdentificationView(
-      questionText: model.quizItem.text,
-      correctAnswer: model.quizItem.answer,
+      questionText: qm.quizItem.text,
+      correctAnswer: qm.quizItem.answer,
       onSubmit: _submitAnswer,
+    );
+  }
+  return const Center(child: Text("Loading question..."));
+}
+
+
+  Widget _buildChoices({
+    required String questionText,
+    required List<String> options,
+    required String answer,
+  }) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.35),
+                const SizedBox(height: 20),
+                ...options.map((option) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: XLButton(
+                    onTap: () => _submitAnswer(option == answer, answer),
+                    isItem: true,
+                    isLocked: !_isAnswerLocked,
+                    isCorrect: _selectedAnswer == option,
+                    child: Text(option,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontSize: option.length > 35 ? 12 : 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )),
+                SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+
+        Positioned(
+          top: 0,
+          right: 0,
+          left: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(50),
+                bottomRight: Radius.circular(50),
+              ),
+              border: BoxBorder.fromLTRB(bottom: BorderSide(
+                width: 5, 
+                color: Theme.of(context).colorScheme.primaryContainer
+              )),
+            ),
+            height: MediaQuery.of(context).size.height * 0.30,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 24),
+              child: Center(
+                child: Text(
+                  questionText,
+                  style: TextStyle(fontSize: questionText.length > 150 ? 18
+                  :questionText.length < 90 ? 22 : 20),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

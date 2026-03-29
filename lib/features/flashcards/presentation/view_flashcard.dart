@@ -119,7 +119,11 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
           final int toReview = vm.sessionItems.length - vm.currentIndex + 1;
           return Scaffold(
             appBar: AppBar(
-              title: toReview > 0 ? Text("Flashcards to review: ${toReview - 1}")
+              leading: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Icon(Icons.close, size: 30),
+                ),
+              title: toReview > 0 ? Text("Flashcards to Review: ${toReview - 1}")
               : Text("Flashcards to Review: 0"),
             ),
             body: Stack(
@@ -296,7 +300,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
           children: [
             Spacer(),
             Center(
-              child: Text(item.text,
+              child: Text("    ${item.text}",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontSize: 20,

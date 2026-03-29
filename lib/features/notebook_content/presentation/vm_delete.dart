@@ -35,10 +35,9 @@ class DeleteViewModel extends ChangeNotifier {
       }
     } catch (e) {
       _deleteError = ["Failed to Delete", "Please try again later."];
-    } finally {
       _isDeleting = false;
       notifyListeners();
-    }
+    } 
   }
 
   void clearDeleteError() {

@@ -46,6 +46,7 @@ class _CreatingViewState extends State<CreatingView> {
     else if (_createViewModel.isSuccess) {
       ToastCard.success(context, "Notebook Created!");
       _createViewModel.resetCreate();
+      
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const Shell(initIndex: 1)),
         (route) => false,

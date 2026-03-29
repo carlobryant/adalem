@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 class SmallButton extends StatefulWidget {
   final void Function()? onTap;
   final void Function()? onBack;
+  final Color? surfacecolor;
   final Widget child;
 
   const SmallButton({
     super.key,
     this.onTap,
     this.onBack,
+    this.surfacecolor,
     required this.child,
     });
 
@@ -24,6 +26,7 @@ class _SmallButtonState extends State<SmallButton> {
   Widget build(BuildContext context) {
     final Color borderColor = widget.onTap != null ?
     Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceContainer;
+    final surfacecolor = widget.surfacecolor ?? Theme.of(context).colorScheme.surface;
 
     return GestureDetector(
       onTap: widget.onTap ?? widget.onBack ?? () {},
@@ -36,8 +39,8 @@ class _SmallButtonState extends State<SmallButton> {
           borderRadius: BorderRadius.circular(12),
           color: Colors.black26,
           border: BoxBorder.fromLTRB(
-            left: BorderSide(color: Theme.of(context).colorScheme.surface, width: 1),
-            top: BorderSide(color: Theme.of(context).colorScheme.surface, width: 3),
+            left: BorderSide(color: surfacecolor, width: 1),
+            top: BorderSide(color: surfacecolor, width: 3),
           )
         )
         : null,
@@ -45,9 +48,9 @@ class _SmallButtonState extends State<SmallButton> {
           color: widget.onTap != null ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
           borderRadius: BorderRadius.circular(12),
           border: BoxBorder.fromLTRB(
-            left: _isPressed ? BorderSide(color: Theme.of(context).colorScheme.surface, width: 1)
+            left: _isPressed ? BorderSide(color: surfacecolor, width: 1)
             : BorderSide.none,
-            top: _isPressed ? BorderSide(color: Theme.of(context).colorScheme.surface, width: 3)
+            top: _isPressed ? BorderSide(color: surfacecolor, width: 3)
             : BorderSide.none,
             right: _isPressed ? BorderSide.none
             : BorderSide(color: borderColor, width: 1),

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:adalem/features/create/data/ai_datasource.dart';
 import 'package:adalem/features/create/domain/ai_repo.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
@@ -10,13 +12,13 @@ class AIRepositoryImpl implements AIRepo {
 
   @override
 Future<NotebookContent> generateStudyMaterial(
-  List<String> filetype,
+  List<({Uint8List bytes, String mimeType})> files,
   String title,
   String? description,
 ) async {
   try {
       return await withRetry(
-        () => _dataSource.generateStudyMaterial(filetype, title, description),
+        () => _dataSource.generateStudyMaterial(files, title, description),
         maxAttempts: 3,
         initialDelay: const Duration(seconds: 1),
       );

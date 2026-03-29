@@ -88,7 +88,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     };
 
     if (!isEarly) {
-      updateData['users.$uid.mastery'] = FieldValue.increment(Constraint.flashcardPts.value);
+      updateData['users.$uid.mastery'] = FieldValue.increment(Constraint.flashcardPts);
     }
     await docRef.update(updateData);
   }

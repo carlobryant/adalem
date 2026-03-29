@@ -226,123 +226,127 @@ class _ContentDrawerState extends State<ContentDrawer> {
               bottom: _isBottomBarVisible ? 0 : -(MediaQuery.sizeOf(context).height * 0.28),
               left: 0,
               right: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: widget.primary,
-                  border: BoxBorder.fromLTRB(top: BorderSide(
-                    width: 3,
-                    color: Recolor.darken(widget.primary),
-                    )),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 8,
-                      offset: Offset(0, -3),
+              child: GestureDetector(
+                onTap: _isBottomBarVisible ? () {} 
+                : () => setState(() => _isBottomBarVisible = true),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: widget.primary,
+                    border: BoxBorder.fromLTRB(top: BorderSide(
+                      width: 3,
+                      color: Recolor.darken(widget.primary),
+                      )),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, -3),
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    top: false, 
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+                      child: Column(
+                        children: [
+                
+                          // NOTEBOOK INFO
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadiusGeometry.circular(5),
+                                child: Image(
+                                  image: AssetImage("assets/nb_${widget.image}.jpg"),
+                                  fit: BoxFit.cover,
+                                  alignment: AlignmentGeometry.center,
+                                  width: 22,
+                                  height: 22,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(widget.course,
+                                style: TextStyle(
+                                  color: Recolor.darken(widget.primary),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Spacer(),
+                              Text(MasteryLevel.fromXp(widget.mastery).label.toUpperCase(),
+                                style: TextStyle(
+                                  color: Recolor.darken(widget.primary),
+                                  fontFamily: "LoveYaLikeASister",
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              SizedBox(width: 5),
+                              Image(
+                                image: AssetImage(MasteryLevel.fromXp(widget.mastery).asset),
+                                width: 20,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 30),
+                
+                          // FLASHCARD BUTTON
+                          XLButton(
+                            onTap: () => _redirectToStudy(),
+                            surfacecolor: widget.primary,
+                            child: Column(
+                            children: [
+                              Text(
+                                "Flashcards",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                "Spaced-repetition review",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.inversePrimary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w100,
+                                ),
+                              ),
+                            ],
+                          )),
+                          SizedBox(height: 10),
+                
+                          // QUIZ BUTTON
+                          XLButton(
+                            onTap: () => _redirectToStudy(isQuiz: true),
+                            surfacecolor: widget.primary,
+                            child: Column(
+                            children: [
+                              Text(
+                                "Start Quiz",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                "Performance-based adaptive quiz",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.inversePrimary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w100,
+                                ),
+                              ),
+                            ],
+                          )),
+                        ],
+                      ), 
                     ),
-                  ],
-                ),
-                child: SafeArea(
-                  top: false, 
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-                    child: Column(
-                      children: [
-
-                        // NOTEBOOK INFO
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadiusGeometry.circular(5),
-                              child: Image(
-                                image: AssetImage("assets/nb_${widget.image}.jpg"),
-                                fit: BoxFit.cover,
-                                alignment: AlignmentGeometry.center,
-                                width: 22,
-                                height: 22,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(widget.course,
-                              style: TextStyle(
-                                color: Recolor.darken(widget.primary),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Spacer(),
-                            Text(MasteryLevel.fromXp(widget.mastery).label.toUpperCase(),
-                              style: TextStyle(
-                                color: Recolor.darken(widget.primary),
-                                fontFamily: "LoveYaLikeASister",
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2,
-                                fontSize: 18,
-                              ),
-                            ),
-                            SizedBox(width: 5),
-                            Image(
-                              image: AssetImage(MasteryLevel.fromXp(widget.mastery).asset),
-                              width: 20,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 30),
-
-                        // FLASHCARD BUTTON
-                        XLButton(
-                          onTap: () => _redirectToStudy(),
-                          surfacecolor: widget.primary,
-                          child: Column(
-                          children: [
-                            Text(
-                              "Flashcards",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              "Spaced-repetition review",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.inversePrimary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w100,
-                              ),
-                            ),
-                          ],
-                        )),
-                        SizedBox(height: 10),
-
-                        // QUIZ BUTTON
-                        XLButton(
-                          onTap: () => _redirectToStudy(isQuiz: true),
-                          surfacecolor: widget.primary,
-                          child: Column(
-                          children: [
-                            Text(
-                              "Start Quiz",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onPrimary,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              "Performance-based adaptive quiz",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.inversePrimary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w100,
-                              ),
-                            ),
-                          ],
-                        )),
-                      ],
-                    ), 
                   ),
                 ),
               ),

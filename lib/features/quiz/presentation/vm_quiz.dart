@@ -158,9 +158,7 @@ class QuizViewModel extends ChangeNotifier {
 
       // 1 - MULTIPLE CHOICE
       // 3 - IDENTIFICATION
-      final mode = formatLevel == 3
-          ? QuizMode.identification
-          : QuizMode.multipleChoice;
+      final mode = formatLevel == 3 ? QuizMode.identification : QuizMode.multipleChoice;
 
       // GENERATE MULTIPLE CHOICES
       List<String>? options;

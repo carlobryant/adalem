@@ -56,16 +56,6 @@ class ContentView extends StatelessWidget {
   }
 }
 
-class _NotebookColorScheme {
-  final Color primary;
-  final Color secondary;
-
-  const _NotebookColorScheme({
-    required this.primary,
-    required this.secondary
-  });
-}
-
 class _ContentView extends StatefulWidget {
   final String notebookId;
   final String notebookTitle;
@@ -86,18 +76,11 @@ class _ContentView extends StatefulWidget {
   @override
   State<_ContentView> createState() => _ContentViewState();
 
-  _NotebookColorScheme _nbColors(String image) {
-    switch(image) {
-      case "red": return _NotebookColorScheme(primary: Color(0xFFbb8997), secondary: Color(0xFF9a1a87));
-      case "orange": return _NotebookColorScheme(primary: Color(0xFFbf9588), secondary: Color(0xFF960e00));
-      case "yellow": return _NotebookColorScheme(primary: Color(0xFFcaae7c), secondary: Color(0xFFc58002));
-      case "green": return _NotebookColorScheme(primary: Color(0xFFa4ba73), secondary: Color(0xFF998b16));
-      case "blue": return _NotebookColorScheme(primary: Color(0xFF7597be), secondary: Color(0xFF147b41));
-      case "purple": return _NotebookColorScheme(primary: Color(0xFF8d88bf), secondary: Color(0xFF1358a5));
-      case "pink": return _NotebookColorScheme(primary: Color(0xFFaf7eb2), secondary: Color(0xFF860fa8));
-      case "grey": return _NotebookColorScheme(primary: Color(0xFFa4a4a4), secondary: Color(0xFF757575));
-    }
-    return _NotebookColorScheme(primary: Color(0xFFcaae7c), secondary: Color(0xFFc58002));
+  NotebookTheme _nbColors(String image) {
+    return NotebookTheme.values.firstWhere(
+      (t) => t.name == image,
+      orElse: () => NotebookTheme.yellow,
+    );
   }
 }
 
@@ -297,7 +280,7 @@ class _ContentViewState extends State<_ContentView> {
     );
   }
 
-  Widget _buildNotebookContent(List<ChapterModel> chapters, _NotebookColorScheme notebookColors){
+  Widget _buildNotebookContent(List<ChapterModel> chapters, NotebookTheme notebookColors){
     return SafeArea(
       child: SuperListView.builder(
         controller: _scrollController,

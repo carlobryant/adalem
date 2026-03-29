@@ -1,14 +1,16 @@
-enum Constraint {
-  maxCreate(value: 10),
-  maxShare(value: 10),
+class Constraint {
+  static const int maxCreate = 10;
+  static const int maxShare = 10;
+  static const int maxUploadMB = 15;
 
-  mcItemPts(value: 10),
-  flashcardPts(value: 30),
-  identificationPts(value: 30);
+  static const int mcItemPts = 10;
+  static const int flashcardPts = 30;
+  static const int indentificationPts = 30;
 
-  final int value;
+  static const int minPromptItems = 36;
+  static const int minPromptScenario = 18;
+  static const int maxPromptSummary = 3000;
 
-  const Constraint({
-    required this.value,
-  });
+  static const List<String> allowedExts = ["png", "jpg", "txt", "md", "pdf", "docx", "doc", "ppt", "pptx", "mp3", "mp4"];
+  static const String noticeAI = "Notice: Files and information provided are processed under Google services per the Gemini Apps Privacy Notice. By creating this notebook, you confirm you have understood the privacy implications and the scope of data usage defined therein.";
 }

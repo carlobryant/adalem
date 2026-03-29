@@ -124,6 +124,9 @@ class NotebookViewModel extends ChangeNotifier {
     (n) => n.owner != _getCurrentUser()?.uid
   ).length;
 
+   // FETCH AVAILABLE
+  bool isNotebookCreating() => _notebooks.any((n) => n.available == "generating");
+
   // FETCH OWNER
   AuthUser? _ownerData;
   AuthUser? get ownerData => _ownerData;

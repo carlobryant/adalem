@@ -58,6 +58,25 @@ ThemeData get darkMode => ThemeData(
     ),
 );
 
+enum NotebookTheme {
+  red(primary: Color(0xFFbb8997), secondary: Color(0xFF9a1a87)),
+  orange(primary: Color(0xFFbf9588), secondary: Color(0xFF960e00)),
+  yellow(primary: Color(0xFFcaae7c), secondary: Color(0xFFc58002)),
+  green(primary: Color(0xFFa4ba73), secondary: Color(0xFF998b16)),
+  blue(primary: Color(0xFF7597be), secondary: Color(0xFF147b41)),
+  purple(primary: Color(0xFF8d88bf), secondary: Color(0xFF1358a5)),
+  pink(primary: Color(0xFFaf7eb2), secondary: Color(0xFF860fa8)),
+  grey(primary: Color(0xFFa4a4a4), secondary: Color(0xFF757575));
+
+  final Color primary;
+  final Color secondary;
+
+  const NotebookTheme({
+    required this.primary,
+    required this.secondary,
+  });
+}
+
 class Recolor{
   static Color darken(Color color, [double amount = 0.4]) {
     assert(amount >= 0 && amount <= 1);

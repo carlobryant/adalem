@@ -71,7 +71,7 @@ class ExploreViewState extends State<ExploreView> {
       return;
     } else if(available == "failed") {
       ToastCard.error(context, "Notebook Creation Failed.",
-      description: "$title failed to process. You can delete this notebook.");
+      description: "You can delete $title.");
       return;
     } else if(available != "ready") {
       ToastCard.error(context, "Notebook Missing",

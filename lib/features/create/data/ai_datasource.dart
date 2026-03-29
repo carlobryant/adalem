@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:adalem/features/create/data/model_datasource.dart';
 import 'package:adalem/features/create/data/repo_impl.dart';
@@ -8,7 +9,7 @@ import 'package:firebase_ai/firebase_ai.dart';
 
 abstract class AIDataSource {
   Future<NotebookContent> generateStudyMaterial(
-    List<String> filetype, 
+    List<({Uint8List bytes, String mimeType})> files, 
     String title,
     String? description,
     );
@@ -21,16 +22,22 @@ class AIDataSourceImpl implements AIDataSource {
 
   @override
   Future<NotebookContent> generateStudyMaterial(
-    List<String> filetype, 
+    List<({Uint8List bytes, String mimeType})> files, 
     String title,
     String? description,
   ) async {
     try {
-      final promptModel = PromptDataModel(filetype: filetype, title: title, description: description);
+      final promptModel = PromptDataModel(files: files, title: title, description: description);
+      final prompt = TextPart(promptModel.build());
+
+      final fileParts = files
+        .map((f) => InlineDataPart(f.mimeType, f.bytes))
+        .toList();
+
       final response = await modelAI.generateContent([
-        Content.text(promptModel.build())
+        Content.multi([prompt, ...fileParts])
       ]);
-      
+            
       final responseText = response.text;
       if (responseText == null || responseText.isEmpty) {
         throw Exception("Unexpected error, received empty response.");
