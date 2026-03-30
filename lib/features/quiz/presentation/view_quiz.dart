@@ -263,8 +263,11 @@ class _QuizSessionViewState extends State<QuizSessionView> {
               child: Center(
                 child: Text(
                   questionText,
-                  style: TextStyle(fontSize: questionText.length > 150 ? 18
-                  :questionText.length < 90 ? 22 : 20),
+                  style: TextStyle(
+                    fontSize: questionText.length > 150 ? 18
+                    : questionText.length < 90 ? 22 : 20,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),

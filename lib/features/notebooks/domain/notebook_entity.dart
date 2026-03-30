@@ -38,16 +38,14 @@ class NotebookUpdatedAt {
 
 class NotebookUser {
   final int mastery;
-  final int quizStreak;
-  final int flashcardStreak;
+  final int? streak;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
   final List<NotebookFlashcard> flashcards;
 
   const NotebookUser({
     required this.mastery,
-    required this.quizStreak,
-    required this.flashcardStreak,
+    required this.streak,
     required this.quizSession,
     required this.flashcardSession,
     required this.flashcards,

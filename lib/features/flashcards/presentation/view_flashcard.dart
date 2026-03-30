@@ -300,7 +300,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
           children: [
             Spacer(),
             Center(
-              child: Text("    ${item.text}",
+              child: Text(item.text,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontSize: 20,

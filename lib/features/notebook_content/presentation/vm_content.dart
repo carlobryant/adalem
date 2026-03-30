@@ -34,6 +34,8 @@ class ContentViewModel extends ChangeNotifier {
 
   ContentViewModel({required GetContent getContent}) : _getContent = getContent;
 
+  int get totalItems => _content?.items.length ?? 0;
+
   Future<void> loadNotebookContent(String notebookId, {Set<ContentType> load = const {ContentType.chapters}}) async {
     _isLoading = true;
     _error = null;

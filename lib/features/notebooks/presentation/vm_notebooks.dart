@@ -24,6 +24,8 @@ class NotebookViewModel extends ChangeNotifier {
         _getCurrentUser = getCurrentUser,
         _getUserProfile = getUserProfile;
 
+  String get currentUserId => _getCurrentUser()?.uid ?? "";
+
   // NOTEBOOK SORT & SEARCH
   String _searchQuery = "";
   String get searchQuery => _searchQuery;
@@ -48,6 +50,7 @@ class NotebookViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // LIST NOTEBOOKS
   List<NotebookModel> _notebooks = [];
   List<NotebookModel> get filteredNotebooks {
     var list = List<NotebookModel>.from(_notebooks);
@@ -70,6 +73,41 @@ class NotebookViewModel extends ChangeNotifier {
       break;
     }
     return list;
+  }
+
+  List<NotebookModel> get rankedNotebooks {
+    final uid = _getCurrentUser()?.uid;
+    final readyNotebooks = _notebooks.where((n) => n.available == "ready").toList();
+    if (uid == null) return readyNotebooks;
+
+    readyNotebooks.sort((a, b) {
+      final masteryA = a.users[uid]?.mastery ?? 0;
+      final masteryB = b.users[uid]?.mastery ?? 0;
+      return masteryB.compareTo(masteryA); 
+    });
+    return readyNotebooks;
+  }
+
+  List<NotebookModel> get toDoNotebooks {
+    final uid = _getCurrentUser()?.uid;
+    final readyNotebooks = _notebooks.where((n) => n.available == "ready").toList();
+    if (uid == null) return readyNotebooks;
+
+    readyNotebooks.sort((a, b) {
+      final sessionA = a.users[uid]?.flashcardSession;
+      final sessionB = b.users[uid]?.flashcardSession;
+
+      // IGNORE IF BOTH ARE NULL
+      if (sessionA == null && sessionB == null) return 0;
+      
+      // IF A VALUE IS NULL
+      if (sessionA == null) return -1;
+      if (sessionB == null) return 1;
+
+      return sessionA.compareTo(sessionB);
+    });
+    
+    return readyNotebooks;
   }
 
   // LOAD NOTEBOOKS
@@ -176,6 +214,22 @@ class NotebookViewModel extends ChangeNotifier {
     return userModel.mastery;
   }
 
+  // FLASHCARD SESSION AVAILABILITY
+  bool flashcardAvailable(String notebookId) {
+    final uid = _getCurrentUser()?.uid;
+    if (uid == null) return false;
+
+    final progress = getProgressFor(notebookId, uid);
+    
+    if (progress.isEmpty) return true;
+
+    final now = DateTime.now();
+    return progress.where((card) {
+      if (card.dueAt == null) return true;
+      return !card.dueAt!.isAfter(now);
+    }).length > 4;
+  }
+  
   // CLEARING NOTEBOOKS
   void clearError() {
     _error = null;

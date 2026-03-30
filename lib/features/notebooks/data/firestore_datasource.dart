@@ -68,7 +68,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     final userData = users[uid] as Map<String, dynamic>? ?? {};
 
     final lastSessionTs = userData['flashcardSession'] as Timestamp?;
-    final currentStreak = userData['flashcardStreak'] as int? ?? 0;
+    final currentStreak = userData['streak'] as int? ?? 0;
 
     final newStreak = _calculateNewStreak(lastSessionTs, currentStreak);
 
@@ -84,7 +84,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     final Map<String, dynamic> updateData = {
       'users.$uid.flashcards': flashcards,
       'users.$uid.flashcardSession': FieldValue.serverTimestamp(),
-      'users.$uid.flashcardStreak': newStreak,
+      'users.$uid.streak': newStreak,
     };
 
     if (!isEarly) {
@@ -110,7 +110,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     final userData = users[uid] as Map<String, dynamic>? ?? {};
 
     final lastSessionTs = userData['quizSession'] as Timestamp?;
-    final currentStreak = userData['quizStreak'] as int? ?? 0;
+    final currentStreak = userData['streak'] as int? ?? 0;
 
     final newStreak = _calculateNewStreak(lastSessionTs, currentStreak);
     final batch = _firestore.batch();
@@ -118,7 +118,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     batch.update(notebookRef, {
       'users.$uid.mastery': FieldValue.increment(history.score),
       'users.$uid.quizSession': FieldValue.serverTimestamp(),
-      'users.$uid.quizStreak': newStreak,
+      'users.$uid.streak': newStreak,
     });
 
     batch.set(historyRef, NotebookHistoryDataModel(

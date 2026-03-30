@@ -1,3 +1,4 @@
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/animation_mastery.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/model_mastery.dart';
@@ -17,7 +18,7 @@ class FlashcardResultsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int flashcardXp = onAgain != null ? 30 : 0;
+    final int flashcardXp = onAgain != null ? Constraint.flashcardPts : 0;
 
     final totalXp = prevMastery + flashcardXp;
     final currentLevel = MasteryLevel.fromXp(totalXp);
@@ -78,7 +79,7 @@ class FlashcardResultsView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(onAgain != null ? "(30 points is rewarded for every completed flashcard session)"
+                      Text(onAgain != null ? "(${Constraint.flashcardPts} points is rewarded for every completed flashcard session)"
                       : "(Flashcards are displayed at calculated intervals to reduce extraneous cognitive load)",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.inversePrimary,

@@ -54,8 +54,7 @@ class NotebookUpdatedAtDataModel extends NotebookUpdatedAt {
 class NotebookUserDataModel extends NotebookUser {
   const NotebookUserDataModel({
     required super.mastery,
-    required super.quizStreak,
-    required super.flashcardStreak,
+    required super.streak,
     required super.quizSession,
     required super.flashcardSession,
     required super.flashcards,
@@ -64,8 +63,7 @@ class NotebookUserDataModel extends NotebookUser {
   factory NotebookUserDataModel.fromMap(Map<String, dynamic> map) {
     return NotebookUserDataModel(
       mastery: map['mastery'] as int? ?? 0,
-      quizStreak: map['quizStreak'] as int? ?? 0,
-      flashcardStreak: map['flashcardStreak'] as int? ?? 0,
+      streak: map['streak'] as int? ?? 0,
       quizSession: (map['quizSession'] as Timestamp?)?.toDate(),
       flashcardSession: (map['flashcardSession'] as Timestamp?)?.toDate(),
       flashcards: (map['flashcards'] as List<dynamic>? ?? [])

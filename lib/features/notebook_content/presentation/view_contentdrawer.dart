@@ -1,20 +1,9 @@
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/model_mastery.dart';
 import 'package:adalem/core/app_theme.dart';
-import 'package:adalem/features/auth/domain/auth_repo.dart';
-import 'package:adalem/features/flashcards/domain/flashcard_algo.dart';
-import 'package:adalem/features/flashcards/domain/uc_syncflashcards.dart';
-import 'package:adalem/features/flashcards/presentation/vm_flashcard.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
-import 'package:adalem/features/notebook_content/presentation/vm_content.dart';
-import 'package:adalem/features/flashcards/presentation/view_flashcard.dart';
-import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
-import 'package:adalem/features/quiz/domain/uc_syncquiz.dart';
-import 'package:adalem/features/quiz/presentation/view_quiz.dart';
-import 'package:adalem/features/quiz/presentation/vm_quiz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:provider/provider.dart';
 import 'package:redacted/redacted.dart';
 
 class ContentDrawer extends StatefulWidget {
@@ -26,11 +15,12 @@ class ContentDrawer extends StatefulWidget {
   final String image;
   final int mastery;
 
-  final bool toQuiz;
-  final bool toFlashcard;
+  final VoidCallback onFlashcardTap;
+  final VoidCallback onQuizTap;
   final Function(int)? onChapterTap;
   final VoidCallback? onClose; 
   final VoidCallback onBack;
+  
   
   const ContentDrawer({
     super.key,
@@ -42,11 +32,11 @@ class ContentDrawer extends StatefulWidget {
     required this.image,
     required this.mastery,
     
-    this.toQuiz = false,
-    this.toFlashcard = false,
     this.onChapterTap,
     this.onClose,
     required this.onBack,
+    required this.onFlashcardTap,
+    required this.onQuizTap,
   });
 
   @override
@@ -67,64 +57,6 @@ class _ContentDrawerState extends State<ContentDrawer> {
         if (!_isBottomBarVisible) setState(() => _isBottomBarVisible = true);
       }
     });
-
-    if (widget.toFlashcard || widget.toQuiz) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _redirectToStudy(isQuiz: widget.toQuiz));
-    }
-  }
-
-  void _redirectToStudy({bool isQuiz = false}) async {
-    final currentUser = context.read<AuthRepo>().getCurrentUser();
-    if (currentUser == null) return;
-
-    final contentvm = context.read<ContentViewModel>();
-    final notebookvm = context.read<NotebookViewModel>();
-    
-    final uid = currentUser.uid;
-    final mastery = notebookvm.getMasteryFor(widget.notebookId, uid);
-
-    if (isQuiz) {
-      final quizvm = QuizViewModel(syncQuizHistory: context.read<SyncQuizHistory>());
-      if (!context.mounted) return;
-      Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider.value(value: quizvm,
-            child: QuizSessionView(viewModel: quizvm, 
-              notebookId: widget.notebookId, 
-              mastery: mastery, uid: uid,
-            ),
-          ),
-        ),
-      );
-
-      quizvm.initSession(contentvm.content!, currentMastery: mastery);
-    } else {
-      final userProgress = notebookvm.getProgressFor(widget.notebookId, uid);
-      final flashcardvm = FlashcardViewModel(
-        sm2: const SM2Algorithm(),
-        sessionService: const FlashcardSession(),
-        syncFlashcardProgress: context.read<SyncFlashcards>(),
-      );
-      
-      if (!context.mounted) return;
-      Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(
-          builder: (_) => ChangeNotifierProvider.value(value: flashcardvm,
-            child: FlashcardView(viewModel: flashcardvm,
-              notebookId: widget.notebookId, 
-              uid: uid, mastery: mastery,
-              onAgain: () => WidgetsBinding.instance.addPostFrameCallback((_) => _redirectToStudy()),
-            ),
-          ),
-        ),
-      );
-
-      if (contentvm.quizItemModels.isEmpty) {
-        await contentvm.loadNotebookContent(widget.notebookId, load: {ContentType.flashcards});
-      }
-      final allItems = contentvm.quizItemModels.map((q) => q.quizItem).toList();
-      flashcardvm.initSession(allItems, userProgress);
-    }
   }
 
   @override
@@ -296,7 +228,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                 
                           // FLASHCARD BUTTON
                           XLButton(
-                            onTap: () => _redirectToStudy(),
+                            onTap: widget.onFlashcardTap,
                             surfacecolor: widget.primary,
                             child: Column(
                             children: [
@@ -322,7 +254,7 @@ class _ContentDrawerState extends State<ContentDrawer> {
                 
                           // QUIZ BUTTON
                           XLButton(
-                            onTap: () => _redirectToStudy(isQuiz: true),
+                            onTap: widget.onQuizTap,
                             surfacecolor: widget.primary,
                             child: Column(
                             children: [

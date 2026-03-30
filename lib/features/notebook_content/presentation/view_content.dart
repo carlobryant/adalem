@@ -1,11 +1,18 @@
 import 'package:adalem/core/app_theme.dart';
 import 'package:adalem/features/auth/domain/auth_repo.dart';
+import 'package:adalem/features/flashcards/domain/flashcard_algo.dart';
+import 'package:adalem/features/flashcards/domain/uc_syncflashcards.dart';
+import 'package:adalem/features/flashcards/presentation/view_flashcard.dart';
+import 'package:adalem/features/flashcards/presentation/vm_flashcard.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
 import 'package:adalem/features/notebook_content/domain/uc_getcontent.dart';
 import 'package:adalem/features/notebook_content/presentation/model_content.dart';
 import 'package:adalem/features/notebook_content/presentation/view_contentdrawer.dart';
 import 'package:adalem/features/notebook_content/presentation/vm_content.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/quiz/domain/uc_syncquiz.dart';
+import 'package:adalem/features/quiz/presentation/view_quiz.dart';
+import 'package:adalem/features/quiz/presentation/vm_quiz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -96,6 +103,8 @@ class _ContentViewState extends State<_ContentView> {
   final ScrollController _scrollController = ScrollController();
   bool _isFabVisible = true;
 
+  // bool _hasAutoRedirected = false;
+
   @override
   void initState() {
     super.initState();
@@ -108,6 +117,70 @@ class _ContentViewState extends State<_ContentView> {
         if (!_isFabVisible) setState(() => _isFabVisible = true);
       }
     });
+
+    if (widget.toFlaschard || widget.toQuiz) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _handleStudyRedirect(isQuiz: widget.toQuiz));
+    }
+  }
+
+  // STUDY TOOLS NAVIGATION
+  void _handleStudyRedirect({bool isQuiz = false}) async {
+    // if ((widget.toFlaschard || widget.toQuiz) && _hasAutoRedirected) return;
+    // _hasAutoRedirected = true;
+
+    final currentUser = context.read<AuthRepo>().getCurrentUser();
+    if (currentUser == null) return;
+
+    final notebookvm = context.read<NotebookViewModel>();
+    final uid = currentUser.uid;
+    final mastery = notebookvm.getMasteryFor(widget.notebookId, uid);
+
+    if (isQuiz) {
+      final quizvm = QuizViewModel(syncQuizHistory: context.read<SyncQuizHistory>());
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(value: quizvm,
+            child: QuizSessionView(viewModel: quizvm, 
+              notebookId: widget.notebookId, 
+              mastery: mastery, uid: uid,
+            ),
+          ),
+        ),
+      );
+
+      if (_viewModel.content == null) {
+        await _viewModel.loadNotebookContent(widget.notebookId);
+      }
+      quizvm.initSession(_viewModel.content!, currentMastery: mastery);
+      
+    } else {
+      final userProgress = notebookvm.getProgressFor(widget.notebookId, uid);
+      final flashcardvm = FlashcardViewModel(
+        sm2: const SM2Algorithm(),
+        sessionService: const FlashcardSession(),
+        syncFlashcardProgress: context.read<SyncFlashcards>(),
+      );
+      
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(
+          builder: (_) => ChangeNotifierProvider.value(value: flashcardvm,
+            child: FlashcardView(viewModel: flashcardvm,
+              notebookId: widget.notebookId, 
+              uid: uid, mastery: mastery,
+              onAgain: () => WidgetsBinding.instance.addPostFrameCallback((_) => _handleStudyRedirect(isQuiz: false)),
+            ),
+          ),
+        ),
+      );
+
+      if (_viewModel.quizItemModels.isEmpty) {
+        await _viewModel.loadNotebookContent(widget.notebookId, load: {ContentType.flashcards});
+      }
+      final allItems = _viewModel.quizItemModels.map((q) => q.quizItem).toList();
+      flashcardvm.initSession(allItems, userProgress);
+    }
   }
 
   void _openDrawer() {
@@ -162,8 +235,8 @@ class _ContentViewState extends State<_ContentView> {
           course: widget.notebookCourse,
           primary: notebookColors.primary,
           notebookTitle: widget.notebookTitle,
-          toFlashcard: widget.toFlaschard,
-          toQuiz: widget.toQuiz,
+          onFlashcardTap: () => _handleStudyRedirect(isQuiz: false),
+          onQuizTap: () => _handleStudyRedirect(isQuiz: true),
           ),
       );
     }
@@ -260,8 +333,8 @@ class _ContentViewState extends State<_ContentView> {
                 image: widget.image,
                 onBack: () => Navigator.of(context, rootNavigator: true).pop(),
                 onClose: _closeDrawer,
-                toFlashcard: widget.toFlaschard,
-                toQuiz: widget.toQuiz,
+                onFlashcardTap: () => _handleStudyRedirect(isQuiz: false),
+                onQuizTap: () => _handleStudyRedirect(isQuiz: true),
                 ),
             ),
 

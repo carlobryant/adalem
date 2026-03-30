@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/create/data/repo_impl.dart';
@@ -78,7 +79,7 @@ class CreateViewModel extends ChangeNotifier {
         return;
       }
 
-      if (currentCount >= 10) {
+      if (currentCount >= Constraint.maxCreate) {
         _error = const ErrorModel(
           header: "Limit Reached!", 
           description: "Notebook creation is limited for now.",

@@ -14,12 +14,6 @@ class AppConfig {
     }
   }
 
-  // GEN AI APIs
-  static const String apiKey = String.fromEnvironment(
-    'GEMINI_API_KEY',
-    //defaultValue: 'https://api.adalem.com',
-  );
-
   // ENVIRONMENT
   static const String environment = String.fromEnvironment(
     'APP_ENVIRONMENT',

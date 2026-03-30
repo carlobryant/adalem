@@ -71,16 +71,25 @@ class NotebookModel {
 
 class NotebookUserModel {
   final int mastery;
+  final int? streak;
+  final DateTime? quizSession;
+  final DateTime? flashcardSession;
   final List<NotebookFlashcardModel> flashcards;
 
   const NotebookUserModel({
     required this.mastery,
+    required this.streak,
+    required this.quizSession,
+    required this.flashcardSession,
     required this.flashcards,
   });
 
   factory NotebookUserModel.fromEntity(NotebookUser user) {
     return NotebookUserModel(
       mastery: user.mastery,
+      streak: user.streak,
+      quizSession: user.quizSession,
+      flashcardSession: user.flashcardSession,
       flashcards: user.flashcards
           .map((e) => NotebookFlashcardModel.fromEntity(e))
           .toList(),
@@ -90,6 +99,9 @@ class NotebookUserModel {
   factory NotebookUserModel.empty() {
     return const NotebookUserModel(
       mastery: 0,
+      streak: 0,
+      quizSession: null,
+      flashcardSession: null,
       flashcards: [],
     );
   }

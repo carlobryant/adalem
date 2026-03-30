@@ -127,6 +127,7 @@ class _ShellState extends State<Shell> {
                       _exploreKey.currentState?.scrollToTop();
                     });
                   },
+                  onNavigateToCreate: () => setState(() {_selectedIndex = 2;}),
                 ),
                 Explore(
                   navigatorKey: _navigatorKeys[1],

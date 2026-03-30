@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class Home extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final VoidCallback onNavigateToExplore;
+   final VoidCallback onNavigateToCreate;
 
   const Home({super.key,
   required this.navigatorKey,
-  required this.onNavigateToExplore
+  required this.onNavigateToExplore,
+  required this.onNavigateToCreate,
   });
 
   @override
@@ -18,10 +20,10 @@ class Home extends StatelessWidget {
         return MaterialPageRoute(
           settings: settings,
           builder: (BuildContext context){
-            if(settings.name == '/'){
-              return HomeView(onNavigateToExplore: onNavigateToExplore);
-            } 
-            return HomeView(onNavigateToExplore: onNavigateToExplore);
+            return HomeView(
+                onNavigateToExplore: onNavigateToExplore,
+                onNavigateToCreate: onNavigateToCreate,
+            );
           },
         );
       } 
