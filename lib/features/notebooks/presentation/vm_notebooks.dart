@@ -90,7 +90,8 @@ class NotebookViewModel extends ChangeNotifier {
 
   List<NotebookModel> get toDoNotebooks {
     final uid = _getCurrentUser()?.uid;
-    final readyNotebooks = _notebooks.where((n) => n.available == "ready").toList();
+    final readyNotebooks = _notebooks.where((n) => n.available == "ready" 
+    && (flashcardAvailable(n.id) || _isNotToday(n.users[uid]!.quizSession))).toList();
     if (uid == null) return readyNotebooks;
 
     readyNotebooks.sort((a, b) {
@@ -108,6 +109,12 @@ class NotebookViewModel extends ChangeNotifier {
     });
     
     return readyNotebooks;
+  }
+
+  bool _isNotToday(DateTime? date) {
+    if (date == null) return true;
+    final now = DateTime.now();
+    return !(date.year == now.year && date.month == now.month && date.day == now.day);
   }
 
   // LOAD NOTEBOOKS

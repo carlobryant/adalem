@@ -67,10 +67,11 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     final users = data['users'] as Map<String, dynamic>? ?? {};
     final userData = users[uid] as Map<String, dynamic>? ?? {};
 
-    final lastSessionTs = userData['flashcardSession'] as Timestamp?;
+    final quizTs = userData['quizSession'] as Timestamp?;
+    final flashcardTs = userData['flashcardSession'] as Timestamp?;
     final currentStreak = userData['streak'] as int? ?? 0;
 
-    final newStreak = _calculateNewStreak(lastSessionTs, currentStreak);
+    final newStreak = _calculateNewStreak(quizTs, flashcardTs, currentStreak);
 
     final flashcards = progress.map((card) => {
       'cardId': card.cardId,
@@ -109,10 +110,11 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     final users = data['users'] as Map<String, dynamic>? ?? {};
     final userData = users[uid] as Map<String, dynamic>? ?? {};
 
-    final lastSessionTs = userData['quizSession'] as Timestamp?;
+    final quizTs = userData['quizSession'] as Timestamp?;
+    final flashcardTs = userData['flashcardSession'] as Timestamp?;
     final currentStreak = userData['streak'] as int? ?? 0;
 
-    final newStreak = _calculateNewStreak(lastSessionTs, currentStreak);
+    final newStreak = _calculateNewStreak(quizTs, flashcardTs, currentStreak);
     final batch = _firestore.batch();
 
     batch.update(notebookRef, {
@@ -134,9 +136,14 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     await batch.commit();
   }
 
-  int _calculateNewStreak(Timestamp? lastSessionTs, int currentStreak) {
+  int _calculateNewStreak(Timestamp? quizTs, Timestamp? flashcardTs, int currentStreak) {
+    Timestamp? lastSessionTs;
+    if (quizTs != null && flashcardTs != null) {
+      lastSessionTs = quizTs.compareTo(flashcardTs) > 0 ? quizTs : flashcardTs;
+    } else {
+      lastSessionTs = quizTs ?? flashcardTs;
+    }
     if (lastSessionTs == null) return 1;
-
     final now = DateTime.now();
     final lastSession = lastSessionTs.toDate();
     
@@ -150,6 +157,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     } else if (difference > 1) {
       return 1; 
     }
+    
     return currentStreak;
   }
 }

@@ -172,7 +172,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
 
                   HomeListView(
-                    notebooks: notebookvm.toDoNotebooks, 
+                    notebooks: notebookvm.toDoNotebooks,
                     isLoading: notebookvm.isLoading,    
                     uid: uid,                            
                   ),

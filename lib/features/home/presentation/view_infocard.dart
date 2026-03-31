@@ -1,42 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:redacted/redacted.dart';
 
-class HorizontalNotebookCard extends StatelessWidget {
+class InfoCardView extends StatelessWidget {
   final String title;
-  final String course;
+  final String details;
+  final String description;
   final String image;
   final bool isLoading;
-  final int streak;
-  final DateTime lastAccess;
-
-  const HorizontalNotebookCard({
+  final bool keepImage;
+  const InfoCardView({
     super.key,
     required this.title,
-    required this.course,
+    required this.details,
+    required this.description,
     required this.image,
     required this.isLoading,
-    required this.streak,
-    required this.lastAccess,
+    this.keepImage = false,
   });
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-
-    final today = DateTime(now.year, now.month, now.day);
-    final targetDate = DateTime(date.year, date.month, date.day);
-    
-    final difference = today.difference(targetDate).inDays;
-
-    if (difference == 0) {
-      return "Today";
-    } else if (difference == 1) {
-      return "Yesterday";
-    } else if (difference >= 2 && difference < 7) {
-      return "$difference Days Ago";
-    } else {
-      return "A Week Ago"; 
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +25,7 @@ class HorizontalNotebookCard extends StatelessWidget {
       shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
       elevation: 5,
       child: SizedBox(
-        height: 120, 
+        height: 130, 
         child: Row( 
           children: [
 
@@ -54,18 +34,19 @@ class HorizontalNotebookCard extends StatelessWidget {
               borderRadius: const BorderRadius.horizontal(left: Radius.circular(15)),
               child: isLoading
                   ? Container(
-                      width: 70,
+                      width: 80,
                       height: double.infinity,
                       color: Colors.grey.shade300,
                     ).redacted(context: context, redact: true)
                   : Image(
-                      image: AssetImage("assets/nb_$image.jpg"),
-                      width: 70,
+                      image: AssetImage("assets/$image.png"),
+                      width: 80,
                       height: double.infinity,
-                      fit: BoxFit.cover,
+                      fit: keepImage ? BoxFit.cover : BoxFit.fitWidth,
+                      color: keepImage ? null : Theme.of(context).colorScheme.primary,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          width: 70,
+                          width: 80,
                           color: Colors.grey.shade400,
                           child: Center(
                             child: Image(
@@ -82,13 +63,13 @@ class HorizontalNotebookCard extends StatelessWidget {
             // TEXT DETAILS
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween, 
                   children: [
                     
-                    // TASK AND TITLE
+                    // TITLE AND DETAILS
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -104,61 +85,30 @@ class HorizontalNotebookCard extends StatelessWidget {
                               maxLines: 2, 
                               overflow: TextOverflow.ellipsis,
                             ),
-                        Text(course,
+
+                        Text(details,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w100, 
                             color: Theme.of(context).colorScheme.primary,
                           ),
                         ).redacted(context: context, redact: isLoading),
                         const SizedBox(height: 2),
-                      ],
-                    ),
 
-                    // COURSE AND LAST ACCESS
-                    isLoading 
-                      ? Container(width: 140, height: 12, color: Colors.grey).redacted(context: context, redact: true)
-                      : Row(
-                        children: [
-                          Text( _formatDate(lastAccess),
+                        Text(description,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 10,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                            maxLines: 1,
+                            maxLines: 4,
                             overflow: TextOverflow.ellipsis,
-                          ),
-                      Spacer(),
-                      // STREAK ROW
-                      isLoading
-                        ? Container(width: 80, height: 18, color: Colors.grey).redacted(context: context, redact: true)
-                        : Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.local_fire_department_rounded, 
-                                size: 18, 
-                                color: streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface, 
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                "$streak ${streak == 1 ? 'Day' : 'Days'} Streak".toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: "LoveYaLikeASister",
-                                  fontWeight: FontWeight.bold,
-                                  color: streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                          ).redacted(context: context, redact: isLoading),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
-
           ],
         ),
       ),
