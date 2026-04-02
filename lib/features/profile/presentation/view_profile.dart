@@ -1,8 +1,8 @@
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
-import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/profile/presentation/view_analytics.dart';
 import 'package:adalem/features/profile/presentation/view_signoutpopup.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -47,8 +47,6 @@ class _ProfileViewState extends State<ProfileView> {
     if(profilevm.errorMessage != null) return;
 
     context.read<NotebookViewModel>().clearData();
-    //context.read<LoginViewModel>().reset();
-
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
     MaterialPageRoute(builder: (context) => const LoginView()),
     (route) => false,
@@ -123,17 +121,8 @@ class _ProfileViewState extends State<ProfileView> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildRow("Course: ", "BS in Information Techonology"),
-            ),
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: AnalyticsView(),
         ),
 
         Padding(
@@ -141,11 +130,11 @@ class _ProfileViewState extends State<ProfileView> {
           child: Column(
             children: [
               SizedBox(height: 10),
-              _buildRow("Total Notebooks", "${notebookvm.notebookCount}", Icons.library_books), 
+              _buildRow("Total Notebooks", "${notebookvm.notebookCount}", "total"), 
               SizedBox(height: 20),
-              _buildRow("Shared Notebooks", "${notebookvm.sharedNotebookCount}", Icons.switch_account_rounded),
+              _buildRow("Shared Notebooks", "${notebookvm.sharedNotebookCount}", "shared"),
               SizedBox(height: 20),
-              _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", Icons.collections_bookmark),
+              _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", "received"),
               SizedBox(height:  10),
             ],
           )
@@ -175,13 +164,14 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buildRow(String title, String end, [IconData? icon]){
+  Widget _buildRow(String title, String end, [String? icon]){
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         if(icon != null)
-        Icon(icon,
-          size: 40,
+        Image(image: AssetImage("assets/ic_nb_$icon.png"),
+          color: Theme.of(context).colorScheme.inverseSurface,
+          width: 50,
         ),
         if(icon != null)
         SizedBox(width: 10),

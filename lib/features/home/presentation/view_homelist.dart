@@ -104,7 +104,7 @@ class HomeListView extends StatelessWidget {
                 ),
               ),
               child: HorizontalNotebookCard(
-                title: "${task[flashcardAvailable ? 0 : 1][random.nextInt(2)]} ${notebook.title}",
+                title: "${task[flashcardAvailable ? 0 : 1][random.nextInt(3)]} ${notebook.title}",
                 course: notebook.course,
                 image: notebook.image,
                 isLoading: isLoading,

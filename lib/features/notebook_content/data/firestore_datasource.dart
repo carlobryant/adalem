@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class FirestoreContentDataSource {
   Future<NotebookContent?> fetchContent(String notebookId);
-  //Future<NotebookContent> parseContent();
   ({String notebookId, String contentId}) generateIds();
   Future<void> createNotebook({
     required CreateNotebookParams params,
@@ -56,13 +55,6 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
     }
   }
 
-  // @override
-  // Future<NotebookContent> parseContent() async {
-  //   final jsonString = await rootBundle.loadString("assets/dummy.json");
-  //   final map = json.decode(jsonString) as Map<String, dynamic>;
-  //   return NotebookContentDataModel.fromMap({'id': '', ...map});
-  // }
-
   @override
   ({String notebookId, String contentId}) generateIds() {
     final notebookRef = _firestore.collection('notebooks').doc();
@@ -79,7 +71,7 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
     await _firestore.collection('notebooks').doc(notebookId).set({
       'owner': params.owner,
       'users': {
-        params.owner: {'mastery': 0, 'flashcards': []},
+        params.owner: {'mastery': 0, 'flashcards': [], 'lastDecayApplied': FieldValue.serverTimestamp(), },
       },
       'title': params.title,
       'course': params.course,

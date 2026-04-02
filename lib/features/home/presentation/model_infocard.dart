@@ -30,13 +30,13 @@ class InfoCardModel {
       title: "Test to Remember",
       details: "Retrieval Practice",
       description: "Simply rereading doesn't work, generate self-testing flashcards and adaptive quizzes that force your brain to actively recall.",
-      image: "ic_adalem",
+      image: "ic_nb_total",
     ),
     InfoCardModel(
       title: "Perfect Timing",
       details: "Spaced Repetition",
       description: "SM-2 algorithm flashcards resurface based on your performance patterns. With these intervals, you lock them into your long-term retention.",
-      image: "ic_adalem",
+      image: "ic_sm2",
     ),
   ];
 }

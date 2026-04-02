@@ -86,13 +86,14 @@ class InfoCardView extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
 
+                        if(!isLoading)
                         Text(details,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w100, 
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                        ).redacted(context: context, redact: isLoading),
+                        ),
                         const SizedBox(height: 2),
 
                         Text(description,

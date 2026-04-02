@@ -41,6 +41,7 @@ class NotebookUser {
   final int? streak;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
+  final DateTime? lastDecayApplied;
   final List<NotebookFlashcard> flashcards;
 
   const NotebookUser({
@@ -48,6 +49,7 @@ class NotebookUser {
     required this.streak,
     required this.quizSession,
     required this.flashcardSession,
+    required this.lastDecayApplied,
     required this.flashcards,
   });
 }

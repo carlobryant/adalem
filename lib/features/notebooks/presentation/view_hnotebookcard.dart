@@ -40,6 +40,8 @@ class HorizontalNotebookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color streakColor = Color(0xFFBA8E23);
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
@@ -63,6 +65,8 @@ class HorizontalNotebookCard extends StatelessWidget {
                       width: 70,
                       height: double.infinity,
                       fit: BoxFit.cover,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                      colorBlendMode: BlendMode.saturation,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           width: 70,
@@ -104,13 +108,14 @@ class HorizontalNotebookCard extends StatelessWidget {
                               maxLines: 2, 
                               overflow: TextOverflow.ellipsis,
                             ),
+                        if(!isLoading)
                         Text(course,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w100, 
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                        ).redacted(context: context, redact: isLoading),
+                        ),
                         const SizedBox(height: 2),
                       ],
                     ),
@@ -120,25 +125,25 @@ class HorizontalNotebookCard extends StatelessWidget {
                       ? Container(width: 140, height: 12, color: Colors.grey).redacted(context: context, redact: true)
                       : Row(
                         children: [
+                          if(streak < 1) Spacer(),
                           Text( _formatDate(lastAccess),
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 12,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                      Spacer(),
+                      if(!isLoading && streak > 0) Spacer(),
                       // STREAK ROW
-                      isLoading
-                        ? Container(width: 80, height: 18, color: Colors.grey).redacted(context: context, redact: true)
-                        : Row(
+                      if(!isLoading && streak > 0)
+                      Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.local_fire_department_rounded, 
                                 size: 18, 
-                                color: streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface, 
+                                color: streak > 1 ? streakColor : Theme.of(context).colorScheme.onSurface, 
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -147,7 +152,7 @@ class HorizontalNotebookCard extends StatelessWidget {
                                   fontSize: 14,
                                   fontFamily: "LoveYaLikeASister",
                                   fontWeight: FontWeight.bold,
-                                  color: streak > 0 ? Colors.deepOrange : Theme.of(context).colorScheme.onSurface,
+                                  color: streak > 1 ? streakColor : Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],
