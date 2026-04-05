@@ -140,7 +140,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     final flashcardTs = userData['flashcardSession'] as Timestamp?;
     final currentStreak = userData['streak'] as int? ?? 0;
 
-    final newStreak = _calculateNewStreak(quizTs, flashcardTs, currentStreak);
+   final newStreak = _calculateNewStreak(quizTs, flashcardTs, currentStreak);
 
     final flashcards = progress.map((card) => {
       'cardId': card.cardId,

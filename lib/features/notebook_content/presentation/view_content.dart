@@ -220,10 +220,10 @@ class _ContentViewState extends State<_ContentView> {
     final viewModel = context.watch<ContentViewModel>();
     final notebookColors = widget._nbColors(widget.image);
 
-    final notebookvm = context.read<NotebookViewModel>();
+    final notebookVM = context.read<NotebookViewModel>();
     final currentUser = context.read<AuthRepo>().getCurrentUser();
     final int mastery = currentUser != null ? 
-    notebookvm.getMasteryFor(widget.notebookId, currentUser.uid) : 0;
+    notebookVM.getMasteryFor(widget.notebookId, currentUser.uid) : 0;
 
     if(viewModel.isLoading) {
       return Scaffold(
