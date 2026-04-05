@@ -33,25 +33,25 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
   @override
   Future<NotebookContent?> fetchContent(String notebookId) async {
     try {
-      final snapshot = await _firestore
-          .collection('content')
-          .where('notebook', isEqualTo: notebookId)
-          .limit(1)
-          .get(const GetOptions(source: Source.serverAndCache));
-
-      if (snapshot.docs.isEmpty) return null;
-      final doc = snapshot.docs.first;
-      return NotebookContentDataModel.fromMap({'id': doc.id, ...doc.data()});
-    } catch (_) {
-      final snapshot = await _firestore
+      var snapshot = await _firestore
           .collection('content')
           .where('notebook', isEqualTo: notebookId)
           .limit(1)
           .get(const GetOptions(source: Source.cache));
 
+      if (snapshot.docs.isEmpty) {
+        snapshot = await _firestore
+            .collection('content')
+            .where('notebook', isEqualTo: notebookId)
+            .limit(1)
+            .get(const GetOptions(source: Source.server));
+      }
+
       if (snapshot.docs.isEmpty) return null;
       final doc = snapshot.docs.first;
       return NotebookContentDataModel.fromMap({'id': doc.id, ...doc.data()});
+    } catch (e) {
+      return null;
     }
   }
 

@@ -6,7 +6,6 @@ import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/auth/domain/uc_googlesignin.dart';
 import 'package:adalem/features/auth/domain/uc_signout.dart';
 import 'package:adalem/config/firebase_options.dart';
-import 'package:adalem/features/auth/presentation/vm_login.dart';
 import 'package:adalem/features/create/data/ai_datasource.dart';
 import 'package:adalem/features/create/data/repo_impl.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
@@ -20,6 +19,8 @@ import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/profile/domain/uc_fetchactivity.dart';
+import 'package:adalem/features/profile/domain/uc_updateactivity.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:adalem/features/quiz/domain/uc_syncquiz.dart';
 import 'package:adalem/nav/authgate_nav.dart';
@@ -93,6 +94,8 @@ void main() async {
           create:(_) => ProfileViewModel(
             signOut: SignOut(authRepo), 
             getCurrentUser: GetCurrentUser(authRepo),
+            fetchActivity: FetchActivity(authRepo),
+            updateActivity: UpdateActivity(authRepo),
           )..init(),
         ),
       ],

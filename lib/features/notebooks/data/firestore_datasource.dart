@@ -109,16 +109,6 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
           return processedNotebooks;
         });
   }
-  // @override
-  // Stream<List<Map<String, dynamic>>> fetchNotebooks(String uid) {
-  //     return _firestore
-  //     .collection('notebooks')
-  //     .where('users.$uid', isNull: false)
-  //     .snapshots()
-  //     .map((snapshot) => snapshot.docs
-  //         .map((doc) => {'id': doc.id, ...doc.data()})
-  //         .toList());
-  // }
 
   @override
   Future<int> getNotebookCount(String uid) async {
@@ -130,7 +120,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     return aggregateQuery.count ?? 0;
   }
 
-@override
+  @override
   Future<void> syncFlashcards({
     required String notebookId,
     required String uid,
@@ -139,6 +129,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
   }) async {
     final docRef = _firestore.collection('notebooks').doc(notebookId);
     final snapshot = await docRef.get();
+    
     if (!snapshot.exists) return;
 
     final data = snapshot.data()!;

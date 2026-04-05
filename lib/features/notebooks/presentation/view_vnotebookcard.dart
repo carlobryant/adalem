@@ -52,6 +52,8 @@ class VerticalNotebookCard extends StatelessWidget {
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  color: isProcessing ? Colors.black54 : null,
+                  colorBlendMode: BlendMode.darken,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       height: 150,
@@ -69,14 +71,13 @@ class VerticalNotebookCard extends StatelessWidget {
 
                 if(isProcessing)
                 Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      LoaderAnimation(onBlack: true),
+                    ],
                   ),
-                ),
-                if(isProcessing)
-                Positioned.fill(child: LoaderAnimation(onBlack: true)),
+                  ),
               ],
             ),
           ),

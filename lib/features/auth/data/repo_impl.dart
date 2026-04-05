@@ -32,5 +32,26 @@ class AuthRepositoryImpl implements AuthRepo {
   Stream<AuthUser?> get authStateChanges {
     return _dataSource.authStateChanges;
   }
+  @override
+  Stream<AuthUser?> fetchActivity() {
+    return _dataSource.fetchActivity();
+  }
+
+  @override
+  Future<void> updateActivity(
+    String uid, 
+    String dateKey, {
+    int created = 0, 
+    int quiz = 0, 
+    int flashcard = 0,
+  }) async {
+    await _dataSource.updateActivity(
+      uid, 
+      dateKey, 
+      created: created, 
+      quiz: quiz, 
+      flashcard: flashcard,
+    );
+  }
 }
 

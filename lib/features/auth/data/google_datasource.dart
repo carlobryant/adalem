@@ -1,4 +1,5 @@
 import 'package:adalem/config/config.dart';
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +11,9 @@ abstract class AuthRemoteDataSource {
   AuthUser? getCurrentUser();
   Future<AuthUser?> getUserById(String uid);
   Stream<AuthUser?> get authStateChanges;
+  Stream<AuthUser?> fetchActivity();
+  Future<void> updateActivity(String uid, 
+    String dateKey, {int created = 0, int quiz = 0, int flashcard = 0,});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -94,6 +98,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'photoURL': user.photoURL ?? '',
         'provider': 'google',
         'createdAt': FieldValue.serverTimestamp(),
+        'activity': {},
       });
     }
   }
@@ -112,7 +117,72 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return user != null ? _mapFirebaseUser(user) : null;
     });
   }
-  
+
+  @override
+  Stream<AuthUser?> fetchActivity() {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return Stream.value(null);
+
+    return _firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+      if (!snapshot.exists || snapshot.data() == null) return null;
+
+      final data = snapshot.data()!;
+
+      final parsedActivity = <String, ActivityEntry>{};
+      if (data['activity'] is Map<String, dynamic>) {
+        (data['activity'] as Map<String, dynamic>).forEach((key, value) {
+          if (value is Map<String, dynamic>) {
+            parsedActivity[key] = ActivityEntry.fromMap(value); 
+          }
+        });
+      }
+
+      return AuthUser(
+        uid: uid,
+        name: data['name'] ?? data['displayName'] ?? 'Unknown User',
+        email: data['email'] ?? '',
+        photoURL: data['photoURL'] ?? '',
+        provider: data['provider'] ?? 'unknown',
+        activity: parsedActivity,
+      );
+    });
+  }
+
+  // UPDATE ACTIVITY
+  @override
+  Future<void> updateActivity(
+    String uid, 
+    String dateKey, {
+    int created = 0, 
+    int quiz = 0, 
+    int flashcard = 0,
+  }) async {
+    final docRef = _firestore.collection('users').doc(uid);
+
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) return;
+
+      final data = snapshot.data() ?? {};
+      final activityMap = (data['activity'] as Map<String, dynamic>?) ?? {};
+
+      final Map<String, dynamic> updates = {};
+
+      if (created > 0) updates['activity.$dateKey.Created'] = FieldValue.increment(created);
+      if (quiz > 0) updates['activity.$dateKey.Quiz'] = FieldValue.increment(quiz);
+      if (flashcard > 0) updates['activity.$dateKey.Flashcard'] = FieldValue.increment(flashcard);
+      if (updates.isEmpty) return;
+
+      if (!activityMap.containsKey(dateKey) && activityMap.length >= Constraint.maxActivity) {
+        final sortedKeys = activityMap.keys.toList()..sort();
+        final oldestKey = sortedKeys.first;
+        updates['activity.$oldestKey'] = FieldValue.delete();
+      }
+
+      transaction.update(docRef, updates);
+    });
+  }
+    
   // GET USER BY USER ID
   @override
   Future<AuthUser?> getUserById(String uid) async {

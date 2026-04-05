@@ -35,8 +35,8 @@ class _ProfileViewState extends State<ProfileView> {
 
   void _onViewModelChanged() {
     final viewModel = context.read<ProfileViewModel>();
-    if(viewModel.errorMessage != null) {
-      ToastCard.error(context, viewModel.errorMessage!);
+    if(viewModel.error != null) {
+      ToastCard.error(context, viewModel.error!.header, description:  viewModel.error!.description);
     }
   }
 
@@ -44,7 +44,7 @@ class _ProfileViewState extends State<ProfileView> {
     final profilevm = context.read<ProfileViewModel>();
     await profilevm.handleSignOut();
     if(!mounted) return;
-    if(profilevm.errorMessage != null) return;
+    if(profilevm.error != null) return;
 
     context.read<NotebookViewModel>().clearData();
     Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(

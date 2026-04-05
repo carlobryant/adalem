@@ -6,4 +6,12 @@ abstract class AuthRepo {
   AuthUser? getCurrentUser();
   Future<AuthUser?> getUserById(String uid);
   Stream<AuthUser?> get authStateChanges;
+  Stream<AuthUser?> fetchActivity();
+  Future<void> updateActivity(
+    String uid, 
+    String dateKey, {
+    int created = 0, 
+    int quiz = 0, 
+    int flashcard = 0,
+  });
 }

@@ -218,9 +218,19 @@ class _ContentDrawerState extends State<ContentDrawer> {
                                 ),
                               ),
                               SizedBox(width: 5),
-                              Image(
-                                image: AssetImage(MasteryLevel.fromXp(widget.mastery).asset),
-                                width: 20,
+                              Stack(
+                                alignment: AlignmentGeometry.center,
+                                children: [
+                                  Image(
+                                    image: AssetImage(MasteryLevel.fromXp(widget.mastery).asset),
+                                    color: Recolor.darken(widget.primary),
+                                    width: 25,
+                                  ),
+                                  Image(
+                                    image: AssetImage(MasteryLevel.fromXp(widget.mastery).asset),
+                                    width: 20,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
