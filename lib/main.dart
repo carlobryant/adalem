@@ -40,7 +40,7 @@ void main() async {
 
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
-    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    //cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
   final modelAI = FirebaseAI.googleAI().generativeModel(model: 'gemini-3-flash-preview');

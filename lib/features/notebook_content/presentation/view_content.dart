@@ -134,6 +134,7 @@ class _ContentViewState extends State<_ContentView> {
     final notebookvm = context.read<NotebookViewModel>();
     final uid = currentUser.uid;
     final mastery = notebookvm.getMasteryFor(widget.notebookId, uid);
+    final currentUserEntity = notebookvm.getUserEntityFor(widget.notebookId, uid);
 
     if (isQuiz) {
       final quizvm = QuizViewModel(syncQuizHistory: context.read<SyncQuizHistory>());
@@ -152,10 +153,10 @@ class _ContentViewState extends State<_ContentView> {
       if (_viewModel.content == null) {
         await _viewModel.loadNotebookContent(widget.notebookId);
       }
-      quizvm.initSession(_viewModel.content!, currentMastery: mastery);
+      // GET INITIAL DIFFICULTY FROM HISTORY
+      quizvm.initSession(_viewModel.content!, currentUserEntity, currentMastery: mastery);
       
     } else {
-      final userProgress = notebookvm.getProgressFor(widget.notebookId, uid);
       final flashcardvm = FlashcardViewModel(
         sm2: const SM2Algorithm(),
         sessionService: const FlashcardSession(),
@@ -179,7 +180,7 @@ class _ContentViewState extends State<_ContentView> {
         await _viewModel.loadNotebookContent(widget.notebookId, load: {ContentType.flashcards});
       }
       final allItems = _viewModel.quizItemModels.map((q) => q.quizItem).toList();
-      flashcardvm.initSession(allItems, userProgress);
+      flashcardvm.initSession(allItems, currentUserEntity);
     }
   }
 

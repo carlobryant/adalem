@@ -16,6 +16,7 @@ class FlashcardViewModel extends ChangeNotifier {
   List<QuizItem> _sessionItems = [];
   List<QuizItem> get sessionItems => _sessionItems;
 
+  NotebookUser? _currentUser;
   List<NotebookFlashcard> _currentProgress = [];
 
   int _currentIndex = 0;
@@ -41,7 +42,7 @@ class FlashcardViewModel extends ChangeNotifier {
         _sessionService = sessionService,
         _syncFlashcards = syncFlashcardProgress;
 
-  void initSession(List<QuizItem> allItems, List<NotebookFlashcard> progress) {
+  void initSession(List<QuizItem> allItems, NotebookUser currentUser) {
     if (allItems.isEmpty) {
       _status = FlashcardSessionStatus.error;
       _error = const ErrorModel(
@@ -53,12 +54,13 @@ class FlashcardViewModel extends ChangeNotifier {
     }
 
     _allItems = allItems;
-    _currentProgress = List.from(progress); 
+    _currentUser = currentUser;
+    _currentProgress = List.from(currentUser.flashcards); 
     _currentIndex = 0;
 
     final sessionCardIds = _sessionService.buildSession(
       allItems: allItems,
-      progress: progress,
+      progress: _currentProgress,
     );
 
     _sessionItems = allItems
@@ -75,7 +77,11 @@ class FlashcardViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startNextSession() => initSession(_allItems, _currentProgress);
+  void startNextSession() {
+    if (_currentUser != null) {
+       initSession(_allItems, _currentUser!);
+    }
+  }
 
   Future<void> rateCard(String notebookId, String uid, int quality) async {
     if (_sessionItems.isEmpty || _status != FlashcardSessionStatus.active) return;
@@ -135,6 +141,7 @@ class FlashcardViewModel extends ChangeNotifier {
       await _syncFlashcards(
         notebookId: notebookId,
         uid: uid,
+        currentUser: _currentUser!,
         progress: _currentProgress,
         isEarly: early,
       );

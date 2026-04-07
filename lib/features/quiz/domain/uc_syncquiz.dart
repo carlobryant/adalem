@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/notebooks/domain/notebook_repo.dart';
 
@@ -12,7 +14,9 @@ class SyncQuizHistory {
     required int score,
     required double aveDifficulty,
     required double accuracy,
+    required NotebookUser currentUser,
   }) async {
+    final newStreak = currentUser.calculateNewStreak();
     final history = NotebookHistory(
       id: "", 
       notebookId: notebookId,
@@ -27,6 +31,7 @@ class SyncQuizHistory {
       notebookId: notebookId,
       uid: uid,
       history: history,
+      newStreak: newStreak,
     );
   }
 }

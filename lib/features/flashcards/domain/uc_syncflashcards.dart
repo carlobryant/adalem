@@ -9,14 +9,17 @@ class SyncFlashcards {
   Future<void> call({
     required String notebookId,
     required String uid,
+    required NotebookUser currentUser,
     required List<NotebookFlashcard> progress,
     required bool isEarly,
   }) async {
+    final newStreak = currentUser.calculateNewStreak();
     await _notebookRepo.syncFlashcards(
       notebookId: notebookId,
       uid: uid,
       progress: progress,
       isEarly: isEarly,
+      newStreak: newStreak,
     );
   }
 }

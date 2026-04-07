@@ -1,6 +1,7 @@
 import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebook_content/presentation/model_quizitem.dart';
+import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:adalem/features/quiz/domain/quiz_algo.dart';
 import 'package:adalem/features/quiz/domain/uc_syncquiz.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ enum QuizSessionStatus { idle, active, complete, syncError, error }
 
 class QuizViewModel extends ChangeNotifier {
   final SyncQuizHistory _syncQuizHistory;
+  NotebookUser? _currentUser;
 
   StaircaseAlgorithm? _algorithm;
 
@@ -63,7 +65,7 @@ class QuizViewModel extends ChangeNotifier {
   QuizViewModel({required SyncQuizHistory syncQuizHistory})
       : _syncQuizHistory = syncQuizHistory;
 
-  void initSession(NotebookContent content, {
+  void initSession(NotebookContent content, NotebookUser currentUser, {
     double initialDifficulty = 1.0,
     int currentMastery = 0,
     }) {
@@ -78,6 +80,7 @@ class QuizViewModel extends ChangeNotifier {
     }
 
     _prevMastery = currentMastery;
+    _currentUser = currentUser;
 
     _algorithm = StaircaseAlgorithm(
       content: content, 
@@ -206,6 +209,7 @@ class QuizViewModel extends ChangeNotifier {
         score: sessionScore, 
         aveDifficulty: sessionAveDifficulty,
         accuracy: sessionAccuracy,
+        currentUser: _currentUser!,
       );
     } catch (e) {
       _status = QuizSessionStatus.syncError;

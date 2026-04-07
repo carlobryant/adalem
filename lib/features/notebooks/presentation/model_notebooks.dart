@@ -74,6 +74,7 @@ class NotebookUserModel {
   final int? streak;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
+  final DateTime? lastDecayApplied;
   final List<NotebookFlashcardModel> flashcards;
 
   const NotebookUserModel({
@@ -81,6 +82,7 @@ class NotebookUserModel {
     required this.streak,
     required this.quizSession,
     required this.flashcardSession,
+    required this.lastDecayApplied,
     required this.flashcards,
   });
 
@@ -90,6 +92,7 @@ class NotebookUserModel {
       streak: user.streak,
       quizSession: user.quizSession,
       flashcardSession: user.flashcardSession,
+      lastDecayApplied: user.lastDecayApplied,
       flashcards: user.flashcards
           .map((e) => NotebookFlashcardModel.fromEntity(e))
           .toList(),
@@ -102,6 +105,7 @@ class NotebookUserModel {
       streak: 0,
       quizSession: null,
       flashcardSession: null,
+      lastDecayApplied: null,
       flashcards: [],
     );
   }

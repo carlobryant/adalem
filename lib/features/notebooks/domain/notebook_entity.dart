@@ -52,6 +52,39 @@ class NotebookUser {
     required this.lastDecayApplied,
     required this.flashcards,
   });
+
+  factory NotebookUser.empty() {
+    return const NotebookUser(
+      mastery: 0,
+      streak: 0,
+      quizSession: null,
+      flashcardSession: null,
+      lastDecayApplied: null,
+      flashcards: [],
+    );
+  }
+
+   DateTime? get latestSession {
+    if (quizSession != null && flashcardSession != null) {
+      return quizSession!.isAfter(flashcardSession!) ? quizSession : flashcardSession;
+    }
+    return quizSession ?? flashcardSession;
+  }
+
+  int calculateNewStreak({DateTime? currentDate}) {
+    if (latestSession == null) return 1;
+
+    final now = currentDate ?? DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
+    final lastDate = DateTime(latestSession!.year, latestSession!.month, latestSession!.day);
+    final difference = today.difference(lastDate).inDays;
+
+    if (difference == 1) return (streak ?? 0) + 1;
+    if (difference > 1) return 1;
+    
+    return streak ?? 0;
+  }
 }
 
 class NotebookFlashcard {

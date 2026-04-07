@@ -172,6 +172,28 @@ class NotebookViewModel extends ChangeNotifier {
    // FETCH AVAILABLE
   bool isNotebookCreating() => _notebooks.any((n) => n.available == "generating");
 
+  // FETCH USER ENTITY
+  NotebookUser getUserEntityFor(String notebookId, String uid) {
+    final notebook = _notebooks.firstWhere(
+      (n) => n.id == notebookId,
+      orElse: () => NotebookModel.empty(),
+    );
+
+    final userModel = notebook.users[uid];
+    final flashcards = getProgressFor(notebookId, uid);
+    if (userModel == null) {
+      return NotebookUser.empty();
+    }
+    return NotebookUser(
+      mastery: userModel.mastery,
+      streak: userModel.streak,
+      quizSession: userModel.quizSession,
+      flashcardSession: userModel.flashcardSession,
+      lastDecayApplied: userModel.lastDecayApplied,
+      flashcards: flashcards,
+    );
+  }
+  
   // FETCH OWNER
   AuthUser? _ownerData;
   AuthUser? get ownerData => _ownerData;
