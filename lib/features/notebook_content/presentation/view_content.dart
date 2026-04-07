@@ -93,7 +93,7 @@ class _ContentView extends StatefulWidget {
 
 class _ContentViewState extends State<_ContentView> {
   final ListController _listController = ListController();
-  late final ContentViewModel _viewModel;
+  late final ContentViewModel _contentvm;
 
   // DRAWER WIDGET
   double _drawerOffset = 0.0; 
@@ -108,7 +108,7 @@ class _ContentViewState extends State<_ContentView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = context.read<ContentViewModel>();
+    _contentvm = context.read<ContentViewModel>();
 
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
@@ -130,9 +130,9 @@ class _ContentViewState extends State<_ContentView> {
 
     final currentUser = context.read<AuthRepo>().getCurrentUser();
     if (currentUser == null) return;
+    final uid = currentUser.uid;
 
     final notebookvm = context.read<NotebookViewModel>();
-    final uid = currentUser.uid;
     final mastery = notebookvm.getMasteryFor(widget.notebookId, uid);
     final currentUserEntity = notebookvm.getUserEntityFor(widget.notebookId, uid);
 
@@ -150,11 +150,11 @@ class _ContentViewState extends State<_ContentView> {
         ),
       );
 
-      if (_viewModel.content == null) {
-        await _viewModel.loadNotebookContent(widget.notebookId);
+      if (_contentvm.content == null) {
+        await _contentvm.loadNotebookContent(widget.notebookId);
       }
       // GET INITIAL DIFFICULTY FROM HISTORY
-      quizvm.initSession(_viewModel.content!, currentUserEntity, currentMastery: mastery);
+      quizvm.initSession(_contentvm.content!, currentUserEntity, currentMastery: mastery);
       
     } else {
       final flashcardvm = FlashcardViewModel(
@@ -176,10 +176,10 @@ class _ContentViewState extends State<_ContentView> {
         ),
       );
 
-      if (_viewModel.quizItemModels.isEmpty) {
-        await _viewModel.loadNotebookContent(widget.notebookId, load: {ContentType.flashcards});
+      if (_contentvm.quizItemModels.isEmpty) {
+        await _contentvm.loadNotebookContent(widget.notebookId, load: {ContentType.flashcards});
       }
-      final allItems = _viewModel.quizItemModels.map((q) => q.quizItem).toList();
+      final allItems = _contentvm.quizItemModels.map((q) => q.quizItem).toList();
       flashcardvm.initSession(allItems, currentUserEntity);
     }
   }
@@ -254,7 +254,7 @@ class _ContentViewState extends State<_ContentView> {
               Text(viewModel.error!.description),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => _viewModel.loadNotebookContent(widget.notebookId),
+                onPressed: () => _contentvm.loadNotebookContent(widget.notebookId),
                 child: const Text("Retry"),
               ),
             ],
