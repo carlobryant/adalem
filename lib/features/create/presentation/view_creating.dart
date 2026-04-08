@@ -44,7 +44,8 @@ class _CreatingViewState extends State<CreatingView> {
       _createViewModel.clearCreateError();
     }
     else if (_createViewModel.isSuccess) {
-      ToastCard.success(context, "Notebook Created!");
+      ToastCard.success(context, "Notebook Created", 
+      description: "Do not close the app while the notebook is being generated!");
       _createViewModel.resetCreate();
       
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(

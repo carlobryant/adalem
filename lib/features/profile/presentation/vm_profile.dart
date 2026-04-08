@@ -57,6 +57,37 @@ class ProfileViewModel extends ChangeNotifier {
     );
   }
 
+  // ACTIVITY HEATMAP DATA
+  Map<DateTime, int> get heatmapData {
+    final activityMap = _user?.activity;
+    if (activityMap == null) return {};
+
+    final Map<DateTime, int> dataset = {};
+
+    activityMap.forEach((dateString, stats) {
+      try {
+        final parts = dateString.split('-');
+        if (parts.length != 3) return; 
+        
+        final DateTime date = DateTime(
+          int.parse(parts[0]), 
+          int.parse(parts[1]), 
+          int.parse(parts[2]),
+        );
+
+        int totalDailyActivity = stats.created + stats.quiz + stats.flashcard;
+
+        if (totalDailyActivity > 0) {
+          dataset[date] = totalDailyActivity;
+        }
+      } catch (e) {
+        // Silently catch format exceptions so bad data doesn't crash the UI
+      }
+    });
+    
+    return dataset;
+  }
+
   Future<void> addActivityStat({
     int created = 0, 
     int quiz = 0, 

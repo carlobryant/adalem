@@ -39,7 +39,7 @@ class AIDataSourceImpl implements AIDataSource {
       ]);
             
       final responseText = response.text;
-      if (responseText == null || responseText.isEmpty) {
+      if (responseText == null || responseText.isEmpty  || responseText == "{}") {
         throw Exception("Unexpected error, received empty response.");
       }
 

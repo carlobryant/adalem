@@ -26,12 +26,24 @@ class VerticalNotebookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final surfaceColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
     final displayDate = updatedAt.split('-').first;
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      shadowColor: Theme.of(context).colorScheme.shadow,
-      elevation: 5,
+    return Container(
+      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      // shadowColor: Theme.of(context).colorScheme.shadow,
+      // elevation: 5,
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(15),
+        border: BoxBorder.fromLTRB(
+            bottom: BorderSide(width: 5, color: borderColor),
+            right: BorderSide(width: 3, color: borderColor),
+            top: BorderSide.none,
+            left: BorderSide.none,
+          ),
+      ),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

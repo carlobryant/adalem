@@ -2,7 +2,9 @@ import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/features/flashcards/presentation/view_flashcardresults.dart';
 import 'package:adalem/features/flashcards/presentation/vm_flashcard.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
+import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FlashcardView extends StatefulWidget {
   final FlashcardViewModel viewModel;
@@ -28,6 +30,7 @@ class _FlashcardViewState extends State<FlashcardView>
 with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _controller;
   late Animation<double> _animation;
+  bool _hasLoggedActivity = false;
   bool _answerRevealed = false;
   bool _infoRevealed = false;
   bool _switchSide = false;
@@ -37,7 +40,7 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
+    widget.viewModel.addListener(_onViewModelChanged);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -48,6 +51,15 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
         curve: Curves.easeInOut,
       ),
     );
+  }
+
+  void _onViewModelChanged() {
+    final vm = widget.viewModel;
+    
+    if (vm.status == FlashcardSessionStatus.complete && !_hasLoggedActivity) {
+      _hasLoggedActivity = true;
+      context.read<ProfileViewModel>().addActivityStat(flashcard: 1); 
+    }
   }
 
   @override
@@ -74,6 +86,8 @@ with SingleTickerProviderStateMixin, WidgetsBindingObserver {
 
   @override
   void dispose() {
+    widget.viewModel.removeListener(_onViewModelChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }

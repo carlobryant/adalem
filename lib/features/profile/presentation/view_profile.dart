@@ -54,26 +54,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Map<DateTime, int> _generateHeatmapData(Map<String, dynamic>? activityMap) {
-    if (activityMap == null) return {};
-    final Map<DateTime, int> dataset = {};
-
-    activityMap.forEach((dateString, stats) {
-      final DateTime date = DateTime.parse(dateString);
-      if (stats is Map<String, dynamic>) {
-        final int created = (stats['Created'] as num?)?.toInt() ?? 0;
-        final int quiz = (stats['Quiz'] as num?)?.toInt() ?? 0;
-        final int flashcard = (stats['Flashcard'] as num?)?.toInt() ?? 0;
-        
-        final int totalDailyActivity = created + quiz + flashcard;
-        if (totalDailyActivity > 0) {
-          dataset[date] = totalDailyActivity;
-        }
-      }
-    });
-    return dataset;
-  }
-
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
@@ -139,49 +119,51 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget _buildBody(AuthUser user) {
     final notebookvm = context.read<NotebookViewModel>();
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: AnalyticsView(heatmapData: _generateHeatmapData(user.activity)),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              _buildRow("Total Notebooks", "${notebookvm.notebookCount}", "total"), 
-              SizedBox(height: 20),
-              _buildRow("Shared Notebooks", "${notebookvm.sharedNotebookCount}", "shared"),
-              SizedBox(height: 20),
-              _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", "received"),
-              SizedBox(height:  10),
-            ],
-          )
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              color: Theme.of(context).colorScheme.onSurface,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: AnalyticsView(heatmapData: _viewModel.heatmapData),
+          ),
+      
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                _buildRow("Total Notebooks", "${notebookvm.notebookCount}", "total"), 
+                SizedBox(height: 20),
+                _buildRow("Shared Notebooks", "${notebookvm.sharedNotebookCount}", "shared"),
+                SizedBox(height: 20),
+                _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", "received"),
+                SizedBox(height:  10),
+              ],
+            )
+          ),
+      
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("test"),
+              ),
             ),
+          ),
+      
+          Container(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text("test"),
             ),
           ),
-        ),
-
-        Container(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("test"),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

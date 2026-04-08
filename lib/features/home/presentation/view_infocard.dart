@@ -20,10 +20,22 @@ class InfoCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
-      elevation: 5,
+    final surfaceColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
+    return Container(
+      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      // shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
+      // elevation: 5,
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(15),
+        border: BoxBorder.fromLTRB(
+            bottom: BorderSide(width: 5, color: borderColor),
+            right: BorderSide(width: 3, color: borderColor),
+            top: BorderSide.none,
+            left: BorderSide.none,
+          ),
+      ),
       child: SizedBox(
         height: 130, 
         child: Row( 

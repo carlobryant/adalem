@@ -3,7 +3,6 @@ import 'package:adalem/features/notebook_content/domain/uc_createnotebook.dart';
 
 abstract class ContentRepo {
   Future<NotebookContent?> fetchContent(String notebookId);
-  //Future<NotebookContent> parseContent();
   ({String notebookId, String contentId}) generateIds();
   Future<void> createNotebook({
     required CreateNotebookParams params,
