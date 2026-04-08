@@ -39,6 +39,7 @@ class NotebookUpdatedAt {
 class NotebookUser {
   final int mastery;
   final int? streak;
+  final String? streakAt;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
   final DateTime? lastDecayApplied;
@@ -47,6 +48,7 @@ class NotebookUser {
   const NotebookUser({
     required this.mastery,
     required this.streak,
+    required this.streakAt,
     required this.quizSession,
     required this.flashcardSession,
     required this.lastDecayApplied,
@@ -57,32 +59,37 @@ class NotebookUser {
     return const NotebookUser(
       mastery: 0,
       streak: 0,
+      streakAt: "",
       quizSession: null,
       flashcardSession: null,
       lastDecayApplied: null,
       flashcards: [],
     );
   }
-
-   DateTime? get latestSession {
-    if (quizSession != null && flashcardSession != null) {
-      return quizSession!.isAfter(flashcardSession!) ? quizSession : flashcardSession;
-    }
-    return quizSession ?? flashcardSession;
+  
+  String timestampToStreakAt() {
+    DateTime dt = DateTime.now();
+    final yyyy = dt.year.toString().padLeft(4, '0');
+    final mm = dt.month.toString().padLeft(2, '0');
+    final dd = dt.day.toString().padLeft(2, '0');
+    return '$yyyy-$mm-$dd';
+    
   }
 
   int calculateNewStreak({DateTime? currentDate}) {
-    if (latestSession == null) return 1;
-
+    if (streakAt == null || streakAt!.isEmpty) return 1;
+    final parts = streakAt!.split('-');
+    if (parts.length != 3) return 1;
+    final lastDate = DateTime(
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      int.parse(parts[2]),
+    );
     final now = currentDate ?? DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
-    final lastDate = DateTime(latestSession!.year, latestSession!.month, latestSession!.day);
     final difference = today.difference(lastDate).inDays;
-
     if (difference == 1) return (streak ?? 0) + 1;
     if (difference > 1) return 1;
-    
     return streak ?? 0;
   }
 }

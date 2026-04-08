@@ -72,6 +72,7 @@ class NotebookModel {
 class NotebookUserModel {
   final int mastery;
   final int? streak;
+  final String? streakAt;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
   final DateTime? lastDecayApplied;
@@ -80,6 +81,7 @@ class NotebookUserModel {
   const NotebookUserModel({
     required this.mastery,
     required this.streak,
+    required this.streakAt,
     required this.quizSession,
     required this.flashcardSession,
     required this.lastDecayApplied,
@@ -90,6 +92,7 @@ class NotebookUserModel {
     return NotebookUserModel(
       mastery: user.mastery,
       streak: user.streak,
+      streakAt: user.streakAt,
       quizSession: user.quizSession,
       flashcardSession: user.flashcardSession,
       lastDecayApplied: user.lastDecayApplied,
@@ -103,6 +106,7 @@ class NotebookUserModel {
     return const NotebookUserModel(
       mastery: 0,
       streak: 0,
+      streakAt: "",
       quizSession: null,
       flashcardSession: null,
       lastDecayApplied: null,

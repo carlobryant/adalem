@@ -40,7 +40,7 @@ class HorizontalNotebookCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color streakColor = Color(0xFFBA8E23);
+    final Color streakColor = Theme.of(context).colorScheme.tertiary;
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

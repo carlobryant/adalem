@@ -5,6 +5,8 @@ Color _primary = Colors.green.shade900;
 Color _inPrimary = Colors.green.shade400;
 Color _conPrimary = const Color.fromARGB(255, 28, 60, 31);
 Color _onPrimary = Colors.grey.shade300;
+Color _tertiary = Color(0xFFBA8E23);
+Color _onTertiary = Color.fromARGB(255, 243, 174, 2);
 Color _onSurface = Colors.grey.shade600;
 Color _conSurface = Colors.grey.shade800;
 Color _error = const Color.fromARGB(255, 186, 84, 71);
@@ -23,6 +25,8 @@ ThemeData get lightMode => ThemeData(
     inversePrimary: _inPrimary,
     onPrimary: _onPrimary,
     primaryContainer: _conPrimary,
+    tertiary: _tertiary,
+    onTertiary: _onTertiary,
     error: _error,
     onError: _onError,
   ),
@@ -47,6 +51,8 @@ ThemeData get darkMode => ThemeData(
     inversePrimary: _inPrimary,
     onPrimary: _onPrimary,
     primaryContainer: _conPrimary,
+    tertiary: _tertiary,
+    onTertiary: _onTertiary,
     error: _error,
     onError: _onError,
   ),

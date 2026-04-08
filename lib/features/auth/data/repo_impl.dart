@@ -41,6 +41,8 @@ class AuthRepositoryImpl implements AuthRepo {
   Future<void> updateActivity(
     String uid, 
     String dateKey, {
+    bool isMaxReached = false,
+    String? oldestDateKey,
     int created = 0, 
     int quiz = 0, 
     int flashcard = 0,
@@ -48,6 +50,8 @@ class AuthRepositoryImpl implements AuthRepo {
     await _dataSource.updateActivity(
       uid, 
       dateKey, 
+      isMaxReached: isMaxReached,
+      oldestDateKey: oldestDateKey,
       created: created, 
       quiz: quiz, 
       flashcard: flashcard,

@@ -1,5 +1,4 @@
 import 'package:adalem/config/config.dart';
-import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,8 +11,15 @@ abstract class AuthRemoteDataSource {
   Future<AuthUser?> getUserById(String uid);
   Stream<AuthUser?> get authStateChanges;
   Stream<AuthUser?> fetchActivity();
-  Future<void> updateActivity(String uid, 
-    String dateKey, {int created = 0, int quiz = 0, int flashcard = 0,});
+  Future<void> updateActivity(
+    String uid, 
+    String dateKey, {
+    bool isMaxReached = false,
+    String? oldestDateKey,
+    int created = 0, 
+    int quiz = 0, 
+    int flashcard = 0,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -153,34 +159,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> updateActivity(
     String uid, 
     String dateKey, {
+    bool isMaxReached = false,
+    String? oldestDateKey,
     int created = 0, 
     int quiz = 0, 
     int flashcard = 0,
   }) async {
+    final Map<String, dynamic> updates = {};
+
+    if (created > 0) updates['activity.$dateKey.Created'] = FieldValue.increment(created);
+    if (quiz > 0) updates['activity.$dateKey.Quiz'] = FieldValue.increment(quiz);
+    if (flashcard > 0) updates['activity.$dateKey.Flashcard'] = FieldValue.increment(flashcard);
+    if (updates.isEmpty) return;
+    if (isMaxReached && oldestDateKey != null) {
+      updates['activity.$oldestDateKey'] = FieldValue.delete();
+    }
+
     final docRef = _firestore.collection('users').doc(uid);
-
-    await _firestore.runTransaction((transaction) async {
-      final snapshot = await transaction.get(docRef);
-      if (!snapshot.exists) return;
-
-      final data = snapshot.data() ?? {};
-      final activityMap = (data['activity'] as Map<String, dynamic>?) ?? {};
-
-      final Map<String, dynamic> updates = {};
-
-      if (created > 0) updates['activity.$dateKey.Created'] = FieldValue.increment(created);
-      if (quiz > 0) updates['activity.$dateKey.Quiz'] = FieldValue.increment(quiz);
-      if (flashcard > 0) updates['activity.$dateKey.Flashcard'] = FieldValue.increment(flashcard);
-      if (updates.isEmpty) return;
-
-      if (!activityMap.containsKey(dateKey) && activityMap.length >= Constraint.maxActivity) {
-        final sortedKeys = activityMap.keys.toList()..sort();
-        final oldestKey = sortedKeys.first;
-        updates['activity.$oldestKey'] = FieldValue.delete();
-      }
-
-      transaction.update(docRef, updates);
-    });
+    await docRef.update(updates);
   }
     
   // GET USER BY USER ID

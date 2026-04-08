@@ -1,5 +1,6 @@
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
+import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/presentation/view_login.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/view_analytics.dart';
@@ -51,6 +52,26 @@ class _ProfileViewState extends State<ProfileView> {
     MaterialPageRoute(builder: (context) => const LoginView()),
     (route) => false,
     );
+  }
+
+  Map<DateTime, int> _generateHeatmapData(Map<String, dynamic>? activityMap) {
+    if (activityMap == null) return {};
+    final Map<DateTime, int> dataset = {};
+
+    activityMap.forEach((dateString, stats) {
+      final DateTime date = DateTime.parse(dateString);
+      if (stats is Map<String, dynamic>) {
+        final int created = (stats['Created'] as num?)?.toInt() ?? 0;
+        final int quiz = (stats['Quiz'] as num?)?.toInt() ?? 0;
+        final int flashcard = (stats['Flashcard'] as num?)?.toInt() ?? 0;
+        
+        final int totalDailyActivity = created + quiz + flashcard;
+        if (totalDailyActivity > 0) {
+          dataset[date] = totalDailyActivity;
+        }
+      }
+    });
+    return dataset;
   }
 
   @override
@@ -111,18 +132,18 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           )
         ],
-        body: _buildBody(),
+        body: _buildBody(user),
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(AuthUser user) {
     final notebookvm = context.read<NotebookViewModel>();
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: AnalyticsView(),
+          child: AnalyticsView(heatmapData: _generateHeatmapData(user.activity)),
         ),
 
         Padding(

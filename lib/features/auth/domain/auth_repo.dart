@@ -10,6 +10,8 @@ abstract class AuthRepo {
   Future<void> updateActivity(
     String uid, 
     String dateKey, {
+    bool isMaxReached = false,
+    String? oldestDateKey,
     int created = 0, 
     int quiz = 0, 
     int flashcard = 0,

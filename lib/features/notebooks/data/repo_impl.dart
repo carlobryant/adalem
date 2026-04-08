@@ -27,6 +27,7 @@ class NotebookRepositoryImpl implements NotebookRepo {
     required List<NotebookFlashcard> progress,
     required bool isEarly,
     required int newStreak,
+    required String newStreakAt,
   }) {
     return _dataSource.syncFlashcards(
       notebookId: notebookId,
@@ -34,6 +35,7 @@ class NotebookRepositoryImpl implements NotebookRepo {
       progress: progress,
       isEarly: isEarly,
       newStreak: newStreak,
+      newStreakAt: newStreakAt,
     );
   }
 
@@ -43,12 +45,14 @@ class NotebookRepositoryImpl implements NotebookRepo {
     required String uid,
     required NotebookHistory history,
     required int newStreak,
+    required String newStreakAt,
   }) {
     return _dataSource.syncQuizHistory(
       notebookId: notebookId,
       uid: uid,
       history: history,
       newStreak: newStreak,
+      newStreakAt: newStreakAt,
     );
   }
 }

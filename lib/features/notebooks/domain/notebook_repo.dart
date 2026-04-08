@@ -9,11 +9,13 @@ abstract class NotebookRepo {
   required List<NotebookFlashcard> progress,
   required bool isEarly,
   required int newStreak,
+  required String newStreakAt,
   });
   Future<void> syncQuizHistory({
     required String notebookId,
     required String uid,
     required NotebookHistory history,
     required int newStreak,
+    required String newStreakAt,
   });
 }

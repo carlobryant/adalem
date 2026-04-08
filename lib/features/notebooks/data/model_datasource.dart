@@ -55,6 +55,7 @@ class NotebookUserDataModel extends NotebookUser {
   const NotebookUserDataModel({
     required super.mastery,
     required super.streak,
+    required super.streakAt,
     required super.quizSession,
     required super.flashcardSession,
     required super.lastDecayApplied,
@@ -65,6 +66,7 @@ class NotebookUserDataModel extends NotebookUser {
     return NotebookUserDataModel(
       mastery: map['mastery'] as int? ?? 0,
       streak: map['streak'] as int? ?? 0,
+      streakAt: map['streakAt'] as String? ?? '',
       quizSession: (map['quizSession'] as Timestamp?)?.toDate(),
       flashcardSession: (map['flashcardSession'] as Timestamp?)?.toDate(),
       lastDecayApplied: (map['lastDecayApplied'] as Timestamp?)?.toDate(),

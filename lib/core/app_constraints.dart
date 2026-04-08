@@ -2,7 +2,7 @@ class Constraint {
   static const int maxCreate = 10;
   static const int maxShare = 10;
   static const int maxUploadMB = 15;
-  static const int maxActivity = 60;
+  static const int maxActivity = 63;
 
   static const int mcItemPts = 10;
   static const int flashcardPts = 30;

@@ -14,12 +14,14 @@ class SyncFlashcards {
     required bool isEarly,
   }) async {
     final newStreak = currentUser.calculateNewStreak();
+    final newStreakAt = currentUser.timestampToStreakAt();
     await _notebookRepo.syncFlashcards(
       notebookId: notebookId,
       uid: uid,
       progress: progress,
       isEarly: isEarly,
       newStreak: newStreak,
+      newStreakAt: newStreakAt,
     );
   }
 }

@@ -6,15 +6,19 @@ class UpdateActivity {
   UpdateActivity(this._authRepo);
   
   Future<void> call(
-    String uid, {
+    String uid, 
+    String dateKey, {
+    bool isMaxReached = false,
+    String? oldestDateKey,
     int created = 0, 
     int quiz = 0, 
     int flashcard = 0,
   }) async {
-    final dateKey = DateTime.now().toIso8601String().split('T').first; 
     return await _authRepo.updateActivity(
       uid, 
-      dateKey, 
+      dateKey,
+      isMaxReached: isMaxReached,
+      oldestDateKey: oldestDateKey,
       created: created, 
       quiz: quiz, 
       flashcard: flashcard,

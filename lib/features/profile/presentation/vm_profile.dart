@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
@@ -57,14 +57,31 @@ class ProfileViewModel extends ChangeNotifier {
     );
   }
 
-  Future<void> addActivityStat({int created = 0, int quiz = 0, int flashcard = 0}) async {
+  Future<void> addActivityStat({
+    int created = 0, 
+    int quiz = 0, 
+    int flashcard = 0,
+  }) async {
     if (_user == null) return;
     _error = null;
     notifyListeners();
 
     try {
+      final String todayKey = DateTime.now().toIso8601String().split('T').first;
+      final Map<String, dynamic> activityMap = _user!.activity; 
+      
+      bool isMaxReached = false;
+      String? oldestDateKey;
+      if (!activityMap.containsKey(todayKey) && activityMap.length >= Constraint.maxActivity) {
+        isMaxReached = true;
+        final sortedKeys = activityMap.keys.toList()..sort();
+        oldestDateKey = sortedKeys.first;
+      }
       await _updateActivity.call(
         _user!.uid, 
+        todayKey,
+        isMaxReached: isMaxReached,
+        oldestDateKey: oldestDateKey,
         created: created, 
         quiz: quiz, 
         flashcard: flashcard,

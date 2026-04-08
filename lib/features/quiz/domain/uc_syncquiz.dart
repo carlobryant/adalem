@@ -17,6 +17,7 @@ class SyncQuizHistory {
     required NotebookUser currentUser,
   }) async {
     final newStreak = currentUser.calculateNewStreak();
+    final newStreakAt = currentUser.timestampToStreakAt();
     final history = NotebookHistory(
       id: "", 
       notebookId: notebookId,
@@ -32,6 +33,7 @@ class SyncQuizHistory {
       uid: uid,
       history: history,
       newStreak: newStreak,
+      newStreakAt: newStreakAt,
     );
   }
 }

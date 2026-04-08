@@ -14,12 +14,14 @@ abstract class FirestoreDataSource {
     required List<NotebookFlashcard> progress,
     required bool isEarly,
     required int newStreak,
+    required String newStreakAt,
   });
   Future<void> syncQuizHistory({
     required String notebookId,
     required String uid,
     required NotebookHistory history,
     required int newStreak,
+    required String newStreakAt,
   });
 }
 
@@ -52,22 +54,25 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
           final users = data['users'] as Map<String, dynamic>? ?? {};
           final userData = Map<String, dynamic>.from(users[uid] as Map<String, dynamic>? ?? {});
 
-          final quizTs = userData['quizSession'] as Timestamp?;
-          final flashcardTs = userData['flashcardSession'] as Timestamp?;
           final lastDecayTs = userData['lastDecayApplied'] as Timestamp?;
-          
+          final streakAt = userData['streakAt'] as String?;
+
           int currentStreak = userData['streak'] as int? ?? 0;
           int currentMastery = userData['mastery'] as int? ?? 0;
+          
+          DateTime? lastSessionDay;
+          if (streakAt != null && streakAt.isNotEmpty) {
+            final parts = streakAt.split('-');
+            if (parts.length == 3) {
+              lastSessionDay = DateTime(
+                int.parse(parts[0]),
+                int.parse(parts[1]),
+                int.parse(parts[2]),
+              );
+            }
+          }
 
-          Timestamp? lastSessionTs;
-          if (quizTs != null && flashcardTs != null) {
-            lastSessionTs = quizTs.compareTo(flashcardTs) > 0 ? quizTs : flashcardTs;
-          } else { lastSessionTs = quizTs ?? flashcardTs; }
-
-          if (lastSessionTs != null) {
-            final lastSessionDate = lastSessionTs.toDate();
-            final lastSessionDay = DateTime(lastSessionDate.year, lastSessionDate.month, lastSessionDate.day);
-            
+          if (lastSessionDay != null) {
             final daysSinceSession = today.difference(lastSessionDay).inDays;
             if (daysSinceSession >= 2) {
               Map<String, dynamic> updates = {};
@@ -82,32 +87,33 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
               if (currentMastery > MasteryLevel.level3.minXp) {
                 final lastDecay = lastDecayTs?.toDate() ?? lastSessionDay;
                 final baselineDate = DateTime(lastDecay.year, lastDecay.month, lastDecay.day);
-                
-                final daysToPenalize = today.difference(baselineDate).inDays;
 
+                final daysToPenalize = today.difference(baselineDate).inDays;
                 if (daysToPenalize > 0) {
                   final penalty = daysToPenalize * Constraint.mcItemPts;
                   int newMastery = currentMastery - penalty;
                   if (newMastery < MasteryLevel.level3.minXp) newMastery = MasteryLevel.level3.minXp;
 
                   updates['users.$uid.mastery'] = newMastery;
-                  updates['users.$uid.lastDecayApplied'] = Timestamp.now();
-                  userData['mastery'] = newMastery; 
+                  updates['users.$uid.lastDecayApplied'] = FieldValue.serverTimestamp();
+                  userData['mastery'] = newMastery;
                   docNeedsUpdate = true;
                 }
               }
+
               if (docNeedsUpdate) {
                 batch.update(doc.reference, updates);
                 hasUpdates = true;
               }
             }
           }
+
           users[uid] = userData;
           data['users'] = users;
           return {'id': doc.id, ...data};
         }).toList();
 
-        if (hasUpdates) { batch.commit(); }
+        if (hasUpdates) { await batch.commit(); }
         return processedNotebooks;
       });
   }
@@ -129,6 +135,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required List<NotebookFlashcard> progress,
     required bool isEarly,
     required int newStreak,
+    required String newStreakAt,
   }) async {
     final docRef = _firestore.collection('notebooks').doc(notebookId);
     final batch = _firestore.batch();
@@ -144,8 +151,9 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
 
     final Map<String, dynamic> updateData = {
       'users.$uid.flashcards': flashcards,
-      'users.$uid.flashcardSession': Timestamp.now(),
+      'users.$uid.flashcardSession': FieldValue.serverTimestamp(),
       'users.$uid.streak': newStreak,
+      'users.$uid.streakAt': newStreakAt,
     };
 
     if (!isEarly) {
@@ -161,7 +169,8 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     required String notebookId,
     required String uid,
     required NotebookHistory history,
-    required int newStreak, 
+    required int newStreak,
+    required String newStreakAt,
   }) async {
     final notebookRef = _firestore.collection('notebooks').doc(notebookId);
     final historyRef = _firestore.collection('history').doc();
@@ -169,8 +178,9 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
 
     batch.update(notebookRef, {
       'users.$uid.mastery': FieldValue.increment(history.score),
-      'users.$uid.quizSession': Timestamp.now(),
+      'users.$uid.quizSession': FieldValue.serverTimestamp(),
       'users.$uid.streak': newStreak,
+      'users.$uid.streakAt': newStreakAt,
     });
 
     batch.set(historyRef, NotebookHistoryDataModel(

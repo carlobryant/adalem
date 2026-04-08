@@ -2,7 +2,8 @@ import 'package:adalem/features/profile/presentation/view_analyticscard.dart';
 import 'package:flutter/material.dart';
 
 class AnalyticsView extends StatefulWidget {
-  const AnalyticsView({super.key});
+  final Map<DateTime, int> heatmapData;
+  const AnalyticsView({super.key, required this.heatmapData});
 
   @override
   State<AnalyticsView> createState() => _AnalyticsViewState();
@@ -33,11 +34,11 @@ class _AnalyticsViewState extends State<AnalyticsView> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: 220,
+          height: 290,
           child: PageView.builder(
             controller: _controller,
             itemCount: 2,
-            itemBuilder: (context, index) => AnalyticsCard(isQuiz: index == 0),
+            itemBuilder: (context, index) => AnalyticsCard(heatmapData: index == 0 ? widget.heatmapData : null),
           ),
         ),
         const SizedBox(height: 12),

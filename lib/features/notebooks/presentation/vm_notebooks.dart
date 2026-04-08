@@ -187,6 +187,7 @@ class NotebookViewModel extends ChangeNotifier {
     return NotebookUser(
       mastery: userModel.mastery,
       streak: userModel.streak,
+      streakAt: userModel.streakAt,
       quizSession: userModel.quizSession,
       flashcardSession: userModel.flashcardSession,
       lastDecayApplied: userModel.lastDecayApplied,
