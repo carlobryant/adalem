@@ -5,7 +5,6 @@ import 'package:adalem/nav/create_nav.dart';
 import 'package:adalem/nav/explore_nav.dart';
 import 'package:adalem/nav/home_nav.dart';
 import 'package:adalem/nav/profile_nav.dart';
-import 'package:adalem/nav/share_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
