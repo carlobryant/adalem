@@ -11,6 +11,7 @@ abstract class ContentRepo {
   });
   Future<void> generateContent({
     required NotebookContent content,
+    required String title,
     required String notebookId,
     required String contentId,
   });

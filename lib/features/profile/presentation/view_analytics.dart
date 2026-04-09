@@ -2,8 +2,8 @@ import 'package:adalem/features/profile/presentation/view_analyticscard.dart';
 import 'package:flutter/material.dart';
 
 class AnalyticsView extends StatefulWidget {
-  final Map<DateTime, int> heatmapData;
-  const AnalyticsView({super.key, required this.heatmapData});
+  final Map<DateTime, ({int total, String summary})>? detailedData;
+  const AnalyticsView({super.key, required this.detailedData});
 
   @override
   State<AnalyticsView> createState() => _AnalyticsViewState();
@@ -38,7 +38,10 @@ class _AnalyticsViewState extends State<AnalyticsView> {
           child: PageView.builder(
             controller: _controller,
             itemCount: 2,
-            itemBuilder: (context, index) => AnalyticsCard(heatmapData: index == 0 ? widget.heatmapData : null),
+            itemBuilder: (context, index) => Padding(
+              padding: EdgeInsets.only(left: index == 0 ? 0 : 4, right: index == 0 ? 4 : 0),
+              child: AnalyticsCard(detailedData: index == 0 ? widget.detailedData : null),
+            ),
           ),
         ),
         const SizedBox(height: 12),

@@ -3,13 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:intl/intl.dart';
 
-class AnalyticsCard extends StatelessWidget {
-  final Map<DateTime, int>? heatmapData;
+class AnalyticsCard extends StatefulWidget {
+  final Map<DateTime, ({int total, String summary})>? detailedData;
 
   const AnalyticsCard({
     super.key,
-    this.heatmapData,
-    });
+    this.detailedData,
+  });
+
+  @override
+  State<AnalyticsCard> createState() => _AnalyticsCardState();
+}
+
+class _AnalyticsCardState extends State<AnalyticsCard> {
+  String _selectedSummary = "Study Activity"; 
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +29,10 @@ class AnalyticsCard extends StatelessWidget {
     final DateTime now = DateTime.now();
     final DateTime endDate = DateTime(now.year, now.month, now.day); 
     final DateTime startDate = endDate.subtract(const Duration(days: Constraint.maxActivity));
+    final String defaultTitle = "Study Activity: ${DateFormat('MMMM d').format(startDate)} to Present";
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
         decoration: BoxDecoration(
           color: onSurface,
@@ -42,17 +50,17 @@ class AnalyticsCard extends StatelessWidget {
           children: [
             // CARD TITLE
             Text(
-              heatmapData == null ? "Quiz Accuracy over Time" 
-              : "Study Activity: ${DateFormat('MMMM d').format(startDate)} to Present",
+              widget.detailedData == null ? "Quiz Accuracy over Time" : (_selectedSummary == "Study Activity" ? defaultTitle : _selectedSummary),
               style: TextStyle(
-                color: contrastColor,
+                color: widget.detailedData == null || _selectedSummary.contains("Study Activity") ? contrastColor :  Theme.of(context).colorScheme.tertiary,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
-            heatmapData == null ? _buildLastQuiz() : _buildHeatmap(endDate, startDate, contrastColor, boxBgColor, boxHgColor),
-            
+            widget.detailedData == null 
+                ? _buildLastQuiz() 
+                : _buildHeatmap(endDate, startDate, contrastColor, boxBgColor, boxHgColor, defaultTitle),
           ],
         ),
       ),
@@ -60,11 +68,20 @@ class AnalyticsCard extends StatelessWidget {
   }
 
   Widget _buildLastQuiz() {
-    return Text("");
+    return const Text(""); 
   }
 
-  Widget _buildHeatmap(DateTime endDate, DateTime startDate, Color contrastColor, Color boxBgColor, Color boxHgColor) {
-    
+  Widget _buildHeatmap(
+    DateTime endDate, 
+    DateTime startDate, 
+    Color contrastColor, 
+    Color boxBgColor, 
+    Color boxHgColor,
+    String defaultTitle,
+  ) {
+    final Map<DateTime, int> simpleHeatmapData = widget.detailedData?.map(
+      (key, value) => MapEntry(key, value.total)
+    ) ?? {};
 
     return Expanded(
       child: Row(
@@ -73,11 +90,10 @@ class AnalyticsCard extends StatelessWidget {
           HeatMap(
             startDate: startDate,
             endDate: endDate,
-            datasets: heatmapData,
+            datasets: simpleHeatmapData,
             colorMode: ColorMode.color,
             
-          
-            size: 16, 
+            size: 17.5, 
             margin: const EdgeInsets.all(2),
             borderRadius: 4,
             defaultColor: boxBgColor,
@@ -90,6 +106,19 @@ class AnalyticsCard extends StatelessWidget {
             },
             showText: false, 
             showColorTip: false, 
+            
+            onClick: (DateTime value) {
+              final record = widget.detailedData?[value];
+              final dateString = DateFormat('MMMM d').format(value); 
+
+              setState(() {
+                if (record != null) {
+                  _selectedSummary = "$dateString: ${record.summary}";
+                } else {
+                  _selectedSummary = defaultTitle;
+                }
+              });
+            },
           ),
         ],
       ),

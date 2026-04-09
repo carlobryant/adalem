@@ -42,11 +42,13 @@ class ContentRepositoryImpl implements ContentRepo {
   @override
   Future<void> generateContent({
     required NotebookContent content,
+    required String title,
     required String notebookId,
     required String contentId,
   }) {
     return _dataSource.generateContent(
       content: content,
+      title: title,
       notebookId: notebookId,
       contentId: contentId,
     );

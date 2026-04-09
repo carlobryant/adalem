@@ -58,12 +58,11 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   // ACTIVITY HEATMAP DATA
-  Map<DateTime, int> get heatmapData {
+  Map<DateTime, ({int total, String summary})> get detailedActivityMap {
     final activityMap = _user?.activity;
     if (activityMap == null) return {};
 
-    final Map<DateTime, int> dataset = {};
-
+    final Map<DateTime, ({int total, String summary})> dataset = {};
     activityMap.forEach((dateString, stats) {
       try {
         final parts = dateString.split('-');
@@ -75,17 +74,32 @@ class ProfileViewModel extends ChangeNotifier {
           int.parse(parts[2]),
         );
 
-        int totalDailyActivity = stats.created + stats.quiz + stats.flashcard;
-
+        final int totalDailyActivity = stats.created + stats.quiz + stats.flashcard;
         if (totalDailyActivity > 0) {
-          dataset[date] = totalDailyActivity;
+          final List<String> summaryParts = [];
+          if (stats.flashcard > 0) {
+            summaryParts.add("${stats.flashcard} Flashcard${stats.flashcard > 1 ? 's' : ''}");
+          }
+          if (stats.quiz > 0) {
+            summaryParts.add("${stats.quiz} Quiz${stats.quiz > 1 ? 'zes' : ''}");
+          }
+          if (stats.created > 0) {
+            summaryParts.add("${stats.created} Created");
+          }
+
+          final String summaryString = summaryParts.join(', ');
+          dataset[date] = (total: totalDailyActivity, summary: summaryString);
         }
       } catch (e) {
-        // Silently catch format exceptions so bad data doesn't crash the UI
+        // Silently catch format exceptions
       }
     });
     
     return dataset;
+  }
+  
+  Map<DateTime, int> get heatmapData {
+    return detailedActivityMap.map((date, record) => MapEntry(date, record.total));
   }
 
   Future<void> addActivityStat({

@@ -1,3 +1,4 @@
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
@@ -8,6 +9,7 @@ import 'package:adalem/features/profile/presentation/view_signoutpopup.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class ProfileView extends StatefulWidget {
@@ -118,13 +120,15 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _buildBody(AuthUser user) {
+    final surfaceColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+    final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
     final notebookvm = context.read<NotebookViewModel>();
     return SingleChildScrollView(
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: AnalyticsView(heatmapData: _viewModel.heatmapData),
+            child: AnalyticsView(detailedData: _viewModel.detailedActivityMap),
           ),
       
           Padding(
@@ -143,15 +147,34 @@ class _ProfileViewState extends State<ProfileView> {
           ),
       
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16),
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(15),
+              border: BoxBorder.fromLTRB(
+                  bottom: BorderSide(width: 5, color: borderColor),
+                  right: BorderSide(width: 3, color: borderColor),
+                  top: BorderSide.none,
+                  left: BorderSide.none,
+                ),
+            ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("test"),
+                child: Row(
+                  spacing: 20,
+                  children: [
+                    SvgPicture.asset("assets/united_nations.svg", width: 50),
+                    SvgPicture.asset("assets/sdg4.svg", width: 50),
+                    Expanded(child: Text(Constraint.sdg4,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12
+                      ),
+                    ))
+                  ],
+                ),
               ),
             ),
           ),

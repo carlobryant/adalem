@@ -2,11 +2,13 @@ import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/core/components/button_xl.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/features/notebook_content/presentation/model_quizitem.dart';
+import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:adalem/features/quiz/presentation/view_exitpopup.dart';
 import 'package:adalem/features/quiz/presentation/view_identification.dart';
 import 'package:adalem/features/quiz/presentation/view_quizresults.dart';
 import 'package:adalem/features/quiz/presentation/vm_quiz.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuizSessionView extends StatefulWidget {
   final QuizViewModel viewModel;
@@ -27,9 +29,23 @@ class QuizSessionView extends StatefulWidget {
 }
 
 class _QuizSessionViewState extends State<QuizSessionView> {
+  bool _hasLoggedActivity = false;
   bool _isAnswerLocked = false;
   String? _selectedAnswer;
   int noItems = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.viewModel.addListener(_onViewModelChanged);
+  }
+
+  void _onViewModelChanged() {
+    if (widget.viewModel.status == QuizSessionStatus.complete && !_hasLoggedActivity) {
+      _hasLoggedActivity = true; 
+      context.read<ProfileViewModel>().addActivityStat(quiz: 1); 
+    }
+  }
 
   Future<bool> _onWillPop() async {
     final vm = widget.viewModel;
@@ -70,6 +86,12 @@ class _QuizSessionViewState extends State<QuizSessionView> {
       _isAnswerLocked = false;
       _selectedAnswer = null;
     });
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.removeListener(_onViewModelChanged);
+    super.dispose();
   }
 
   @override

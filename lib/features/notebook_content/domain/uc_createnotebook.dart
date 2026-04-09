@@ -46,9 +46,10 @@ class CreateNotebook {
         files, topic, description
       );
       
-      content = content.copyWith(id: contentId, notebookId: notebookId);
+      content = content.copyWith(id: contentId, title: topic, notebookId: notebookId);
       await _contentRepo.generateContent(
         content: content,
+        title: topic,
         notebookId: notebookId,
         contentId: contentId,
       );

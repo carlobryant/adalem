@@ -13,6 +13,7 @@ abstract class FirestoreContentDataSource {
   });
   Future<void> generateContent({
     required NotebookContent content,
+    required String title,
     required String notebookId,
     required String contentId,
   });
@@ -90,12 +91,13 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
   @override
   Future<void> generateContent({
     required NotebookContent content,
+    required String title,
     required String notebookId,
     required String contentId,
   }) async {
     final batch = _firestore.batch();
     batch.set(_firestore.collection('content').doc(contentId), {
-      'title': content.title,
+      'title': title,
       'notebook': notebookId,
       'chapters': _listToNumberedMap(
         content.chapters.map((c) => {'header': c.header, 'body': c.body}).toList(),

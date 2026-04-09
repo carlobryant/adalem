@@ -1,6 +1,7 @@
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
+import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:adalem/shell.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,7 @@ class CreatingView extends StatefulWidget {
 
 class _CreatingViewState extends State<CreatingView> {
   late final CreateViewModel _createViewModel;
+  bool _hasLoggedActivity = false;
   bool _createError = false;
 
   @override
@@ -21,7 +23,6 @@ class _CreatingViewState extends State<CreatingView> {
     super.initState();
     _createViewModel = context.read<CreateViewModel>();
     _createViewModel.addListener(_onViewModelChanged);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
     _onViewModelChanged();
     });
@@ -43,9 +44,11 @@ class _CreatingViewState extends State<CreatingView> {
       ToastCard.error(context, _createViewModel.error!.header, description: _createViewModel.error!.description);
       _createViewModel.clearCreateError();
     }
-    else if (_createViewModel.isSuccess) {
+    else if (_createViewModel.isSuccess && !_hasLoggedActivity) {
+      _hasLoggedActivity = true; 
+      context.read<ProfileViewModel>().addActivityStat(created: 1); 
       ToastCard.success(context, "Notebook Created", 
-      description: "Do not close the app while the notebook is being generated!");
+      description: "Do not close app while generating!");
       _createViewModel.resetCreate();
       
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
