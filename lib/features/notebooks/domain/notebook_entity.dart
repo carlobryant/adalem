@@ -40,18 +40,18 @@ class NotebookUser {
   final int mastery;
   final int? streak;
   final String? streakAt;
+  final String? decayAt;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
-  final DateTime? lastDecayApplied;
   final List<NotebookFlashcard> flashcards;
 
   const NotebookUser({
     required this.mastery,
     required this.streak,
     required this.streakAt,
+    required this.decayAt,
     required this.quizSession,
     required this.flashcardSession,
-    required this.lastDecayApplied,
     required this.flashcards,
   });
 
@@ -60,9 +60,9 @@ class NotebookUser {
       mastery: 0,
       streak: 0,
       streakAt: "",
+      decayAt: "",
       quizSession: null,
       flashcardSession: null,
-      lastDecayApplied: null,
       flashcards: [],
     );
   }
@@ -73,7 +73,6 @@ class NotebookUser {
     final mm = dt.month.toString().padLeft(2, '0');
     final dd = dt.day.toString().padLeft(2, '0');
     return '$yyyy-$mm-$dd';
-    
   }
 
   int calculateNewStreak({DateTime? currentDate}) {

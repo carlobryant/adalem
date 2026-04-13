@@ -91,7 +91,7 @@ class ProfileViewModel extends ChangeNotifier {
           dataset[date] = (total: totalDailyActivity, summary: summaryString);
         }
       } catch (e) {
-        // Silently catch format exceptions
+        _error = const ErrorModel(header: "Unexpected Error", description: "Data was not saved to profile.");
       }
     });
     

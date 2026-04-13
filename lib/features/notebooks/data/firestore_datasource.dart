@@ -26,6 +26,7 @@ abstract class FirestoreDataSource {
 }
 
 class FirestoreDataSourceImpl implements FirestoreDataSource {
+  List<Map<String, dynamic>> _cachedNotebooks = [];
   final FirebaseFirestore _firestore;
 
   FirestoreDataSourceImpl({FirebaseFirestore? firestore})
@@ -42,52 +43,47 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       .collection('notebooks')
       .where('users.$uid', isNull: false)
       .snapshots()
-      .asyncMap((snapshot) async {
+      .map((snapshot) {
+        if (snapshot.metadata.hasPendingWrites && _cachedNotebooks.isNotEmpty) {
+          return _cachedNotebooks;
+        }
         final batch = _firestore.batch();
         bool hasUpdates = false;
 
         final now = DateTime.now();
         final today = DateTime(now.year, now.month, now.day);
+        final todayString = "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
 
         final processedNotebooks = snapshot.docs.map((doc) {
           final data = doc.data();
           final users = data['users'] as Map<String, dynamic>? ?? {};
           final userData = Map<String, dynamic>.from(users[uid] as Map<String, dynamic>? ?? {});
-
-          final lastDecayTs = userData['lastDecayApplied'] as Timestamp?;
           final streakAt = userData['streakAt'] as String?;
-
+          final decayAt = userData['decayAt'] as String?;
           int currentStreak = userData['streak'] as int? ?? 0;
           int currentMastery = userData['mastery'] as int? ?? 0;
-          
+    
           DateTime? lastSessionDay;
           if (streakAt != null && streakAt.isNotEmpty) {
-            final parts = streakAt.split('-');
-            if (parts.length == 3) {
-              lastSessionDay = DateTime(
-                int.parse(parts[0]),
-                int.parse(parts[1]),
-                int.parse(parts[2]),
-              );
-            }
+            lastSessionDay = DateTime.tryParse(streakAt);
           }
-
           if (lastSessionDay != null) {
             final daysSinceSession = today.difference(lastSessionDay).inDays;
             if (daysSinceSession >= 2) {
               Map<String, dynamic> updates = {};
               bool docNeedsUpdate = false;
-
               if (currentStreak > 0) {
                 updates['users.$uid.streak'] = 0;
                 userData['streak'] = 0;
                 docNeedsUpdate = true;
               }
-
               if (currentMastery > MasteryLevel.level3.minXp) {
-                final lastDecay = lastDecayTs?.toDate() ?? lastSessionDay;
-                final baselineDate = DateTime(lastDecay.year, lastDecay.month, lastDecay.day);
+                DateTime? lastDecayDay;
+                if (decayAt != null && decayAt.isNotEmpty) {
+                  lastDecayDay = DateTime.tryParse(decayAt);
+                }
 
+                final baselineDate = lastDecayDay ?? lastSessionDay;
                 final daysToPenalize = today.difference(baselineDate).inDays;
                 if (daysToPenalize > 0) {
                   final penalty = daysToPenalize * Constraint.mcItemPts;
@@ -95,25 +91,28 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
                   if (newMastery < MasteryLevel.level3.minXp) newMastery = MasteryLevel.level3.minXp;
 
                   updates['users.$uid.mastery'] = newMastery;
-                  updates['users.$uid.lastDecayApplied'] = FieldValue.serverTimestamp();
+                  updates['users.$uid.decayAt'] = todayString; 
                   userData['mastery'] = newMastery;
+                  userData['decayAt'] = todayString;
                   docNeedsUpdate = true;
                 }
               }
-
               if (docNeedsUpdate) {
                 batch.update(doc.reference, updates);
                 hasUpdates = true;
               }
             }
           }
-
           users[uid] = userData;
           data['users'] = users;
           return {'id': doc.id, ...data};
         }).toList();
 
-        if (hasUpdates) { await batch.commit(); }
+        if (hasUpdates) { 
+          batch.commit(); 
+        }
+        
+        _cachedNotebooks = processedNotebooks;
         return processedNotebooks;
       });
   }

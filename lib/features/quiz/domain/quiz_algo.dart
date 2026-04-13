@@ -4,8 +4,7 @@ import 'package:adalem/features/quiz/domain/quiz_axis.dart';
 
 enum Attribution { contentOnly, formatOnly, both }
 
-//2D Adaptive Staircase
-//PEST (Parameter Estimation by Sequential Testing) Step Control and Attribution Layer
+//PEST ADAPTIVE STAIRCASE
 class StaircaseAlgorithm {
   final NotebookContent content;
   final Random _random = Random();
@@ -22,11 +21,10 @@ class StaircaseAlgorithm {
   final Set<int> _servedItemIds = {};
   final Set<int> _servedScenarioIds = {};
 
-  // COWAN'S 4±1 CHUNKS (CLT-DERIVED):
-  // EASY: 12 ITEMS, MEDIUM: 9 ITEMS, HARD: 6 ITEMS
+  // CLT-DERIVED COWAN'S 4±1 CHUNKS (EASY: 12 ITEMS, MEDIUM: 9 ITEMS, HARD: 6 ITEMS)
   static const Map<int, int> _sessionCaps = {1: 12, 2: 9, 3: 6};
 
-  /// FROM USER'S PREVIOUS AVERAGE DIFFICULTY
+  // FROM PREVIOUS AVE DIFFICULTY
   StaircaseAlgorithm({
     required this.content,
     double initialDifficulty = 1.0, 
@@ -35,6 +33,7 @@ class StaircaseAlgorithm {
 
   // CONTENT DIFFICULTY (EASY: 1, MEDIUM: 2, HARD: 3)
   int get targetContent => _contentAxis.target;
+
   // FORMAT DIFFICULTY (MC: 1, SCENARIO: 2, IDENTIFICATION: 3)
   int get targetFormat => _formatAxis.target;
   int get itemsServedThisSession => _totalItemsThisSession;
@@ -49,11 +48,11 @@ class StaircaseAlgorithm {
     if (isCorrect) {
       _totalCorrectThisSession++;
       if (formatLevel == 1) {
-        _sessionScoreXp += 10; // Multiple Choice
+        _sessionScoreXp += 10;
       } else if (formatLevel == 2) {
-        _sessionScoreXp += 10; // Scenario
+        _sessionScoreXp += 10;
       } else if (formatLevel == 3) {
-        _sessionScoreXp += 30; // Identification
+        _sessionScoreXp += 30;
       }
     }
 
@@ -87,43 +86,34 @@ class StaircaseAlgorithm {
 
     _totalItemsThisSession++;
 
-    // Cognitive overload — end session early
+    // END SESSION EARLY (COGNITIVE OVERLOAD)
     if (contentOverload || formatOverload) {
       shouldEndSession = true;
     }
 
-    // CLT item cap for current content difficulty
+    // ITEM CAP
     final cap = _sessionCaps[targetContent] ?? 9;
     if (_totalItemsThisSession >= cap) {
       shouldEndSession = true;
     }
   }
 
-  // ── Final DB Sync Metrics ──────────────────────────────────
-
-  /// Experience Points (XP) earned in this session. Replaces the old percentage score.
+  // QUIZ RESULT METRICS
   int get sessionScore => _sessionScoreXp;
-
-  /// The percentage of questions answered correctly (0.0 to 1.0).
   double get sessionAccuracy {
     if (_totalItemsThisSession == 0) return 0.0;
     return _totalCorrectThisSession / _totalItemsThisSession;
   }
-
-  /// The average difficulty of all questions served in this session.
-  /// Used to populate the DB field and "Warm Start" the next session.
   double get sessionAveDifficulty {
     if (_totalItemsThisSession == 0) return 1.0;
     return _accumulatedDifficulty / _totalItemsThisSession;
   }
 
-  // 👇 ADD THIS BACK IN FOR THE UI SUMMARY SCREEN 👇
-  /// Discrete gamified tier (1 through 9) representing the current difficulty level
+  // UI SUMMARY SCREEN
+  // Discrete gamified tier (1 through 9) representing the current difficulty level
   // int get calculatedQuizLevel {
   //   return ((targetContent - 1) * 3) + targetFormat;
   // }
-
-  // ───────────────────────────────────────────────────────────
 
   dynamic getNextQuestion() {
     final contentLevel = targetContent;
@@ -237,15 +227,15 @@ class StaircaseAlgorithm {
 Attribution attributeError(int contentLevel, int formatLevel, bool isCorrect) {
   if (isCorrect) return Attribution.both;
 
-  // Format is the bottleneck — hard format, easy/medium content
+  // FORMAT TOO HARD
   if (formatLevel == 3 && contentLevel == 1) return Attribution.formatOnly;
   if (formatLevel == 3 && contentLevel == 2) return Attribution.formatOnly;
 
-  // Content is the bottleneck — hard content, easy format
+  // CONTENT TOO HARD
   if (contentLevel == 3 && formatLevel == 1) return Attribution.contentOnly;
   if (contentLevel == 2 && formatLevel == 1) return Attribution.contentOnly;
 
-  // Ambiguous — penalise both
+  // BOTH AXES
   return Attribution.both;
 }
 

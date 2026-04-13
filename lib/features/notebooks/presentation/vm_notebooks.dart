@@ -188,9 +188,9 @@ class NotebookViewModel extends ChangeNotifier {
       mastery: userModel.mastery,
       streak: userModel.streak,
       streakAt: userModel.streakAt,
+      decayAt: userModel.decayAt,
       quizSession: userModel.quizSession,
       flashcardSession: userModel.flashcardSession,
-      lastDecayApplied: userModel.lastDecayApplied,
       flashcards: flashcards,
     );
   }

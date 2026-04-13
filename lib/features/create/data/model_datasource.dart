@@ -1,20 +1,23 @@
 import 'dart:typed_data';
-
 import 'package:adalem/core/app_constraints.dart';
 
 class PromptDataModel {
   final List<({Uint8List bytes, String mimeType})> files;
+  final String extractedText;
   final String title;
   String? description;
+  
 
   PromptDataModel({
     required this.files,
+    required this.extractedText,
     required this.title,
     this.description,
+    
     });
 
   String build() { 
-    description = description != null || description!.isNotEmpty ? " Additionally, $description. " : "";
+    final String userDescription = description != null && description!.isNotEmpty ? "\nAdditionally, $description." : "";
     final String filesLabel = files.isNotEmpty 
     ? files.map((f) => f.mimeType.split('/').last).toSet().join(', ')
     : "file";
@@ -53,8 +56,7 @@ ITEMS AND SCENARIOS:
 OUTPUT FORMAT:
 Respond only with a valid JSON object. No text before or after it.
 Set "title" and "notebook" to empty strings (""); all other fields must be populated 
-If no attached files are readable, respond with: {}
-$description
+If no attached files are readable, respond with: {} $userDescription
 Use this exact schema:
 {
     "title": "",
@@ -102,6 +104,7 @@ Use this exact schema:
         }
     } 
 }
+${extractedText.isNotEmpty ? "\n--- SOURCE MATERIAL START ---\n$extractedText\n--- SOURCE MATERIAL END ---" : ""}
   ''';
   }
 }

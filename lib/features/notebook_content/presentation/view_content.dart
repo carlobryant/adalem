@@ -205,7 +205,7 @@ class _ContentViewState extends State<_ContentView> {
       index: index,
       scrollController: _scrollController, 
       alignment: 0.0,
-      duration: (estimatedDistance) => Duration(milliseconds: 2000),
+      duration: (estimatedDistance) => Duration(milliseconds: 800),
       curve: (estimatedDistance) => Curves.easeInOutCubic,
     );
   }

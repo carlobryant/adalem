@@ -28,7 +28,7 @@ class _ShellState extends State<Shell> {
     GlobalKey<NavigatorState>(), // 0 : HOME
     GlobalKey<NavigatorState>(), // 1 : EXPLORE
     GlobalKey<NavigatorState>(), // 2 : CREATE
-    //GlobalKey<NavigatorState>(), // 3 : SHARE
+    GlobalKey<NavigatorState>(), // 3 : SHARE
     GlobalKey<NavigatorState>(), // 4 : PROFILE
   ];
 
@@ -96,10 +96,10 @@ class _ShellState extends State<Shell> {
                 selectedIcon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
                 icon: Icon(Icons.add, size: 38, color: Theme.of(context).colorScheme.onPrimary),
                 label: "Create"),
-              // NavigationDestination(
-              //   selectedIcon: Icon(Icons.share_rounded, color: Theme.of(context).colorScheme.primary),
-              //   icon: Icon(Icons.share_outlined, color: Theme.of(context).colorScheme.onPrimary),
-              //   label: "Share"),
+              NavigationDestination(
+                selectedIcon: Icon(Icons.share_rounded, color: Theme.of(context).colorScheme.primary),
+                icon: Icon(Icons.share_outlined, color: Theme.of(context).colorScheme.onPrimary),
+                label: "Share"),
               NavigationDestination(
                 selectedIcon: Icon(Icons.account_circle, color: Theme.of(context).colorScheme.primary),
                 icon: Icon(Icons.account_circle_outlined, color: Theme.of(context).colorScheme.onPrimary),
@@ -134,9 +134,8 @@ class _ShellState extends State<Shell> {
                   exploreKey: _exploreKey,
                   ),
                 Create(navigatorKey: _navigatorKeys[2],),
-                // Share(),
-                // Profile(navigatorKey: _navigatorKeys[4]),
-                Profile(navigatorKey: _navigatorKeys[3]),
+                Share(),
+                Profile(navigatorKey: _navigatorKeys[4]),
               ],
             )
           ),

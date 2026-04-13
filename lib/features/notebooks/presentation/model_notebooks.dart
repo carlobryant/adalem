@@ -73,18 +73,18 @@ class NotebookUserModel {
   final int mastery;
   final int? streak;
   final String? streakAt;
+  final String? decayAt;
   final DateTime? quizSession;
   final DateTime? flashcardSession;
-  final DateTime? lastDecayApplied;
   final List<NotebookFlashcardModel> flashcards;
 
   const NotebookUserModel({
     required this.mastery,
     required this.streak,
     required this.streakAt,
+    required this.decayAt,
     required this.quizSession,
     required this.flashcardSession,
-    required this.lastDecayApplied,
     required this.flashcards,
   });
 
@@ -93,9 +93,9 @@ class NotebookUserModel {
       mastery: user.mastery,
       streak: user.streak,
       streakAt: user.streakAt,
+      decayAt: user.decayAt,
       quizSession: user.quizSession,
       flashcardSession: user.flashcardSession,
-      lastDecayApplied: user.lastDecayApplied,
       flashcards: user.flashcards
           .map((e) => NotebookFlashcardModel.fromEntity(e))
           .toList(),
@@ -107,9 +107,9 @@ class NotebookUserModel {
       mastery: 0,
       streak: 0,
       streakAt: "",
+      decayAt: "",
       quizSession: null,
       flashcardSession: null,
-      lastDecayApplied: null,
       flashcards: [],
     );
   }

@@ -56,9 +56,9 @@ class NotebookUserDataModel extends NotebookUser {
     required super.mastery,
     required super.streak,
     required super.streakAt,
+    required super.decayAt,
     required super.quizSession,
     required super.flashcardSession,
-    required super.lastDecayApplied,
     required super.flashcards,
   });
 
@@ -67,9 +67,9 @@ class NotebookUserDataModel extends NotebookUser {
       mastery: map['mastery'] as int? ?? 0,
       streak: map['streak'] as int? ?? 0,
       streakAt: map['streakAt'] as String? ?? '',
+      decayAt: map['decayAt'] as String? ?? '',
       quizSession: (map['quizSession'] as Timestamp?)?.toDate(),
       flashcardSession: (map['flashcardSession'] as Timestamp?)?.toDate(),
-      lastDecayApplied: (map['lastDecayApplied'] as Timestamp?)?.toDate(),
       flashcards: (map['flashcards'] as List<dynamic>? ?? [])
           .map((e) => NotebookFlashcardDataModel.fromMap(e as Map<String, dynamic>))
           .toList(),

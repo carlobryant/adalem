@@ -27,8 +27,8 @@ class _AnalyticsCardState extends State<AnalyticsCard> {
     final boxHgColor = Theme.of(context).colorScheme.onTertiary;
 
     final DateTime now = DateTime.now();
-    final DateTime endDate = DateTime(now.year, now.month, now.day); 
-    final DateTime startDate = endDate.subtract(const Duration(days: Constraint.maxActivity));
+    final DateTime endDate = DateTime(now.year, now.month, now.day);
+    final DateTime startDate = endDate.subtract(Duration(days: Constraint.maxActivity));
     final String defaultTitle = "Study Activity: ${DateFormat('MMMM d').format(startDate)} to Present";
 
     return Padding(

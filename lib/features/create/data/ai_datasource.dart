@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:adalem/features/create/data/extract_datasource.dart';
 import 'package:adalem/features/create/data/model_datasource.dart';
 import 'package:adalem/features/create/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/data/model_datasource.dart';
@@ -27,12 +28,33 @@ class AIDataSourceImpl implements AIDataSource {
     String? description,
   ) async {
     try {
-      final promptModel = PromptDataModel(files: files, title: title, description: description);
-      final prompt = TextPart(promptModel.build());
+      final List<InlineDataPart> fileParts = [];
+      final extractedTextBuffer = StringBuffer();
+      int docCount = 1;
 
-      final fileParts = files
-        .map((f) => InlineDataPart(f.mimeType, f.bytes))
-        .toList();
+      // DOCX, PPTX
+      for (final file in files) {
+        if (file.mimeType == 'application/msword' || 
+            file.mimeType == 'application/vnd.ms-powerpoint') {
+          final extractedText = LocalExtractDataSource.extract(file.mimeType, file.bytes);
+          extractedTextBuffer.writeln("EXTRACTED ${
+            file.mimeType == 'application/msword' ? 
+            "DOCUMENT" : "POWERPOINT"} $docCount:");
+          extractedTextBuffer.writeln(extractedText);
+          extractedTextBuffer.writeln('\n');
+          docCount++;
+        } else {
+          fileParts.add(InlineDataPart(file.mimeType, file.bytes));
+        }
+      }
+
+      final promptModel = PromptDataModel(
+        files: files,
+        title: title, 
+        description: description,
+        extractedText: extractedTextBuffer.toString(), 
+      );
+      final prompt = TextPart(promptModel.build());
 
       final response = await modelAI.generateContent([
         Content.multi([prompt, ...fileParts])
