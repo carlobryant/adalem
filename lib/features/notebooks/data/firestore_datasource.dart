@@ -160,7 +160,7 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
     }
 
     batch.update(docRef, updateData);
-    await batch.commit();
+    batch.commit();
   }
 
   @override
@@ -192,6 +192,6 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
       createdAt: history.createdAt,
     ).toMap());
 
-    await batch.commit();
+    batch.commit();
   }
 }

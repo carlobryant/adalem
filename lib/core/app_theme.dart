@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 const String _globalFont = "GoogleSans";
-Color _primary = Colors.green.shade900;
-Color _inPrimary = Colors.green.shade400;
-Color _conPrimary = const Color.fromARGB(255, 28, 60, 31);
-Color _onPrimary = Colors.grey.shade300;
-Color _tertiary = Color(0xFFBA8E23);
-Color _onTertiary = Color.fromARGB(255, 243, 174, 2);
-Color _onSurface = Colors.grey.shade600;
-Color _conSurface = Colors.grey.shade800;
-Color _error = const Color.fromARGB(255, 186, 84, 71);
-Color _onError = const Color.fromARGB(255, 75, 2, 2);
+//final Color _primary = Colors.green.shade900;
+final Color _primary = const Color.fromARGB(255, 34, 92, 54);
+final Color _inPrimary = Colors.green.shade400;
+final Color _conPrimary = const Color.fromARGB(255, 28, 60, 31);
+final Color _onPrimary = Colors.grey.shade300;
+final Color _tertiary = Color(0xFFBA8E23);
+final Color _onTertiary = Color.fromARGB(255, 243, 174, 2);
+final Color _onSurface = Colors.grey.shade600;
+final Color _conSurface = Colors.grey.shade800;
+final Color _error = const Color.fromARGB(255, 186, 84, 71);
+final Color _onError = const Color.fromARGB(255, 75, 2, 2);
 
 ThemeData get lightMode => ThemeData(
   fontFamily: _globalFont,

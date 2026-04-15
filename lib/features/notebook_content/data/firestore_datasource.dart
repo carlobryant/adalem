@@ -17,7 +17,10 @@ abstract class FirestoreContentDataSource {
     required String notebookId,
     required String contentId,
   });
-  Future<void> generateFailed({required String notebookId});
+  Future<void> generateFailed({
+    required String notebookId,
+    required String error,
+  });
   Future<void> deleteOrLeaveNotebook({
     required String notebookId,
     required String contentId,
@@ -135,9 +138,16 @@ class ContentDataSourceImpl implements FirestoreContentDataSource {
   @override
   Future<void> generateFailed({
     required String notebookId,
+    required String error,
   }) async {
     await _firestore.collection('notebooks').doc(notebookId).update({
-      'available': "failed",
+      'available': error,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': {
+        'content': FieldValue.serverTimestamp(),
+        'flashcard': FieldValue.serverTimestamp(),
+        'quiz': FieldValue.serverTimestamp(),
+      },
     });
   }
 

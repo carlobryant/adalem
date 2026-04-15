@@ -15,7 +15,10 @@ abstract class ContentRepo {
     required String notebookId,
     required String contentId,
   });
-  Future<void> generateFailed({required String notebookId});
+  Future<void> generateFailed({
+    required String notebookId,
+    required String error,
+  });
   Future<void> deleteOrLeaveNotebook({
     required String notebookId,
     required String contentId,

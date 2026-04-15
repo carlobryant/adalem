@@ -87,10 +87,10 @@ class _ImagePopupState extends State<ImagePopup> {
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: isSelected ? 
-                                        Theme.of(context).colorScheme.inversePrimary : Colors.transparent,
+                                        Theme.of(context).colorScheme.primary : Colors.transparent,
                                         width: 3,
                                       ),
                                     ),
@@ -99,6 +99,8 @@ class _ImagePopupState extends State<ImagePopup> {
                                       child: Image(
                                         image: AssetImage("assets/nb_$option.jpg"),
                                         fit: BoxFit.cover,
+                                        color: isSelected ? null : Colors.black38,
+                                        colorBlendMode: isSelected ? BlendMode.clear : BlendMode.darken,
                                         errorBuilder: (context, error, stackTrace) {
                                           return Container(
                                             color: Colors.grey.shade300,

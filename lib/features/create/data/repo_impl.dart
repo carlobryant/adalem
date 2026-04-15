@@ -56,6 +56,11 @@ class AINetworkException extends AIException {
       : super("Network error. Please check your connection and try again.");
 }
 
+class AIInvalidInputException extends AIException {
+  const AIInvalidInputException() 
+      : super("None of the files uploaded seem be readable nor accessible.");
+}
+
 class AIInvalidResponseException extends AIException {
   const AIInvalidResponseException() 
       : super("The AI generated an invalid format. Please try again.");

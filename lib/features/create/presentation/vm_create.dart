@@ -81,7 +81,7 @@ class CreateViewModel extends ChangeNotifier {
 
       if (currentCount >= Constraint.maxCreate) {
         _error = const ErrorModel(
-          header: "Limit Reached!", 
+          header: "Total Limit Reached!", 
           description: "Notebook creation is limited for now.",
         );
         notifyListeners();
@@ -126,6 +126,8 @@ class CreateViewModel extends ChangeNotifier {
           errorHeader = "Daily Limit Reached";
         case AINetworkException():
           errorHeader = "Connection Failed";
+        case AIInvalidInputException():
+          errorHeader = "Unreadable Files";
         case AIInvalidResponseException():
           errorHeader = "Generation Failed";
         case AIUnknownException():

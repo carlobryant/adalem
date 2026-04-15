@@ -20,11 +20,6 @@ class ContentRepositoryImpl implements ContentRepo {
     return _dataSource.generateIds();
   }
 
-  // @override
-  // Future<NotebookContent> parseContent() {
-  //   return _dataSource.parseContent();
-  // }
-
   @override
   Future<void> createNotebook({
     required CreateNotebookParams params,
@@ -57,9 +52,11 @@ class ContentRepositoryImpl implements ContentRepo {
   @override
   Future<void> generateFailed({
     required String notebookId,
+    required String error,
   }) {
     return _dataSource.generateFailed(
       notebookId: notebookId,
+      error: error,
     );
   }
 

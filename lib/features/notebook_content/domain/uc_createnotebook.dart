@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:adalem/features/create/data/repo_impl.dart';
 import 'package:adalem/features/create/domain/ai_repo.dart';
 import 'package:adalem/features/notebook_content/domain/content_entity.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
@@ -55,7 +56,13 @@ class CreateNotebook {
       );
 
     } catch (e) {
-      await _contentRepo.generateFailed(notebookId: notebookId);
+      final String error = e is AIException ? e.message 
+      : "An unexpected error occurred during generation.";
+
+      await _contentRepo.generateFailed(
+        notebookId: notebookId, 
+        error: error,
+      );
     }
   }
 }

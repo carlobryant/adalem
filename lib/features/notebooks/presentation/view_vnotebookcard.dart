@@ -7,8 +7,8 @@ class VerticalNotebookCard extends StatelessWidget {
   final String course;
   final String updatedAt;
   final String image;
+  final String available;
   final bool isLoading;
-  final bool isProcessing;
   final VoidCallback? onDelete;
   final VoidCallback? onShare;
 
@@ -18,8 +18,8 @@ class VerticalNotebookCard extends StatelessWidget {
     required this.course,
     required this.updatedAt,
     required this.image,
+    required this.available,
     required this.isLoading,
-    required this.isProcessing,
     this.onDelete,
     this.onShare,
   });
@@ -64,7 +64,7 @@ class VerticalNotebookCard extends StatelessWidget {
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  color: isProcessing ? Colors.black54 : null,
+                  color: available != "ready" ? Colors.black54 : null,
                   colorBlendMode: BlendMode.darken,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
@@ -81,12 +81,19 @@ class VerticalNotebookCard extends StatelessWidget {
                   },
                 ),
 
-                if(isProcessing)
+                if(available != "ready")
                 Positioned.fill(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      LoaderAnimation(onBlack: true),
+                      available == "generating" ? LoaderAnimation(onBlack: true)
+                      : Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Icon(Icons.error_outline_rounded, 
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        size: 60,
+                        ),
+                      ),
                     ],
                   ),
                   ),
@@ -204,7 +211,8 @@ class VerticalNotebookCard extends StatelessWidget {
                         child: isLoading ?
                         const SizedBox()
                         : Text(
-                          isProcessing ? "Generating..." : displayDate,
+                          available == "generating" ? "Generating..." 
+                          : available != "ready" ? "Error" : displayDate,
                           style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey.shade600,

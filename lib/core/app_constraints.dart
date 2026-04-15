@@ -8,6 +8,7 @@ class Constraint {
   static const int flashcardPts = 30;
   static const int indentificationPts = 30;
 
+  static const int maxPdfPage = 20;
   static const int minPromptItems = 36;
   static const int minPromptScenario = 18;
   static const int maxPromptSummary = 3000;

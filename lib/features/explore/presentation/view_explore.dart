@@ -62,22 +62,18 @@ class ExploreViewState extends State<ExploreView> {
     String course, 
     String image, 
     String available, 
-    String? contentId
+    String? contentId,
   ) {
     ToastCard.clearError();
     if(available == "generating") {
       ToastCard.error(context, "Try Again Later",
       description: "$title is still processing.");
       return;
-    } else if(available == "failed") {
-      ToastCard.error(context, "Notebook Creation Failed.",
-      description: "You can delete $title.");
-      return;
     } else if(available != "ready") {
-      ToastCard.error(context, "Notebook Missing",
-      description: "$title not found. You can delete this notebook.");
+      ToastCard.error(context, "Failed to Create Notebook",
+      description: available != "" ? available : "Unable to find $title"); 
       return;
-    }
+    } 
 
     Navigator.of(context, rootNavigator: true)
       .push(MaterialPageRoute(
@@ -215,8 +211,8 @@ class ExploreViewState extends State<ExploreView> {
             course: notebook.course,
             updatedAt: notebook.updatedAt,
             image: notebook.image,
+            available: notebook.available,
             isLoading: viewModel.isLoading,
-            isProcessing: notebook.available == "generating" ? true : false,
             onDelete: () async {
               await viewModel.fetchOwnerDetails(notebook.owner);
               if (!context.mounted) return;

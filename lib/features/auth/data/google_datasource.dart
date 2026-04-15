@@ -176,7 +176,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
 
     final docRef = _firestore.collection('users').doc(uid);
-    await docRef.update(updates);
+    docRef.update(updates);
   }
     
   // GET USER BY USER ID

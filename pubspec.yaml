@@ -25,6 +25,7 @@ dependencies:
   file_picker: ^10.3.10
   google_sign_in: ^7.2.0
   toastification: ^3.0.3
+  dart_pdf_reader: ^2.2.0
   cloud_firestore: ^6.1.2
   super_sliver_list: ^0.4.1
   connectivity_plus: ^7.0.0

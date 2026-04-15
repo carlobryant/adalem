@@ -95,17 +95,17 @@ class NotebookViewModel extends ChangeNotifier {
     if (uid == null) return readyNotebooks;
 
     readyNotebooks.sort((a, b) {
-      final sessionA = a.users[uid]?.flashcardSession;
-      final sessionB = b.users[uid]?.flashcardSession;
+      final streakA = a.users[uid]?.streakAt;
+      final streakB = b.users[uid]?.streakAt;
 
       // IGNORE IF BOTH ARE NULL
-      if (sessionA == null && sessionB == null) return 0;
+      if (streakA == null && streakB == null) return 0;
       
       // IF A VALUE IS NULL
-      if (sessionA == null) return -1;
-      if (sessionB == null) return 1;
+      if (streakA == null) return -1;
+      if (streakB == null) return 1;
 
-      return sessionA.compareTo(sessionB);
+      return streakA.compareTo(streakB);
     });
     
     return readyNotebooks;

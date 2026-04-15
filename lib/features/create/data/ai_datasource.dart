@@ -62,7 +62,7 @@ class AIDataSourceImpl implements AIDataSource {
             
       final responseText = response.text;
       if (responseText == null || responseText.isEmpty  || responseText == "{}") {
-        throw Exception("Unexpected error, received empty response.");
+        throw AIInvalidInputException();
       }
 
       final cleanJsonString = responseText
@@ -75,8 +75,9 @@ class AIDataSourceImpl implements AIDataSource {
 
     } catch (e) {
       if (e is FirebaseAIException) {
-          if (e.message == "quota-exceeded") throw AIQuotaExceededException;
-          if (e.message == "model-not-found") throw AIUnknownException;
+          if (e.message == "aiinvalidresponseexception") throw AIInvalidResponseException();
+          if (e.message == "quota-exceeded") throw AIQuotaExceededException();
+          if (e.message == "model-not-found") throw AIUnknownException("model not found.");
           throw AIUnknownException;
       }
       if (e is FormatException) throw AIInvalidResponseException();

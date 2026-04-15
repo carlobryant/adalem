@@ -61,6 +61,10 @@ class _ShellState extends State<Shell> {
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = Theme.of(context).colorScheme.surface;
+    final onBgColor = Theme.of(context).colorScheme.inverseSurface;
+    final indColor = Theme.of(context).colorScheme.primary;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) async {
@@ -75,40 +79,45 @@ class _ShellState extends State<Shell> {
       child: Scaffold( 
         bottomNavigationBar: NavigationBarTheme(
           data: NavigationBarThemeData(labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>(
-            (states) => TextStyle(color: Theme.of(context).colorScheme.onPrimary),)),
-          child: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            destinations: <NavigationDestination>[
-              NavigationDestination(
-                selectedIcon: Icon(Icons.home, color: Theme.of(context).colorScheme.primary),
-                icon: Icon(Icons.home_outlined, color: Theme.of(context).colorScheme.onPrimary),
-                label: "Home"),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.chrome_reader_mode, color: Theme.of(context).colorScheme.primary),
-                icon: Icon(Icons.chrome_reader_mode_outlined, color: Theme.of(context).colorScheme.onPrimary),
-                label: "Explore"),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
-                icon: Icon(Icons.add, size: 38, color: Theme.of(context).colorScheme.onPrimary),
-                label: "Create"),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.share_rounded, color: Theme.of(context).colorScheme.primary),
-                icon: Icon(Icons.share_outlined, color: Theme.of(context).colorScheme.onPrimary),
-                label: "Share"),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.account_circle, color: Theme.of(context).colorScheme.primary),
-                icon: Icon(Icons.account_circle_outlined, color: Theme.of(context).colorScheme.onPrimary),
-                label: "Me"),       
-            ],
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            indicatorColor: Theme.of(context).colorScheme.inversePrimary,
-            height: 65,
-            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            (states) => TextStyle(color: onBgColor),)),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(width: 1.0, color: onBgColor.withValues(alpha: 0.08)))
+            ),
+            child: NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              destinations: <NavigationDestination>[
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.home, color: bgColor),
+                  icon: Icon(Icons.home_outlined, color: onBgColor),
+                  label: "Home"),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.chrome_reader_mode, color: bgColor),
+                  icon: Icon(Icons.chrome_reader_mode_outlined, color: onBgColor),
+                  label: "Explore"),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.add, color: bgColor),
+                  icon: Icon(Icons.add, size: 38, color: onBgColor),
+                  label: "Create"),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.share_rounded, color: bgColor),
+                  icon: Icon(Icons.share_outlined, color: onBgColor),
+                  label: "Share"),
+                NavigationDestination(
+                  selectedIcon: Icon(Icons.account_circle, color: bgColor),
+                  icon: Icon(Icons.account_circle_outlined, color: onBgColor),
+                  label: "Me"),       
+              ],
+              backgroundColor: bgColor,
+              indicatorColor: indColor,
+              height: 65,
+              labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            ),
           ),
         ),
       

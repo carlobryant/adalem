@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/app_theme.dart';
 import 'package:adalem/core/components/button_sm.dart';
@@ -9,6 +11,7 @@ import 'package:adalem/features/create/presentation/view_creating.dart';
 import 'package:adalem/features/create/presentation/view_imagepopup.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:dart_pdf_reader/dart_pdf_reader.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +28,7 @@ class CreateView extends StatefulWidget {
 class _CreateViewState extends State<CreateView> {
   List<PlatformFile> _files = [];
   bool _fileUploaded = false;
+  bool _isUploading = false;
 
   final List<String> _imageOptions = [
     "red",
@@ -37,32 +41,71 @@ class _CreateViewState extends State<CreateView> {
     "grey",
   ];
 
-  void listFiles(List<PlatformFile> files) {
-     ToastCard.clearError();
-    final combined = [..._files, ...files];
-    
-    final seen = <String>{};
-    final selected = combined
-      .where((f) => seen.add(f.name)).toList()
-      .where((f) => f.size <= Constraint.maxUploadMB * 1024 * 1024)
-      .toList();
-    final rejected = combined
-      .where((f) => f.size > Constraint.maxUploadMB * 1024 * 1024)
-      .toList();
+  Future<void> listFiles(List<PlatformFile> files) async {
+  ToastCard.clearError();
+  final combined = [..._files, ...files];
 
-    setState(() {
-      _files = selected;
-      _fileUploaded = selected.isNotEmpty;
-    });
+  bool isCorrupted = false;
+  final seen = <String>{};
+  final selected = <PlatformFile>[];
+  final sizeRejected = <PlatformFile>[];
+  final pageRejected = <PlatformFile>[];
+  
+  setState(() => _isUploading = true);
 
-    if (rejected.isNotEmpty) {
-      ToastCard.error(context, "${Constraint.maxUploadMB} MB Limit Exceeded",
-        description: rejected.length > 1 ? "${rejected.length} files were removed."
-          : "Please make sure the file doesn't exceed the limit."
-      );
-      return;
+  for (final f in combined) {
+    if (!seen.add(f.name)) continue;
+    if (f.size > Constraint.maxUploadMB * 1024 * 1024) {
+      sizeRejected.add(f);
+      continue;
     }
+    if (f.extension?.toLowerCase() == 'pdf') {
+      try {
+        final bytes = f.bytes ?? await File(f.path!).readAsBytes();
+        
+        final stream = ByteStream(bytes);
+        final parser = PDFParser(stream);
+        final document = await parser.parse();
+        final catalog = await document.catalog;
+        final pages = await catalog.getPages();
+
+        if (pages.pageCount > Constraint.maxPdfPage) {
+          pageRejected.add(f);
+          continue; 
+        }
+      } catch (e) {
+        isCorrupted = true;
+        continue;
+      }
+    }
+    selected.add(f);
   }
+
+  setState(() {
+    _files = selected;
+    _fileUploaded = selected.isNotEmpty;
+    _isUploading = false;
+  });
+  if(!mounted) return;
+  if (isCorrupted) {
+    ToastCard.error(context, "Uploaded File Access Denied",
+      description: "Removed corrupted or password-protected files."
+    );
+  }
+  else if (sizeRejected.isNotEmpty) {
+    ToastCard.error(context, "${Constraint.maxUploadMB} MB Limit Exceeded",
+      description: sizeRejected.length > 1 
+        ? "${sizeRejected.length} files were removed."
+        : "Please make sure the file doesn't exceed the limit."
+    );
+  } else if (pageRejected.isNotEmpty) {
+    ToastCard.error(context, "Page Limit Exceeded",
+      description: pageRejected.length > 1 
+        ? "${pageRejected.length} PDFs exceeded the limit."
+        : "Please upload PDFs with ${Constraint.maxPdfPage} pages or less."
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +152,7 @@ class _CreateViewState extends State<CreateView> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.inversePrimary,
+                              color: Theme.of(context).colorScheme.primaryContainer,
                               width: 3,
                             ),
                           ),
@@ -129,7 +172,7 @@ class _CreateViewState extends State<CreateView> {
                             width: 20,
                             height: 20,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.inversePrimary,
+                              color: Theme.of(context).colorScheme.primaryContainer,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Icon(Icons.color_lens_rounded, size: 14,
@@ -268,6 +311,22 @@ class _CreateViewState extends State<CreateView> {
                         ),
                       )
                       // UPLOAD FILES
+                      : _isUploading ?
+                      DottedBorder(
+                        options: RoundedRectDottedBorderOptions(
+                          color: darkPrimary,
+                          dashPattern: [10, 10],
+                          strokeWidth: 2,
+                          radius: Radius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: MediaQuery.sizeOf(context).width/3, 
+                            vertical: MediaQuery.sizeOf(context).height/6,
+                          ),
+                          child: CircularProgressIndicator(color: darkPrimary),
+                        ),
+                      )
                       : GestureDetector(
                         onTap: () async {
                           final result = await FilePicker.platform.pickFiles(

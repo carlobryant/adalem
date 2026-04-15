@@ -122,7 +122,7 @@ class ProfileViewModel extends ChangeNotifier {
         final sortedKeys = activityMap.keys.toList()..sort();
         oldestDateKey = sortedKeys.first;
       }
-      await _updateActivity.call(
+      _updateActivity.call(
         _user!.uid, 
         todayKey,
         isMaxReached: isMaxReached,
