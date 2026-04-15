@@ -11,6 +11,7 @@ import 'package:adalem/features/create/presentation/view_creating.dart';
 import 'package:adalem/features/create/presentation/view_imagepopup.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/profile/presentation/vm_profile.dart';
 import 'package:dart_pdf_reader/dart_pdf_reader.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
@@ -29,6 +30,7 @@ class _CreateViewState extends State<CreateView> {
   List<PlatformFile> _files = [];
   bool _fileUploaded = false;
   bool _isUploading = false;
+  int _sizeUploaded = 0;
 
   final List<String> _imageOptions = [
     "red",
@@ -42,70 +44,77 @@ class _CreateViewState extends State<CreateView> {
   ];
 
   Future<void> listFiles(List<PlatformFile> files) async {
-  ToastCard.clearError();
-  final combined = [..._files, ...files];
+    ToastCard.clearError();
+    final combined = [..._files, ...files];
 
-  bool isCorrupted = false;
-  final seen = <String>{};
-  final selected = <PlatformFile>[];
-  final sizeRejected = <PlatformFile>[];
-  final pageRejected = <PlatformFile>[];
-  
-  setState(() => _isUploading = true);
+    bool isCorrupted = false;
+    final seen = <String>{};
+    final selected = <PlatformFile>[];
+    final sizeRejected = <PlatformFile>[];
+    final pageRejected = <PlatformFile>[];
+    
+    int runningTotalSize = 0; 
+    final maxSizeBytes = Constraint.maxUploadMB * 1024 * 1024;
 
-  for (final f in combined) {
-    if (!seen.add(f.name)) continue;
-    if (f.size > Constraint.maxUploadMB * 1024 * 1024) {
-      sizeRejected.add(f);
-      continue;
-    }
-    if (f.extension?.toLowerCase() == 'pdf') {
-      try {
-        final bytes = f.bytes ?? await File(f.path!).readAsBytes();
-        
-        final stream = ByteStream(bytes);
-        final parser = PDFParser(stream);
-        final document = await parser.parse();
-        final catalog = await document.catalog;
-        final pages = await catalog.getPages();
+    setState(() => _isUploading = true);
 
-        if (pages.pageCount > Constraint.maxPdfPage) {
-          pageRejected.add(f);
-          continue; 
-        }
-      } catch (e) {
-        isCorrupted = true;
+    for (final f in combined) {
+      if (!seen.add(f.name)) continue;
+      if (runningTotalSize + f.size > maxSizeBytes) {
+        sizeRejected.add(f);
         continue;
       }
-    }
-    selected.add(f);
-  }
+      
+      if (f.extension?.toLowerCase() == 'pdf') {
+        try {
+          final bytes = f.bytes ?? await File(f.path!).readAsBytes();
+          
+          final stream = ByteStream(bytes);
+          final parser = PDFParser(stream);
+          final document = await parser.parse();
+          final catalog = await document.catalog;
+          final pages = await catalog.getPages();
 
-  setState(() {
-    _files = selected;
-    _fileUploaded = selected.isNotEmpty;
-    _isUploading = false;
-  });
-  if(!mounted) return;
-  if (isCorrupted) {
-    ToastCard.error(context, "Uploaded File Access Denied",
-      description: "Removed corrupted or password-protected files."
-    );
+          if (pages.pageCount > Constraint.maxPdfPage) {
+            pageRejected.add(f);
+            continue; 
+          }
+        } catch (e) {
+          isCorrupted = true;
+          continue;
+        }
+      }
+      selected.add(f);
+      runningTotalSize += f.size;
+    }
+
+    setState(() {
+      _files = selected;
+      _fileUploaded = selected.isNotEmpty;
+      _sizeUploaded = runningTotalSize; 
+      
+      _isUploading = false;
+    });
+    if(!mounted) return;
+    if (isCorrupted) {
+      ToastCard.error(context, "Uploaded File Access Denied",
+        description: "Removed corrupted or password-protected files."
+      );
+    }
+    else if (sizeRejected.isNotEmpty) {
+      ToastCard.error(context, "${Constraint.maxUploadMB} MB Limit Exceeded",
+        description: sizeRejected.length > 1 
+          ? "${sizeRejected.length} files were removed."
+          : "Please make sure the files don't exceed the limit."
+      );
+    } else if (pageRejected.isNotEmpty) {
+      ToastCard.error(context, "Page Limit Exceeded",
+        description: pageRejected.length > 1 
+          ? "${pageRejected.length} PDFs exceeded the limit."
+          : "Please upload PDFs with ${Constraint.maxPdfPage} pages or less."
+      );
+    }
   }
-  else if (sizeRejected.isNotEmpty) {
-    ToastCard.error(context, "${Constraint.maxUploadMB} MB Limit Exceeded",
-      description: sizeRejected.length > 1 
-        ? "${sizeRejected.length} files were removed."
-        : "Please make sure the file doesn't exceed the limit."
-    );
-  } else if (pageRejected.isNotEmpty) {
-    ToastCard.error(context, "Page Limit Exceeded",
-      description: pageRejected.length > 1 
-        ? "${pageRejected.length} PDFs exceeded the limit."
-        : "Please upload PDFs with ${Constraint.maxPdfPage} pages or less."
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -306,6 +315,11 @@ class _CreateViewState extends State<CreateView> {
                                   ),
                                 ],
                               ),
+                              Text("Total Upload Size: ${_sizeUploaded < 1024 * 1024 ? 
+                                  "${(_sizeUploaded / 1024).toStringAsFixed(1)} KB" 
+                                  : "${(_sizeUploaded / (1024 * 1024)).toStringAsFixed(1)} MB"}",
+                                style: TextStyle(color: darkPrimary, fontSize: 10),
+                              ),
                             ],
                           ),
                         ),
@@ -391,6 +405,7 @@ class _CreateViewState extends State<CreateView> {
                     viewModel.handleCreate(
                       notebookvm.notebookCount, 
                       notebookvm.isNotebookCreating(), 
+                      context.read<ProfileViewModel>().isLimitReached(),
                       _files
                     ); 
                   },
@@ -437,6 +452,16 @@ class _CreateViewState extends State<CreateView> {
       ? "${(file.size / 1024).toStringAsFixed(1)} KB"
       : "${(file.size / (1024 * 1024)).toStringAsFixed(1)} MB";
 
+  IconData fileIcon = Icons.library_books;
+
+  switch(file.extension) {
+    case 'pdf': fileIcon = Icons.picture_as_pdf_rounded; break;
+    case 'png' || 'jpg' || 'jpeg': fileIcon = Icons.filter; break;
+    case 'pptx': fileIcon = Icons.photo_library_rounded; break;
+    case 'mp4': fileIcon = Icons.video_library; break;
+    case 'mp3': fileIcon = Icons.library_music; break;
+  }
+
   return Container(
     margin: const EdgeInsets.only(bottom: 8),
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -447,7 +472,7 @@ class _CreateViewState extends State<CreateView> {
     ),
     child: Row(
       children: [
-        Icon(Icons.insert_drive_file_rounded, color: darkPrimary, size: 20),
+        Icon(fileIcon, color: darkPrimary, size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Column(

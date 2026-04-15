@@ -10,6 +10,9 @@ import 'package:adalem/features/create/data/ai_datasource.dart';
 import 'package:adalem/features/create/data/repo_impl.dart';
 import 'package:adalem/features/create/presentation/vm_create.dart';
 import 'package:adalem/features/flashcards/domain/uc_syncflashcards.dart';
+import 'package:adalem/features/home/data/firestore_datasource.dart';
+import 'package:adalem/features/home/data/repo_impl.dart';
+import 'package:adalem/features/home/domain/uc_getupdates.dart';
 import 'package:adalem/features/notebook_content/data/firestore_datasource.dart';
 import 'package:adalem/features/notebook_content/data/repo_impl.dart';
 import 'package:adalem/features/notebook_content/domain/content_repo.dart';
@@ -55,6 +58,7 @@ void main() async {
   final notebookRepo = NotebookRepositoryImpl(dataSource: FirestoreDataSourceImpl());
   final aiRepo = AIRepositoryImpl(dataSource: AIDataSourceImpl(modelAI: modelAI));
   final contentRepo = ContentRepositoryImpl(dataSource: ContentDataSourceImpl());
+  final updatesRepo = UpdatesRepositoryImpl(dataSource: UpdatesDataSourceImpl());
 
   final signInWithGoogle = SignInWithGoogle(authRepo);
   final getAuthState = GetAuthState(authRepo);
@@ -102,6 +106,7 @@ void main() async {
             getCurrentUser: GetCurrentUser(authRepo),
             fetchActivity: FetchActivity(authRepo),
             updateActivity: UpdateActivity(authRepo),
+            getUpdates: GetUpdates(updatesRepo),
           )..init(),
         ),
       ],

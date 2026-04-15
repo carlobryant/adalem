@@ -4,6 +4,8 @@ import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
 import 'package:adalem/features/auth/domain/uc_signout.dart';
+import 'package:adalem/features/home/domain/uc_getupdates.dart';
+import 'package:adalem/features/home/domain/updates_entity.dart';
 import 'package:adalem/features/profile/domain/uc_fetchactivity.dart';
 import 'package:adalem/features/profile/domain/uc_updateactivity.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +15,22 @@ class ProfileViewModel extends ChangeNotifier {
   final GetCurrentUser _getCurrentUser;
   final FetchActivity _fetchActivity;
   final UpdateActivity _updateActivity;
+  final GetUpdates _getUpdates;
 
   StreamSubscription<AuthUser?>? _activitySubscription;
+  StreamSubscription<Updates>? _updatesSubscription;
 
   ProfileViewModel({
     required SignOut signOut,
     required GetCurrentUser getCurrentUser,
     required FetchActivity fetchActivity,
     required UpdateActivity updateActivity,
+    required GetUpdates getUpdates,
   })  : _signOut = signOut,
         _getCurrentUser = getCurrentUser,
         _fetchActivity = fetchActivity,
-        _updateActivity = updateActivity;
+        _updateActivity = updateActivity,
+        _getUpdates = getUpdates;
 
   AuthUser? _user;
   AuthUser? get user => _user;
@@ -50,6 +56,30 @@ class ProfileViewModel extends ChangeNotifier {
       onError: (error) {
         _error = ErrorModel(
           header: "Failed to Load Activity Data", 
+          description: error.toString(),
+        );
+        notifyListeners();
+      },
+    );
+  }
+
+  // USER UPDATES
+  Updates? _updates;
+  List<Update> get updates => (_updates?.updates ?? [])
+    ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+  void fetchUpdates() {
+    if (_user?.email == null) return;
+
+    _updatesSubscription?.cancel();
+    _updatesSubscription = _getUpdates.call(email: _user!.email).listen(
+      (updates) {
+        _updates = updates;
+        notifyListeners();
+      },
+      onError: (error) {
+        _error = ErrorModel(
+          header: "Failed to Load Updates",
           description: error.toString(),
         );
         notifyListeners();
@@ -140,6 +170,13 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+  // CREATE DAILY LIMIT
+  bool isLimitReached() => (
+    _user?.activity[
+      DateTime.now().toIso8601String().split('T').first
+    ]?.created ?? 0
+  ) >= Constraint.maxDailyCr;
+
   Future<void> handleSignOut() async {
     _error = null;
     _isLoading = true;
@@ -163,6 +200,7 @@ class ProfileViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _activitySubscription?.cancel();
+    _updatesSubscription?.cancel();
     super.dispose();
   }
 }

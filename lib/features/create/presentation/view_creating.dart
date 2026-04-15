@@ -14,15 +14,15 @@ class CreatingView extends StatefulWidget {
 }
 
 class _CreatingViewState extends State<CreatingView> {
-  late final CreateViewModel _createViewModel;
+  late final CreateViewModel createvm;
   bool _hasLoggedActivity = false;
   bool _createError = false;
 
   @override
   void initState() {
     super.initState();
-    _createViewModel = context.read<CreateViewModel>();
-    _createViewModel.addListener(_onViewModelChanged);
+    createvm = context.read<CreateViewModel>();
+    createvm.addListener(_onViewModelChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
     _onViewModelChanged();
     });
@@ -30,26 +30,28 @@ class _CreatingViewState extends State<CreatingView> {
 
   @override
   void dispose() {
-    _createViewModel.removeListener(_onViewModelChanged);
+    createvm.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
   void _onViewModelChanged() {
-    if (_createViewModel.isCreating) return;
-    if (_createViewModel.error != null) {
+    if(createvm.isCreating) return;
+
+    final profilevm = context.read<ProfileViewModel>();
+    if(createvm.error != null) {
       setState(() {
         _createError = true;
       });
       Navigator.of(context, rootNavigator: true).pop();
-      ToastCard.error(context, _createViewModel.error!.header, description: _createViewModel.error!.description);
-      _createViewModel.clearCreateError();
+      ToastCard.error(context, createvm.error!.header, description: createvm.error!.description);
+      createvm.clearCreateError();
     }
-    else if (_createViewModel.isSuccess && !_hasLoggedActivity) {
+    else if(createvm.isSuccess && !_hasLoggedActivity) {
       _hasLoggedActivity = true; 
-      context.read<ProfileViewModel>().addActivityStat(created: 1); 
+      profilevm.addActivityStat(created: 1); 
       ToastCard.success(context, "Notebook Created", 
       description: "Do not close app while generating!");
-      _createViewModel.resetCreate();
+      createvm.resetCreate();
       
       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const Shell(initIndex: 1)),

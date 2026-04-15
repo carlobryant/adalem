@@ -3,6 +3,8 @@ import 'package:adalem/features/home/presentation/view_homelist.dart';
 import 'package:adalem/features/notebook_content/presentation/view_content.dart';
 import 'package:adalem/features/notebooks/presentation/view_hnotebookrank.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
+import 'package:adalem/features/profile/presentation/vm_profile.dart';
+import 'package:adalem/nav/profile_nav.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,8 +28,10 @@ class _HomeViewState extends State<HomeView> {
 
   @override
    Widget build(BuildContext context) {
+    final profilevm = context.watch<ProfileViewModel>();
     final notebookvm = context.watch<NotebookViewModel>();
     final notebooks = notebookvm.rankedNotebooks;
+    final updates = profilevm.updates;
     final uid = notebookvm.currentUserId;
 
     return Scaffold(

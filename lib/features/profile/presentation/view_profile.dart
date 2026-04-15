@@ -179,24 +179,22 @@ class _ProfileViewState extends State<ProfileView> {
             ),
           ),
       
-          Container(
-            child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  spacing: 20,
-                  children: [
-                    SvgPicture.asset("assets/united_nations.svg", width: 50),
-                    SvgPicture.asset("assets/sdg4.svg", width: 50),
-                    Expanded(child: Text(Constraint.sdg4,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12
-                      ),
-                    ))
-                  ],
-                ),
-            ),
+          Padding(
+              padding: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 16),
+              child: Row(
+                spacing: 20,
+                children: [
+                  SvgPicture.asset("assets/united_nations.svg", width: 40),
+                  SvgPicture.asset("assets/sdg4.svg", width: 40),
+                  Expanded(child: Text(Constraint.sdg4,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 11
+                    ),
+                  ))
+                ],
+              ),
           ),
         ],
       ),

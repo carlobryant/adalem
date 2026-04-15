@@ -44,14 +44,15 @@ class CreateViewModel extends ChangeNotifier {
   
   Future<void> handleCreate(
     int currentCount, 
-    bool isCreating, 
+    bool isCreating,
+    bool isLimitReached, 
     List<PlatformFile> files,
   ) async {
     try {
       final title = titleController.text.trim();
       final course = courseController.text.trim();
 
-      if (title.isEmpty || course.isEmpty) {
+      if(title.isEmpty || course.isEmpty) {
         _error = const ErrorModel(
           header: "Missing Details", 
           description: "Please fill in all fields.",
@@ -60,7 +61,7 @@ class CreateViewModel extends ChangeNotifier {
         return;
       }
 
-      if (files.isEmpty) {
+      if(files.isEmpty) {
         _error = const ErrorModel(
           header: "No Files Uploaded", 
           description: "You can't create a notebook without notes!",
@@ -70,7 +71,7 @@ class CreateViewModel extends ChangeNotifier {
       }
 
       final currentUser = _getCurrentUser();
-      if (currentUser == null) {
+      if(currentUser == null) {
         _error = const ErrorModel(
           header: "Unexpected Error", 
           description: "No user is authenticated.",
@@ -79,7 +80,16 @@ class CreateViewModel extends ChangeNotifier {
         return;
       }
 
-      if (currentCount >= Constraint.maxCreate) {
+      if(isLimitReached) {
+        _error = const ErrorModel(
+          header: "Daily Limit Reached!", 
+          description: "${Constraint.maxDailyCr} notebooks can only be created for today.",
+        );
+        notifyListeners();
+        return; 
+      }
+
+      if(currentCount >= Constraint.maxCreate) {
         _error = const ErrorModel(
           header: "Total Limit Reached!", 
           description: "Notebook creation is limited for now.",
@@ -87,7 +97,8 @@ class CreateViewModel extends ChangeNotifier {
         notifyListeners();
         return; 
       }
-      if (isCreating) {
+
+      if(isCreating) {
         _error = const ErrorModel(
           header: "A Notebook is Processing", 
           description: "A notebook is still being created, check back later.",
