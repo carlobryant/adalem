@@ -1,10 +1,10 @@
 import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/features/home/presentation/view_homelist.dart';
+import 'package:adalem/features/home/presentation/view_homeupdates.dart';
 import 'package:adalem/features/notebook_content/presentation/view_content.dart';
 import 'package:adalem/features/notebooks/presentation/view_hnotebookrank.dart';
 import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/profile/presentation/vm_profile.dart';
-import 'package:adalem/nav/profile_nav.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +36,7 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       body: NestedScrollView(
+        // APP BAR
         headerSliverBuilder:(context, innerBoxIsScrolled) => [
           SliverAppBar(
             floating: true,
@@ -72,13 +73,14 @@ class _HomeViewState extends State<HomeView> {
             ],
           )
         ],
+
         body: RefreshIndicator(
           color: Theme.of(context).colorScheme.primary,
           backgroundColor: Theme.of(context).colorScheme.surface,
           onRefresh: () async {
             notebookvm.setSortOption(notebookvm.currentSort); 
             await Future.delayed(const Duration(milliseconds: 550));
-            },
+          },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: SafeArea(
@@ -173,6 +175,11 @@ class _HomeViewState extends State<HomeView> {
                         );
                       },
                     ),
+                  ),
+
+                  if(updates.isNotEmpty)
+                  HomeUpdatesView(
+                    updates: updates,
                   ),
 
                   HomeListView(

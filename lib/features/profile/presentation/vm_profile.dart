@@ -44,6 +44,7 @@ class ProfileViewModel extends ChangeNotifier {
   void init() {
     _activitySubscription?.cancel(); 
     _user = _getCurrentUser();
+    fetchUpdates();
     Future.microtask(() {
       notifyListeners(); 
     });

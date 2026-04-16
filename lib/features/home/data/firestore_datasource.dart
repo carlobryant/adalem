@@ -25,15 +25,18 @@ class UpdatesDataSourceImpl implements FirestoreUpdatesDataSource {
               .map((item) {
                 final map = item as Map<String, dynamic>;
                 return Update(
-                  title: map['title'] as String? ?? '',
-                  description: map['description'] as String? ?? '',
+                  title: map['title'] as String? ?? "",
+                  description: map['description'] as String? ?? "",
                   path: map['path'] as String?,
                   excluded: List<String>.from(map['excluded'] as List<dynamic>? ?? []),
                   createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
                   photoURL: map['photoURL'] as String?,
                 );
               })
-              .where((update) => !update.excluded.contains(email))
+              .where((update) =>
+                !update.excluded.contains('all') &&
+                !update.excluded.contains(email)
+              )
               .toList();
 
           return Updates(
