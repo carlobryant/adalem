@@ -31,6 +31,8 @@ class _AnalyticsViewState extends State<AnalyticsView> {
 
   @override
   Widget build(BuildContext context) {
+    final itemCount = 1;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -38,7 +40,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
           height: 290,
           child: PageView.builder(
             controller: _controller,
-            itemCount: 2,
+            itemCount: itemCount,
             itemBuilder: (context, index) => Padding(
               padding: EdgeInsets.only(left: index == 0 ? 0 : 4, right: index == 0 ? 4 : 0),
               child: AnalyticsCard(detailedData: index == 0 ? widget.detailedData : null),
@@ -46,7 +48,8 @@ class _AnalyticsViewState extends State<AnalyticsView> {
           ),
         ),
         const SizedBox(height: 12),
-        CarouselCardDots(count: 2, current: _currentPage),
+        if(itemCount > 1)
+        CarouselCardDots(count: itemCount, current: _currentPage),
       ],
     );
   }

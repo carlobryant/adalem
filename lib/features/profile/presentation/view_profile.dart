@@ -146,44 +146,45 @@ class _ProfileViewState extends State<ProfileView> {
             )
           ),
       
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-              color: surfaceColor,
-              borderRadius: BorderRadius.circular(15),
-              border: BoxBorder.fromLTRB(
-                  bottom: BorderSide(width: 5, color: borderColor),
-                  right: BorderSide(width: 3, color: borderColor),
-                  top: BorderSide.none,
-                  left: BorderSide.none,
-                ),
-            ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  spacing: 20,
-                  children: [
-                    SvgPicture.asset("assets/united_nations.svg", width: 50),
-                    SvgPicture.asset("assets/sdg4.svg", width: 50),
-                    Expanded(child: Text(Constraint.sdg4,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12
-                      ),
-                    ))
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(16),
+          //   child: Container(
+          //     decoration: BoxDecoration(
+          //     color: surfaceColor,
+          //     borderRadius: BorderRadius.circular(15),
+          //     border: BoxBorder.fromLTRB(
+          //         bottom: BorderSide(width: 5, color: borderColor),
+          //         right: BorderSide(width: 3, color: borderColor),
+          //         top: BorderSide.none,
+          //         left: BorderSide.none,
+          //       ),
+          //   ),
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(8.0),
+          //       child: Row(
+          //         spacing: 20,
+          //         children: [
+          //           SvgPicture.asset("assets/united_nations.svg", width: 50),
+          //           SvgPicture.asset("assets/sdg4.svg", width: 50),
+          //           Expanded(child: Text(Constraint.sdg4,
+          //           style: TextStyle(
+          //             color: Theme.of(context).colorScheme.onSurface,
+          //             fontWeight: FontWeight.w900,
+          //             fontSize: 12
+          //             ),
+          //           ))
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
       
           Padding(
               padding: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 16),
               child: Row(
-                spacing: 20,
+                spacing: 10,
                 children: [
+                  SizedBox(width: 2),
                   SvgPicture.asset("assets/united_nations.svg", width: 40),
                   SvgPicture.asset("assets/sdg4.svg", width: 40),
                   Expanded(child: Text(Constraint.sdg4,

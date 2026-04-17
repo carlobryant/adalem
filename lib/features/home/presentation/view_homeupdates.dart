@@ -13,6 +13,7 @@ class HomeUpdatesView extends StatefulWidget {
 
 class _HomeUpdatesViewState extends State<HomeUpdatesView> {
   final PageController _controller = PageController(viewportFraction: 0.85);
+  bool onTap = false;
   int _currentPage = 0;
 
   @override
@@ -34,8 +35,7 @@ class _HomeUpdatesViewState extends State<HomeUpdatesView> {
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
     final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
-    // final contrastColor = Theme.of(context).colorScheme.inverseSurface;
-    // final boxBgColor = Theme.of(context).colorScheme.onSurface;
+    final surfaceColor = Theme.of(context).colorScheme.surface;
     // final boxHgColor = Theme.of(context).colorScheme.onTertiary;
 
     return Column(
@@ -50,10 +50,10 @@ class _HomeUpdatesViewState extends State<HomeUpdatesView> {
                 color: onSurface,
                 borderRadius: BorderRadius.circular(20),
                 border: BoxBorder.fromLTRB(
-                  bottom: BorderSide(width: 5, color: borderColor),
-                  right: BorderSide(width: 3, color: borderColor),
-                  top: BorderSide.none,
-                  left: BorderSide.none,
+                  bottom: onTap ? BorderSide.none : BorderSide(width: 5, color: borderColor),
+                  right: onTap ? BorderSide.none : BorderSide(width: 3, color: borderColor),
+                  top: onTap ?  BorderSide(width: 5, color: surfaceColor) : BorderSide.none,
+                  left: onTap ?  BorderSide(width: 3, color: surfaceColor) : BorderSide.none,
                 ),
               ),
               child: PageView.builder(
@@ -71,6 +71,11 @@ class _HomeUpdatesViewState extends State<HomeUpdatesView> {
                     createdAt: widget.updates[index].createdAt,
                     photoURL: widget.updates[index].photoURL,
                     path: widget.updates[index].path,
+                    onTap: () async {
+                      setState(() => onTap = true);
+                      await Future.delayed(Duration(milliseconds: 2000));
+                      setState(() => onTap = false);
+                    },
                   ),
                 ),
               ),

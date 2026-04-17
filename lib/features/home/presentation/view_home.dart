@@ -177,7 +177,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
 
-                  if(updates.isNotEmpty)
+                  if(updates.isNotEmpty && !notebookvm.isLoading)
                   HomeUpdatesView(
                     updates: updates,
                   ),

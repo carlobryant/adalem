@@ -53,7 +53,8 @@ class _CreateViewState extends State<CreateView> {
     final sizeRejected = <PlatformFile>[];
     final pageRejected = <PlatformFile>[];
     
-    int runningTotalSize = 0; 
+    int runningTotalSize = 0;
+    int runningTotalPage = 0; 
     final maxSizeBytes = Constraint.maxUploadMB * 1024 * 1024;
 
     setState(() => _isUploading = true);
@@ -75,7 +76,8 @@ class _CreateViewState extends State<CreateView> {
           final catalog = await document.catalog;
           final pages = await catalog.getPages();
 
-          if (pages.pageCount > Constraint.maxPdfPage) {
+          runningTotalPage += pages.pageCount;
+          if (runningTotalPage > Constraint.maxPdfPage) {
             pageRejected.add(f);
             continue; 
           }
@@ -108,10 +110,10 @@ class _CreateViewState extends State<CreateView> {
           : "Please make sure the files don't exceed the limit."
       );
     } else if (pageRejected.isNotEmpty) {
-      ToastCard.error(context, "Page Limit Exceeded",
+      ToastCard.error(context, "Total Page Limit Exceeded",
         description: pageRejected.length > 1 
           ? "${pageRejected.length} PDFs exceeded the limit."
-          : "Please upload PDFs with ${Constraint.maxPdfPage} pages or less."
+          : "Upload PDFs with ${Constraint.maxPdfPage} total pages or less."
       );
     }
   }

@@ -10,6 +10,7 @@ class UpdateCardView extends StatelessWidget {
   final DateTime createdAt;
   final String? photoURL;
   final String? path;
+  final VoidCallback onTap;
 
   const UpdateCardView({
     super.key,
@@ -18,6 +19,7 @@ class UpdateCardView extends StatelessWidget {
     required this.createdAt,
     this.photoURL,
     this.path,
+    required this.onTap,
   });
 
   @override
@@ -28,8 +30,7 @@ class UpdateCardView extends StatelessWidget {
       () => CheckNetwork.execute(
         signedIn: true, 
         context: context, 
-        onTap: () async {
-          if (path == null) return;
+        onTap: () async {onTap();
           final uri = Uri.parse(path!);
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
