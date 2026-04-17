@@ -28,7 +28,7 @@ class _ShellState extends State<Shell> {
     GlobalKey<NavigatorState>(), // 0 : HOME
     GlobalKey<NavigatorState>(), // 1 : EXPLORE
     GlobalKey<NavigatorState>(), // 2 : CREATE
-    GlobalKey<NavigatorState>(), // 3 : SHARE
+    //GlobalKey<NavigatorState>(), // 3 : SHARE
     GlobalKey<NavigatorState>(), // 4 : PROFILE
   ];
 
@@ -104,10 +104,10 @@ class _ShellState extends State<Shell> {
                   selectedIcon: Icon(Icons.add, color: bgColor),
                   icon: Icon(Icons.add, size: 38, color: onBgColor),
                   label: "Create"),
-                NavigationDestination(
-                  selectedIcon: Icon(Icons.share_rounded, color: bgColor),
-                  icon: Icon(Icons.share_outlined, color: onBgColor),
-                  label: "Share"),
+                // NavigationDestination(
+                //   selectedIcon: Icon(Icons.share_rounded, color: bgColor),
+                //   icon: Icon(Icons.share_outlined, color: onBgColor),
+                //   label: "Share"),
                 NavigationDestination(
                   selectedIcon: Icon(Icons.account_circle, color: bgColor),
                   icon: Icon(Icons.account_circle_outlined, color: onBgColor),
@@ -143,8 +143,8 @@ class _ShellState extends State<Shell> {
                   exploreKey: _exploreKey,
                   ),
                 Create(navigatorKey: _navigatorKeys[2],),
-                Share(),
-                Profile(navigatorKey: _navigatorKeys[4]),
+                //Share(),
+                Profile(navigatorKey: _navigatorKeys[3]),
               ],
             )
           ),
