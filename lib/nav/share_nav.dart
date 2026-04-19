@@ -1,29 +1,23 @@
-import 'package:adalem/views/share/share.dart';
+import 'package:adalem/features/share/presentation/view_share.dart';
 import 'package:flutter/material.dart';
 
-class Share extends StatefulWidget {
-  const Share({super.key});
+class Share extends StatelessWidget {
+  final GlobalKey<NavigatorState> navigatorKey;
 
-  @override
-  State<Share> createState() => _ShareState();
-}
+  const Share({
+    super.key,
+    required this.navigatorKey,
+  });
 
-class _ShareState extends State<Share> {
-
-  GlobalKey<NavigatorState> shareNavigatorKey = GlobalKey<NavigatorState>();
-  
   @override
   Widget build(BuildContext context) {
     return Navigator(
-      key: shareNavigatorKey,
+      key: navigatorKey,
       onGenerateRoute: (RouteSettings settings){
         return MaterialPageRoute(
           settings: settings,
           builder: (BuildContext context){
-            if(settings.name == '/'){
-              return const ShareView();
-            } 
-            return const ShareView();
+            return ShareView();
           },
         );
       } 

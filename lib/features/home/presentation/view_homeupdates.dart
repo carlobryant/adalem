@@ -36,7 +36,6 @@ class _HomeUpdatesViewState extends State<HomeUpdatesView> {
     final onSurface = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
     final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    // final boxHgColor = Theme.of(context).colorScheme.onTertiary;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

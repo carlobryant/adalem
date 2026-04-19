@@ -15,7 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ExploreView extends StatefulWidget {
-  const ExploreView({super.key});
+  final VoidCallback onNavigateToShare;
+
+  const ExploreView({super.key, required this.onNavigateToShare});
 
   @override
   State<ExploreView> createState() => ExploreViewState();
@@ -186,7 +188,7 @@ class ExploreViewState extends State<ExploreView> {
     )
     : GridView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 10,
@@ -235,7 +237,11 @@ class ExploreViewState extends State<ExploreView> {
                   ),
                 ),
               );
-            }
+            },
+            onShare: () {
+              widget.onNavigateToShare();
+              viewModel.toggleNotebookSelection(notebook.id, isToggle: false);
+            },
           ),
         );
       },

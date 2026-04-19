@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class Explore extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final GlobalKey<ExploreViewState>? exploreKey;
+  final VoidCallback onNavigateToShare;
 
   const Explore({
     super.key,
-    required this.navigatorKey,
     this.exploreKey,
+    required this.navigatorKey,
+    required this.onNavigateToShare,
     });
   
   @override
@@ -20,10 +22,10 @@ class Explore extends StatelessWidget {
         return MaterialPageRoute(
           settings: settings,
           builder: (BuildContext context){
-            if(settings.name == '/'){
-              return ExploreView(key: exploreKey);
-            } 
-            return ExploreView(key: exploreKey);
+            return ExploreView(
+              key: exploreKey,
+              onNavigateToShare: onNavigateToShare,
+            );
           },
         );
       } 

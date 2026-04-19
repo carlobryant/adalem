@@ -131,7 +131,7 @@ class _ShellState extends State<Shell> {
                 Home(
                   navigatorKey: _navigatorKeys[0],
                   onNavigateToExplore: () {
-                    setState(() {_selectedIndex = 1;});
+                    setState(() => _selectedIndex = 1);
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       _exploreKey.currentState?.scrollToTop();
                     });
@@ -139,11 +139,12 @@ class _ShellState extends State<Shell> {
                   onNavigateToCreate: () => setState(() => _selectedIndex = 2),
                 ),
                 Explore(
-                  navigatorKey: _navigatorKeys[1],
                   exploreKey: _exploreKey,
+                  navigatorKey: _navigatorKeys[1],
+                  onNavigateToShare: () => setState(() => _selectedIndex = 3),
                   ),
-                Create(navigatorKey: _navigatorKeys[2],),
-                Share(),
+                Create(navigatorKey: _navigatorKeys[2]),
+                Share(navigatorKey: _navigatorKeys[3]),
                 Profile(navigatorKey: _navigatorKeys[4]),
               ],
             )

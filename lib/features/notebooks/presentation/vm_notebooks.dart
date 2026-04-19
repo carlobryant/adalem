@@ -55,7 +55,7 @@ class NotebookViewModel extends ChangeNotifier {
   List<NotebookModel> get filteredNotebooks {
     var list = List<NotebookModel>.from(_notebooks);
     
-    if (_searchQuery.isNotEmpty) {
+    if(_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       list = _notebooks.where((notebook) {
         return notebook.title.toLowerCase().contains(query) ||
@@ -78,7 +78,7 @@ class NotebookViewModel extends ChangeNotifier {
   List<NotebookModel> get rankedNotebooks {
     final uid = _getCurrentUser()?.uid;
     final readyNotebooks = _notebooks.where((n) => n.available == "ready").toList();
-    if (uid == null) return readyNotebooks;
+    if(uid == null) return readyNotebooks;
 
     readyNotebooks.sort((a, b) {
       final masteryA = a.users[uid]?.mastery ?? 0;
@@ -92,18 +92,18 @@ class NotebookViewModel extends ChangeNotifier {
     final uid = _getCurrentUser()?.uid;
     final readyNotebooks = _notebooks.where((n) => n.available == "ready" 
     && (flashcardAvailable(n.id) || _isNotToday(n.users[uid]!.quizSession))).toList();
-    if (uid == null) return readyNotebooks;
+    if(uid == null) return readyNotebooks;
 
     readyNotebooks.sort((a, b) {
       final streakA = a.users[uid]?.streakAt;
       final streakB = b.users[uid]?.streakAt;
 
       // IGNORE IF BOTH ARE NULL
-      if (streakA == null && streakB == null) return 0;
+      if(streakA == null && streakB == null) return 0;
       
       // IF A VALUE IS NULL
-      if (streakA == null) return -1;
-      if (streakB == null) return 1;
+      if(streakA == null) return -1;
+      if(streakB == null) return 1;
 
       return streakA.compareTo(streakB);
     });
@@ -112,7 +112,7 @@ class NotebookViewModel extends ChangeNotifier {
   }
 
   bool _isNotToday(DateTime? date) {
-    if (date == null) return true;
+    if(date == null) return true;
     final now = DateTime.now();
     return !(date.year == now.year && date.month == now.month && date.day == now.day);
   }
@@ -131,7 +131,7 @@ class NotebookViewModel extends ChangeNotifier {
 
     final currentUser = _getCurrentUser();
 
-    if (currentUser == null) {
+    if(currentUser == null) {
       _error = const ErrorModel(
         header: "No User Found", 
         description: "Unexpected error, no user signed in."
@@ -181,7 +181,7 @@ class NotebookViewModel extends ChangeNotifier {
 
     final userModel = notebook.users[uid];
     final flashcards = getProgressFor(notebookId, uid);
-    if (userModel == null) {
+    if(userModel == null) {
       return NotebookUser.empty();
     }
     return NotebookUser(
@@ -220,7 +220,7 @@ class NotebookViewModel extends ChangeNotifier {
     );
 
     final userModel = notebook.users[uid];
-    if (userModel == null) return [];
+    if(userModel == null) return [];
 
     return userModel.flashcards.map((model) => NotebookFlashcard(
       cardId: model.cardId,
@@ -240,22 +240,50 @@ class NotebookViewModel extends ChangeNotifier {
     );
 
     final userModel = notebook.users[uid];
-    if (userModel == null) return 0;
+    if(userModel == null) return 0;
     return userModel.mastery;
+  }
+
+  // SELECTED NOTEBOOKS
+  List<String> _selectedNotebookIds = [];
+  List<String> get selectedNotebookIds => List.unmodifiable(_selectedNotebookIds);
+
+  List<NotebookModel> get selectedNotebooks => 
+      _notebooks.where((n) => _selectedNotebookIds.contains(n.id)).toList();
+
+  bool isSelected(String notebookId) => _selectedNotebookIds.contains(notebookId);
+
+  void toggleNotebookSelection(String notebookId, {bool isToggle = true}) {
+    if(_selectedNotebookIds.contains(notebookId)) {
+      if(isToggle) { _selectedNotebookIds.remove(notebookId); }
+      else { return; }
+      }
+    else { _selectedNotebookIds.add(notebookId); }
+    notifyListeners();
+  }
+
+  void selectAll() {
+    _selectedNotebookIds = _notebooks.map((n) => n.id).toList();
+    notifyListeners();
+  }
+
+  void clearSelection() {
+    _selectedNotebookIds = [];
+    notifyListeners();
   }
 
   // FLASHCARD SESSION AVAILABILITY
   bool flashcardAvailable(String notebookId) {
     final uid = _getCurrentUser()?.uid;
-    if (uid == null) return false;
+    if(uid == null) return false;
 
     final progress = getProgressFor(notebookId, uid);
     
-    if (progress.isEmpty) return true;
+    if(progress.isEmpty) return true;
 
     final now = DateTime.now();
     return progress.where((card) {
-      if (card.dueAt == null) return true;
+      if(card.dueAt == null) return true;
       return !card.dueAt!.isAfter(now);
     }).length > 4;
   }
@@ -273,9 +301,10 @@ class NotebookViewModel extends ChangeNotifier {
   }
 
   void clearData() {
+    _error = null;
     _notebooks =[];
     _searchQuery = "";
-    _error = null;
+    _selectedNotebookIds = [];
     _subscription?.cancel();
     notifyListeners();
   }

@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 class Home extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final VoidCallback onNavigateToExplore;
-   final VoidCallback onNavigateToCreate;
+  final VoidCallback onNavigateToCreate;
 
-  const Home({super.key,
-  required this.navigatorKey,
-  required this.onNavigateToExplore,
-  required this.onNavigateToCreate,
+  const Home({
+    super.key,
+    required this.navigatorKey,
+    required this.onNavigateToExplore,
+    required this.onNavigateToCreate,
   });
 
   @override

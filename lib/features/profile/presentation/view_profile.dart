@@ -1,4 +1,5 @@
 import 'package:adalem/core/app_constraints.dart';
+import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
@@ -59,9 +60,9 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewModel>();
-    final user = viewModel.user!;
+    final user = viewModel.user;
 
-    return Scaffold(
+    return user != null ? Scaffold(
       body: NestedScrollView(
         headerSliverBuilder:(context, innerBoxIsScrolled) => [
           SliverAppBar(
@@ -116,7 +117,8 @@ class _ProfileViewState extends State<ProfileView> {
         ],
         body: _buildBody(user),
       ),
-    );
+    )
+    : Scaffold(body: LoaderAnimation());
   }
 
   Widget _buildBody(AuthUser user) {

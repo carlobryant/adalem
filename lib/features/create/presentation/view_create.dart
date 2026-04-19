@@ -206,6 +206,7 @@ class _CreateViewState extends State<CreateView> {
             children: [
               
               Container(
+                height: _fileUploaded ? null : MediaQuery.sizeOf(context).height * 0.6,
                 decoration: BoxDecoration(
                   color: primary,
                   borderRadius: BorderRadius.circular(20),
@@ -337,8 +338,8 @@ class _CreateViewState extends State<CreateView> {
                         ),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: MediaQuery.sizeOf(context).width/3, 
-                            vertical: MediaQuery.sizeOf(context).height/6,
+                            horizontal: MediaQuery.sizeOf(context).width * 0.30, 
+                            vertical: MediaQuery.sizeOf(context).height * 0.12,
                           ),
                           child: CircularProgressIndicator(color: darkPrimary),
                         ),
@@ -363,7 +364,10 @@ class _CreateViewState extends State<CreateView> {
                             
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: MediaQuery.sizeOf(context).width * 0.26, 
+                              vertical: MediaQuery.sizeOf(context).height * 0.11,
+                            ),
                             child: Column(
                               children: [
                                 Icon(Icons.upload, size: 30, color: darkPrimary),
