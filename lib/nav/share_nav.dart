@@ -13,12 +13,13 @@ class Share extends StatelessWidget {
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
+      observers: [HeroController()],
       onGenerateRoute: (RouteSettings settings){
         return MaterialPageRoute(
           settings: settings,
           builder: (BuildContext context){
             return ShareView();
-          },
+          }, 
         );
       } 
     );

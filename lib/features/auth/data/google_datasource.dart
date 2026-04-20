@@ -9,6 +9,7 @@ abstract class AuthRemoteDataSource {
   Future<void> signOut();
   AuthUser? getCurrentUser();
   Future<AuthUser?> getUserById(String uid);
+  Future<AuthUser?> getUserByEmail(String email);
   Stream<AuthUser?> get authStateChanges;
   Stream<AuthUser?> fetchActivity();
   Future<void> updateActivity(
@@ -193,6 +194,31 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       photoURL: data['photoURL'] ?? '',
       provider: data['provider'] ?? 'unknown',
     );
+  }
+
+  // GET USER BY EMAIL
+  @override
+  Future<AuthUser?> getUserByEmail(String email) async {
+    if(email.isEmpty) { return null; }
+    
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1) 
+        .get();
+
+    if (querySnapshot.docs.isEmpty) { return null; }
+
+    final doc = querySnapshot.docs.first;
+    final data = doc.data();
+    
+    return AuthUser(
+      uid: doc.id,
+      name: data['name'] ?? data['displayName'] ?? 'Unknown User',
+      email: data['email'] ?? '',
+      photoURL: data['photoURL'] ?? '',
+      provider: data['provider'] ?? 'unknown',
+    ); 
   }
 
   //SIGN OUT 

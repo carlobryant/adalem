@@ -5,6 +5,7 @@ abstract class AuthRepo {
   Future<void> signOut();
   AuthUser? getCurrentUser();
   Future<AuthUser?> getUserById(String uid);
+  Future<AuthUser?> getUserByEmail(String email);
   Stream<AuthUser?> get authStateChanges;
   Stream<AuthUser?> fetchActivity();
   Future<void> updateActivity(

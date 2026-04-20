@@ -29,6 +29,11 @@ class AuthRepositoryImpl implements AuthRepo {
   }
 
   @override
+  Future<AuthUser?> getUserByEmail(String email) async {
+    return await _dataSource.getUserById(email);
+  }
+
+  @override
   Stream<AuthUser?> get authStateChanges {
     return _dataSource.authStateChanges;
   }

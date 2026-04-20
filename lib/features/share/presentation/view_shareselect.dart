@@ -4,8 +4,14 @@ import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:flutter/material.dart';
 
 class ShareSelectionView extends StatefulWidget {
+  final void Function(String) onToggle;
   final List<NotebookModel> notebooks;
-  const ShareSelectionView({super.key, required this.notebooks});
+
+  const ShareSelectionView({
+    super.key,
+    required this.onToggle,
+    required this.notebooks,
+    });
 
   @override
   State<ShareSelectionView> createState() => _ShareSelectionViewState();
@@ -41,9 +47,6 @@ class _ShareSelectionViewState extends State<ShareSelectionView> {
 
   @override
   Widget build(BuildContext context) {
-    final onSurface = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
-    final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
-    final surfaceColor = Theme.of(context).colorScheme.surface;
     final pages = _pairPages();
 
     return Column(
@@ -51,7 +54,8 @@ class _ShareSelectionViewState extends State<ShareSelectionView> {
       children: [
         SizedBox(
           height: 240,
-          child: PageView.builder(
+          child: widget.notebooks.length > 1 ? 
+          PageView.builder(
             controller: _controller,
             itemCount: pages.length,
             itemBuilder: (context, index) {
@@ -73,7 +77,11 @@ class _ShareSelectionViewState extends State<ShareSelectionView> {
                 ),
               );
             },
-          ),
+          )
+          : Center(child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width * 0.29),
+            child: _buildNotebookCard(widget.notebooks, 0),
+          ))
         ),
         const SizedBox(height: 12),
         if (pages.length > 1) CarouselCardDots(count: pages.length, current: _currentPage),
@@ -83,13 +91,36 @@ class _ShareSelectionViewState extends State<ShareSelectionView> {
 
   Widget _buildNotebookCard(List<NotebookModel> pair, int index) {
     return Expanded(
-      child: VerticalNotebookCard(
-        title: pair[index].title,
-        course: pair[index].course,
-        updatedAt: pair[index].updatedAt,
-        image: pair[index].image,
-        available: pair[index].available,
-        isLoading: false,
+      child: Stack(
+        children: [
+          VerticalNotebookCard(
+            title: pair[index].title,
+            course: pair[index].course,
+            updatedAt: pair[index].updatedAt,
+            image: pair[index].image,
+            available: pair[index].available,
+            isLoading: false,
+          ),
+
+          Positioned(
+            top: 10,
+            right: 10,
+            child: GestureDetector(
+              onTap: () => widget.onToggle(pair[index].id),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Icon(Icons.close_rounded, size: 20,
+                  color: Theme.of(context).colorScheme.inverseSurface),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

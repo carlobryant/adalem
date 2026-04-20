@@ -1,3 +1,4 @@
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/animation_loader.dart';
 import 'package:adalem/core/components/card_popuptween.dart';
 import 'package:adalem/core/components/card_toast.dart';
@@ -25,7 +26,6 @@ class ExploreView extends StatefulWidget {
 
 class ExploreViewState extends State<ExploreView> {
   final ScrollController _scrollController = ScrollController();
-
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
@@ -239,8 +239,14 @@ class ExploreViewState extends State<ExploreView> {
               );
             },
             onShare: () {
-              widget.onNavigateToShare();
-              viewModel.toggleNotebookSelection(notebook.id, isToggle: false);
+              if(notebook.users.length > Constraint.maxShare) {
+                ToastCard.clearError();
+                ToastCard.error(context, "Notebook Reached Share Limit", 
+                  description: "Cannot share ${notebook.title}.");
+              } else {
+                widget.onNavigateToShare();
+                viewModel.toggleNotebookSelection(notebook.id, isToggle: false);
+              }
             },
           ),
         );

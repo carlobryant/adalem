@@ -29,7 +29,7 @@ class _AnalyticsCardState extends State<AnalyticsCard> {
     final DateTime now = DateTime.now();
     final DateTime endDate = DateTime(now.year, now.month, now.day);
     final int daysToSat = endDate.weekday == DateTime.sunday ? 6 : DateTime.saturday - endDate.weekday;
-    final DateTime startDate = endDate.add(Duration(days: daysToSat)).subtract(Duration(days: Constraint.maxActivity));
+    final DateTime startDate = endDate.add(Duration(days: daysToSat)).subtract(Duration(days: Constraint.maxActivity + 6));
     final String defaultTitle = "Study Activity: ${DateFormat('MMMM d').format(startDate)} to Present";
 
     return Padding(

@@ -10,5 +10,6 @@ class GetCurrentUser {
 class GetUserProfile {
   final AuthRepo _authRepo;
   GetUserProfile(this._authRepo);
-  Future<AuthUser?> call(String uid) => _authRepo.getUserById(uid);
+  Future<AuthUser?> call({String uid = "", String email = ""}) =>
+    uid.isNotEmpty ? _authRepo.getUserById(uid) : _authRepo.getUserByEmail(email);
 }

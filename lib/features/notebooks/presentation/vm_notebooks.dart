@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
@@ -75,26 +75,37 @@ class NotebookViewModel extends ChangeNotifier {
     return list;
   }
 
+  List<NotebookModel> get shareableNotebooks {
+    final uid = _getCurrentUser()?.uid;
+    final list = _notebooks.where(
+      (n) => n.available == "ready" && n.users.length <= Constraint.maxShare
+    ).toList();
+    if(uid == null) return list;
+
+    list.sort((b, a) => a.updatedAt.compareTo(b.updatedAt));
+    return list;
+  }
+
   List<NotebookModel> get rankedNotebooks {
     final uid = _getCurrentUser()?.uid;
-    final readyNotebooks = _notebooks.where((n) => n.available == "ready").toList();
-    if(uid == null) return readyNotebooks;
+    final list = _notebooks.where((n) => n.available == "ready").toList();
+    if(uid == null) return list;
 
-    readyNotebooks.sort((a, b) {
+    list.sort((a, b) {
       final masteryA = a.users[uid]?.mastery ?? 0;
       final masteryB = b.users[uid]?.mastery ?? 0;
       return masteryB.compareTo(masteryA); 
     });
-    return readyNotebooks;
+    return list;
   }
 
   List<NotebookModel> get toDoNotebooks {
     final uid = _getCurrentUser()?.uid;
-    final readyNotebooks = _notebooks.where((n) => n.available == "ready" 
+    final list = _notebooks.where((n) => n.available == "ready" 
     && (flashcardAvailable(n.id) || _isNotToday(n.users[uid]!.quizSession))).toList();
-    if(uid == null) return readyNotebooks;
+    if(uid == null) return list;
 
-    readyNotebooks.sort((a, b) {
+    list.sort((a, b) {
       final streakA = a.users[uid]?.streakAt;
       final streakB = b.users[uid]?.streakAt;
 
@@ -108,7 +119,7 @@ class NotebookViewModel extends ChangeNotifier {
       return streakA.compareTo(streakB);
     });
     
-    return readyNotebooks;
+    return list;
   }
 
   bool _isNotToday(DateTime? date) {
@@ -206,7 +217,7 @@ class NotebookViewModel extends ChangeNotifier {
     _isLoadingOwner = true;
     notifyListeners();
 
-    _ownerData = await _getUserProfile(ownerId);
+    _ownerData = await _getUserProfile(uid: ownerId);
 
     _isLoadingOwner = false;
     notifyListeners();
@@ -254,11 +265,16 @@ class NotebookViewModel extends ChangeNotifier {
   bool isSelected(String notebookId) => _selectedNotebookIds.contains(notebookId);
 
   void toggleNotebookSelection(String notebookId, {bool isToggle = true}) {
-    if(_selectedNotebookIds.contains(notebookId)) {
+     if(_selectedNotebookIds.contains(notebookId)) {
       if(isToggle) { _selectedNotebookIds.remove(notebookId); }
       else { return; }
       }
     else { _selectedNotebookIds.add(notebookId); }
+    notifyListeners();
+  }
+
+  void setSelectedNotebooks(List<NotebookModel> notebooks) {
+    _selectedNotebookIds = notebooks.map((n) => n.id).toList();
     notifyListeners();
   }
 
@@ -270,6 +286,47 @@ class NotebookViewModel extends ChangeNotifier {
   void clearSelection() {
     _selectedNotebookIds = [];
     notifyListeners();
+  }
+
+  // FETCH USERS TO SHARE
+  Future<AuthUser?> searchUserByEmail(String email) async {
+    final currentUserEmail = _getCurrentUser()?.email;
+
+    if (email.trim().isEmpty) return null;
+    if (email.trim() == currentUserEmail) {
+      _error = const ErrorModel(
+        header: "Invalid Email", 
+        description: "You cannot share a notebook with yourself."
+      );
+      notifyListeners();
+      return null;
+    }
+
+    _error = null;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final searchedUser = await _getUserProfile.call(email: email.trim());
+      
+      if (searchedUser == null) {
+        _error = const ErrorModel(
+          header: "User Not Found",
+          description: "No account exists with that email address.",
+        );
+      }
+      return searchedUser; 
+      
+    } catch (e) {
+      _error = ErrorModel(
+        header: "Search Failed",
+        description: e.toString(),
+      );
+      return null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   // FLASHCARD SESSION AVAILABILITY

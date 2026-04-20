@@ -20,6 +20,11 @@ class NotebookRepositoryImpl implements NotebookRepo {
     return _dataSource.getNotebookCount(uid);
   }
 
+  @override
+  Future<void> shareNotebooks(List<String> notebookIds, List<String> targetUserIds){
+    return _dataSource.shareNotebooks(notebookIds, targetUserIds);
+  }
+
     @override
   Future<void> syncFlashcards({
     required String notebookId,

@@ -166,7 +166,7 @@ class VerticalNotebookCard extends StatelessWidget {
                                   }
                                 },
                                 itemBuilder: (BuildContext context) => [
-                                  if (onShare != null)
+                                  if (onShare != null && available == "ready")
                                   PopupMenuItem(
                                     value: "share",
                                     child: ListTile(

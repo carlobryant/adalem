@@ -5,6 +5,7 @@ import 'package:adalem/features/notebooks/domain/notebook_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class FirestoreDataSource {
+  Future<void> shareNotebooks(List<String> notebookIds, List<String> targetUserIds);
   Stream<List<Map<String, dynamic>>> fetchNotebooks(String uid);
   Future<void> createNotebook(Map<String, dynamic> data);
   Future<int> getNotebookCount(String uid);
@@ -125,6 +126,28 @@ class FirestoreDataSourceImpl implements FirestoreDataSource {
         
     final aggregateQuery = await query.count().get();
     return aggregateQuery.count ?? 0;
+  }
+
+  @override
+  Future<void> shareNotebooks(List<String> notebookIds, List<String> targetUserIds) async {
+    if (notebookIds.isEmpty || targetUserIds.isEmpty) return;
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    final Map<String, dynamic> updates = {};
+    for (final uid in targetUserIds) {
+      updates['users.$uid'] = {
+        'mastery': 0, 
+        'flashcards': [], 
+        'lastDecayApplied': FieldValue.serverTimestamp(),
+      };
+    }
+    final WriteBatch batch = firestore.batch();
+    for (final notebookId in notebookIds) {
+      final docRef = firestore.collection('notebooks').doc(notebookId);
+      batch.update(docRef, updates);
+    }
+
+    await batch.commit();
   }
 
   @override
