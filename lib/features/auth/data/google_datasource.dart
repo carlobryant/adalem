@@ -200,18 +200,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthUser?> getUserByEmail(String email) async {
     if(email.isEmpty) { return null; }
-    
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .limit(1) 
-        .get();
+    final querySnapshot = await _firestore 
+    .collection('users')
+    .where('email', isEqualTo: email.trim().toLowerCase())
+    .limit(1)
+    .get();
 
     if (querySnapshot.docs.isEmpty) { return null; }
 
     final doc = querySnapshot.docs.first;
     final data = doc.data();
-    
+    if (data.isEmpty) return null;
     return AuthUser(
       uid: doc.id,
       name: data['name'] ?? data['displayName'] ?? 'Unknown User',

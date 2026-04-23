@@ -259,6 +259,9 @@ class NotebookViewModel extends ChangeNotifier {
   List<String> _selectedNotebookIds = [];
   List<String> get selectedNotebookIds => List.unmodifiable(_selectedNotebookIds);
 
+  ErrorModel? _errorShare;
+  ErrorModel? get errorShare => _errorShare;
+
   List<NotebookModel> get selectedNotebooks => 
       _notebooks.where((n) => _selectedNotebookIds.contains(n.id)).toList();
 
@@ -286,47 +289,6 @@ class NotebookViewModel extends ChangeNotifier {
   void clearSelection() {
     _selectedNotebookIds = [];
     notifyListeners();
-  }
-
-  // FETCH USERS TO SHARE
-  Future<AuthUser?> searchUserByEmail(String email) async {
-    final currentUserEmail = _getCurrentUser()?.email;
-
-    if (email.trim().isEmpty) return null;
-    if (email.trim() == currentUserEmail) {
-      _error = const ErrorModel(
-        header: "Invalid Email", 
-        description: "You cannot share a notebook with yourself."
-      );
-      notifyListeners();
-      return null;
-    }
-
-    _error = null;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      final searchedUser = await _getUserProfile.call(email: email.trim());
-      
-      if (searchedUser == null) {
-        _error = const ErrorModel(
-          header: "User Not Found",
-          description: "No account exists with that email address.",
-        );
-      }
-      return searchedUser; 
-      
-    } catch (e) {
-      _error = ErrorModel(
-        header: "Search Failed",
-        description: e.toString(),
-      );
-      return null;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   // FLASHCARD SESSION AVAILABILITY

@@ -190,7 +190,7 @@ class _SelectPopupState extends State<SelectPopup> {
                 color: Theme.of(context).colorScheme.inverseSurface,
               ),
               overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+              maxLines: 2,
               ),
             ),
             const SizedBox(width: 6),

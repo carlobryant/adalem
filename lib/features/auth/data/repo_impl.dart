@@ -30,7 +30,7 @@ class AuthRepositoryImpl implements AuthRepo {
 
   @override
   Future<AuthUser?> getUserByEmail(String email) async {
-    return await _dataSource.getUserById(email);
+    return await _dataSource.getUserByEmail(email);
   }
 
   @override
