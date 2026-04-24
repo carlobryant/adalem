@@ -1,20 +1,26 @@
 
+import 'package:adalem/core/app_constraints.dart';
 import 'package:adalem/core/components/model_error.dart';
 import 'package:adalem/features/auth/domain/auth_user.dart';
 import 'package:adalem/features/auth/domain/uc_getuser.dart';
+import 'package:adalem/features/notebooks/domain/uc_getnotebooks.dart';
 import 'package:adalem/features/notebooks/domain/uc_sharenotebooks.dart';
+import 'package:adalem/features/notebooks/presentation/model_notebooks.dart';
 import 'package:flutter/material.dart';
 
 class ShareViewModel extends ChangeNotifier {
+  final GetNotebookCount _getNotebookCount;
   final GetCurrentUser _getCurrentUser;
   final GetUserProfile _getUserProfile;
   final ShareNotebooks _shareNotebooks;
 
   ShareViewModel({
+    required GetNotebookCount getNotebookCount,
     required GetCurrentUser getCurrentUser,
     required GetUserProfile getUserProfile,
     required ShareNotebooks shareNotebooks,
-  }) :  _getCurrentUser = getCurrentUser,
+  }) :  _getNotebookCount = getNotebookCount,
+        _getCurrentUser = getCurrentUser,
         _getUserProfile = getUserProfile,
         _shareNotebooks = shareNotebooks;
 
@@ -24,6 +30,9 @@ class ShareViewModel extends ChangeNotifier {
   ErrorModel? _error;
   ErrorModel? get error => _error;
 
+  String? _success;
+  String? get success => _success;
+
   AuthUser? _foundUser;
   AuthUser? get foundUser => _foundUser;
 
@@ -31,7 +40,7 @@ class ShareViewModel extends ChangeNotifier {
   List<AuthUser> get recipients => List.unmodifiable(_recipients);
 
   // FETCH USERS TO SHARE
-  Future<AuthUser?> searchUserByEmail(String email) async {
+  Future<AuthUser?> searchUserByEmail(String email, int share) async {
     final currentUserEmail = _getCurrentUser()?.email;
     if (email.trim().isEmpty) return null;
     if (email.trim() == currentUserEmail) {
@@ -57,8 +66,24 @@ class ShareViewModel extends ChangeNotifier {
           description: "No account exists with that email address.",
         );
       } else {
-        _foundUser = searchedUser;
-        addRecipient();
+        if(await _getNotebookCount(searchedUser.uid) + share > Constraint.maxCreate) {
+          _error = ErrorModel(
+            header: "Limit Reached for ${searchedUser.name}",
+            description: "Ask ${searchedUser.name} to delete notebooks, or remove from your selection."
+          );
+        } else {
+          _foundUser = searchedUser;
+          if (!_recipients.any((u) => u.uid == searchedUser.uid)) {
+            _recipients.add(searchedUser);
+            _success = "Added ${searchedUser.name}"; 
+            _foundUser = null;
+          } else {
+            _error = ErrorModel(
+              header: "Already Added",
+              description: "${searchedUser.name} is already included.",
+            );
+          }
+        }
       }
       return searchedUser; 
       
@@ -87,22 +112,68 @@ class ShareViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> validateRecipients(int share) async {
+    if(recipients.isEmpty) return true;
+    
+    for(final recipient in _recipients) {
+      final count = await _getNotebookCount(recipient.uid);
+      if (count + share > Constraint.maxCreate) {
+        _error = ErrorModel(
+          header: "Limit Reached for ${recipient.name}",
+          description: "Ask ${recipient.name} to delete notebooks, or remove them from your selection.",
+        );
+        notifyListeners();
+        return false;
+      }
+    }
+    return true;
+  }
+
   // SHARE
+  bool _isShared = false;
+  bool get isShared => _isShared;
+
   bool _isSharing = false;
   bool get isSharing => _isSharing;
 
-  Future<void> shareNotebooks(List<String> notebookIds) async {
-    if (_recipients.isEmpty || notebookIds.isEmpty) return;
+  Future<void> shareNotebooks(List<NotebookModel> notebooks) async {
+    if (_recipients.isEmpty || notebooks.isEmpty) return;
 
     _isSharing = true;
     notifyListeners();
 
+    for (final recipient in _recipients) {
+      for (final notebook in notebooks) {
+        if (notebook.users.containsKey(recipient.uid)) {
+          _error = ErrorModel(
+            header: "Already Shared to ${recipient.name}",
+            description: "${notebook.title} was shared to ${recipient.name}.",
+          );
+          _isSharing = false;
+          notifyListeners();
+          return;
+        }
+      }
+
+      final count = await _getNotebookCount(recipient.uid);
+      if (count + notebooks.length > Constraint.maxCreate) {
+        _error = ErrorModel(
+          header: "Limit Reached for ${recipient.name}",
+          description: "Ask ${recipient.name} to delete notebooks, or remove them from your selection.",
+        );
+        _isSharing = false;
+        notifyListeners();
+        return;
+      }
+    }
+
     try {
       await _shareNotebooks(
-        notebookIds: notebookIds,
+        notebookIds: notebooks.map((n) => n.id).toList(),
         targetUserIds: _recipients.map((u) => u.uid).toList(),
       );
       _recipients.clear();
+      _isShared = true;
       _foundUser = null;
       _error = null;
     } catch (e) {
@@ -114,6 +185,15 @@ class ShareViewModel extends ChangeNotifier {
       _isSharing = false;
       notifyListeners();
     }
+  }
+
+  void returnToShare() {
+    _isShared = false;
+    notifyListeners();
+  }
+
+  void clearSuccess() {
+    _success = null;
   }
 
   void clearError() {

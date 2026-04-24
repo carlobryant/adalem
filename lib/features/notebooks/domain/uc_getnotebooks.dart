@@ -9,3 +9,10 @@ class GetNotebooks {
     return _repository.fetchNotebooks(uid);
   }
 }
+
+class GetNotebookCount {
+  final NotebookRepo _notebookRepo;
+  const GetNotebookCount(this._notebookRepo);
+
+  Future<int> call(String uid) => _notebookRepo.getNotebookCount(uid);
+}

@@ -19,6 +19,7 @@ class ShareToPicker extends StatefulWidget {
 
 class _ShareToPickerState extends State<ShareToPicker> {
   final TextEditingController _controller = TextEditingController();
+  bool _hasInput = false;
 
   @override
   void initState() {
@@ -32,6 +33,8 @@ class _ShareToPickerState extends State<ShareToPicker> {
           selection: TextSelection.collapsed(offset: stripped.length),
         );
       }
+    final hasInput = _controller.text.trim().length >= 6;
+      if (hasInput != _hasInput) setState(() => _hasInput = hasInput);
     });
   }
 
@@ -41,11 +44,11 @@ class _ShareToPickerState extends State<ShareToPicker> {
     super.dispose();
   }
 
-  void _handleAdd() {
+  void _handleAdd() async {
     final email = "${_controller.text.trim()}@gmail.com";
     if (_controller.text.trim().isEmpty) return;
-    widget.onAdd(email);
-    _controller.clear();
+    final result = await widget.onAdd(email);
+    if (result != null) _controller.clear();
   }
 
   @override
@@ -81,13 +84,13 @@ class _ShareToPickerState extends State<ShareToPicker> {
                     hintText: "Enter email",
                     hintStyle: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                      fontSize: 14,
+                      fontSize: 12,
                     ),
                     suffix: Text(
                       "@gmail.com",
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.8),
-                        fontSize: 14,
+                        fontSize: 11,
                       ),
                     ),
                     border: InputBorder.none,
@@ -97,19 +100,24 @@ class _ShareToPickerState extends State<ShareToPicker> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
-                child: !widget.isLoading ? SmallButton(
-                  surfacecolor: Theme.of(context).colorScheme.onSurface,
-                  onTap: () => CheckNetwork.execute(
-                    signedIn: true,
-                    context: context,
-                    onTap: () async { _handleAdd(); }),
-                  child:Icon(
-                    Icons.person_add_alt_1_rounded,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                child: AnimatedScale(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  scale: _hasInput ? 1 : 0,
+                  child: !widget.isLoading ? !_hasInput ? null : SmallButton(
+                    surfacecolor: Theme.of(context).colorScheme.surface,
+                    onTap: () => CheckNetwork.execute(
+                      signedIn: true,
+                      context: context,
+                      onTap: () async { _handleAdd(); }),
+                    child:Icon(
+                      Icons.person_add_alt_1_rounded,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ) : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
                   ),
-                ) : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
                 )
               ),
             ],

@@ -138,11 +138,11 @@ class _ProfileViewState extends State<ProfileView> {
             child: Column(
               children: [
                 SizedBox(height: 10),
-                _buildRow("Total Notebooks", "${notebookvm.notebookCount}", "total"), 
+                _buildRow("Created Notebooks", "${notebookvm.ownedNotebookCount}", "total"), 
                 SizedBox(height: 20),
-                _buildRow("Shared Notebooks", "${notebookvm.sharedNotebookCount}", "shared"),
+                _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", "shared"),
                 SizedBox(height: 20),
-                _buildRow("Received Notebooks", "${notebookvm.receivedNotebookCount}", "received"),
+                _buildRow("Total Notebooks", "${notebookvm.notebookCount}", "received"),
                 SizedBox(height:  10),
               ],
             )

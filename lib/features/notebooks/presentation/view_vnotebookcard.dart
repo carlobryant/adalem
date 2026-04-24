@@ -9,6 +9,7 @@ class VerticalNotebookCard extends StatelessWidget {
   final String image;
   final String available;
   final bool isLoading;
+  final bool isSolid;
   final VoidCallback? onDelete;
   final VoidCallback? onShare;
 
@@ -20,14 +21,19 @@ class VerticalNotebookCard extends StatelessWidget {
     required this.image,
     required this.available,
     required this.isLoading,
+    this.isSolid = false,
     this.onDelete,
     this.onShare,
   });
 
   @override
   Widget build(BuildContext context) {
-    final surfaceColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
-    final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
+    final surfaceColor = !isSolid ? 
+      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)
+      : Theme.of(context).colorScheme.surface;
+    final borderColor = !isSolid ?
+      Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1)
+      : Theme.of(context).colorScheme.onSurface;
     final displayDate = updatedAt.split('-').first;
 
     return Container(

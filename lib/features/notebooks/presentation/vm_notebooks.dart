@@ -119,7 +119,7 @@ class NotebookViewModel extends ChangeNotifier {
       return streakA.compareTo(streakB);
     });
     
-    return list;
+    return list.take(5).toList();
   }
 
   bool _isNotToday(DateTime? date) {
@@ -170,6 +170,10 @@ class NotebookViewModel extends ChangeNotifier {
   }
 
   // NOTEBOOK COUNT
+  int get ownedNotebookCount => _notebooks.where(
+    (n) => n.owner == _getCurrentUser()?.uid
+    ).length;
+
   int get notebookCount => _notebooks.length;
 
   int get sharedNotebookCount => _notebooks.where(
@@ -259,9 +263,6 @@ class NotebookViewModel extends ChangeNotifier {
   List<String> _selectedNotebookIds = [];
   List<String> get selectedNotebookIds => List.unmodifiable(_selectedNotebookIds);
 
-  ErrorModel? _errorShare;
-  ErrorModel? get errorShare => _errorShare;
-
   List<NotebookModel> get selectedNotebooks => 
       _notebooks.where((n) => _selectedNotebookIds.contains(n.id)).toList();
 
@@ -289,6 +290,18 @@ class NotebookViewModel extends ChangeNotifier {
   void clearSelection() {
     _selectedNotebookIds = [];
     notifyListeners();
+  }
+
+  Future<String?> validateNotebooks() async {
+    if (selectedNotebooks.isEmpty) return null;
+    for (final notebookId in _selectedNotebookIds) {
+      final notebook = _notebooks.firstWhere(
+        (n) => n.id == notebookId,
+        orElse: () => NotebookModel.empty(),
+      );
+      if (notebook.users.length > Constraint.maxShare) return notebook.title;
+    }
+    return null;
   }
 
   // FLASHCARD SESSION AVAILABILITY

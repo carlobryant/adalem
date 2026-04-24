@@ -4,12 +4,14 @@ import 'package:adalem/features/notebooks/presentation/view_vnotebookcard.dart';
 import 'package:flutter/material.dart';
 
 class ShareSelectionView extends StatefulWidget {
-  final void Function(String) onToggle;
+  final void Function(String)? onToggle;
   final List<NotebookModel> notebooks;
+  final bool isSolid;
 
   const ShareSelectionView({
     super.key,
-    required this.onToggle,
+    this.onToggle,
+    this.isSolid = false,
     required this.notebooks,
     });
 
@@ -100,13 +102,15 @@ class _ShareSelectionViewState extends State<ShareSelectionView> {
             image: pair[index].image,
             available: pair[index].available,
             isLoading: false,
+            isSolid: widget.isSolid,
           ),
 
+          if (widget.onToggle != null)
           Positioned(
             top: 10,
             right: 10,
             child: GestureDetector(
-              onTap: () => widget.onToggle(pair[index].id),
+              onTap: () => widget.onToggle!(pair[index].id),
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
