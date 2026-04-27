@@ -130,7 +130,7 @@ class _DeleteNotebookViewState extends State<DeleteNotebookView> {
                   );
                 
                 ToastCard.success(context, "Notebook Deleted");
-                if (!mounted) { return; }
+                if (mounted) { return; }
                 else { Navigator.pop(context); }
               },
               child: Text("Delete ${widget.title}",

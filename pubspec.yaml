@@ -1,7 +1,7 @@
 name: adalem
-description: "A new Flutter project."
+description: "A Study Companion App for MMSU Students"
 publish_to: 'none'
-version: 0.1.0
+version: 0.1.6
 
 environment:
   sdk: ^3.10.7

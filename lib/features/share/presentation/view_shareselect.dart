@@ -82,7 +82,39 @@ class _ShareSelectionViewState extends State<ShareSelectionView> {
           )
           : Center(child: Padding(
             padding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width * 0.29),
-            child: _buildNotebookCard(widget.notebooks, 0),
+            child: Stack(
+              children: [
+                VerticalNotebookCard(
+                  title: widget.notebooks[0].title,
+                  course: widget.notebooks[0].course,
+                  updatedAt: widget.notebooks[0].updatedAt,
+                  image: widget.notebooks[0].image,
+                  available: widget.notebooks[0].available,
+                  isLoading: false,
+                  isSolid: widget.isSolid,
+                ),
+
+                if (widget.onToggle != null)
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: GestureDetector(
+                    onTap: () => widget.onToggle!(widget.notebooks[0].id),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(Icons.close_rounded, size: 20,
+                        color: Theme.of(context).colorScheme.inverseSurface),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ))
         ),
         const SizedBox(height: 12),
