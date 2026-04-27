@@ -136,22 +136,20 @@ with SingleTickerProviderStateMixin {
               
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Expanded(
-                      child: Text(
-                        widget.users.length > 1 ?
-                        "Shared Successfully to ${widget.users[0].name} and ${widget.users.length - 1} Others"
-                        : widget.users.length == 1 ?
-                        "Shared Successfully to ${widget.users[0].name}!"
-                        : "Successfully Shared Notebooks!",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      widget.users.length > 1 ?
+                      "Shared Successfully to ${widget.users[0].name} and ${widget.users.length - 1} Others"
+                      : widget.users.length == 1 ?
+                      "Shared Successfully to ${widget.users[0].name}!"
+                      : "Successfully Shared Notebooks!",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
 
