@@ -175,9 +175,9 @@ class _QuizSessionViewState extends State<QuizSessionView> {
                   padding: const EdgeInsets.only(right: 20),
                   child: Text("Score: ${vm.sessionScore}",
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.8),
+                      color: Theme.of(context).colorScheme.tertiary,
                       fontFamily: "LoveYaLikeASister",
-                      fontSize: 18,
+                      fontSize: 20,
                     ),
                   ),
                 )

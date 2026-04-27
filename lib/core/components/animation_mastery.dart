@@ -91,7 +91,7 @@ class _MasteryAnimationState extends State<MasteryAnimation>
                   ),
                   Text(masteryLabel.toUpperCase(),
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.tertiary,
                       fontFamily: "LoveYaLikeASister",
                       fontWeight: FontWeight.w800,
                       letterSpacing: 3,
@@ -109,7 +109,7 @@ class _MasteryAnimationState extends State<MasteryAnimation>
                         value: widget.progress,
                         minHeight: 24,
                         backgroundColor: Theme.of(context).colorScheme.onSurface,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.tertiary,
                       ),
                     ),
                   const SizedBox(height: 3),
@@ -124,7 +124,7 @@ class _MasteryAnimationState extends State<MasteryAnimation>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(context).colorScheme.tertiary,
                           ),
                         ) : Spacer(),
                       if(widget.currPts != null && widget.maxPts != null)

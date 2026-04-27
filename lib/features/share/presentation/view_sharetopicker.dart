@@ -75,22 +75,27 @@ class _ShareToPickerState extends State<ShareToPicker> {
             children: [
               Expanded(
                 child: TextField(
+                  maxLength: 30,
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(RegExp(r'[\s]')),
                   ],
+                  style: TextStyle(
+                    fontSize: 13
+                  ),
                   controller: _controller,
                   onSubmitted: (_) => _handleAdd(),
                   decoration: InputDecoration(
+                    counterText: "",
                     hintText: "Enter email",
                     hintStyle: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                     suffix: Text(
                       "@gmail.com",
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.8),
-                        fontSize: 11,
+                        fontSize: 13,
                       ),
                     ),
                     border: InputBorder.none,

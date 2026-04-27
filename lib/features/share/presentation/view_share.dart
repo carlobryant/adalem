@@ -13,6 +13,7 @@ import 'package:adalem/features/notebooks/presentation/vm_notebooks.dart';
 import 'package:adalem/features/share/presentation/view_selectpopup.dart';
 import 'package:adalem/features/share/presentation/view_sharecomplete.dart';
 import 'package:adalem/features/share/presentation/view_shareselect.dart';
+import 'package:adalem/features/share/presentation/view_sharetoempty.dart';
 import 'package:adalem/features/share/presentation/view_sharetopicker.dart';
 import 'package:adalem/features/share/presentation/view_sharetousers.dart';
 import 'package:adalem/features/share/presentation/vm_share.dart';
@@ -147,8 +148,8 @@ class _ShareViewContentState extends State<_ShareViewContent> {
         ],
         body: SingleChildScrollView(
           child: Column(
+
             children: [
-              
               Padding(
                 padding: const EdgeInsets.only(top: 30),
                 child: SizedBox(height: 260, 
@@ -182,7 +183,6 @@ class _ShareViewContentState extends State<_ShareViewContent> {
                 isLoading: sharevm.isLoading,
               ),
 
-              if(users.isNotEmpty)
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: users.isNotEmpty ? ShareToUsers(
@@ -198,7 +198,7 @@ class _ShareViewContentState extends State<_ShareViewContent> {
                     await sharevm.shareNotebooks(notebookvm.selectedNotebooks);
                     notebookvm.clearSelection();
                   }
-                ) : const SizedBox.shrink(key: ValueKey("empty")),
+                ) : ShareToEmpty(key: ValueKey("empty")),
               ),
             ],
           ),

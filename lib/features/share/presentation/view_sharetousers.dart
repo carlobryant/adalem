@@ -35,7 +35,7 @@ class ShareToUsers extends StatelessWidget {
             top: BorderSide.none,
             left: BorderSide.none,
           ),
-      ),
+        ),
         child: Column(
           children: [
             ListView.separated(

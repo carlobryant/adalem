@@ -54,12 +54,7 @@ with SingleTickerProviderStateMixin {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
         automaticallyImplyLeading: false,
-        title: Text(
-          widget.users.length > 1 ?
-          "Shared to ${widget.users[0].name} and ${widget.users.length - 1} Others"
-          : widget.users.length == 1 ?
-          "Shared Successfully to ${widget.users[0].name}"
-          : "Shared Notebooks",
+        title: Text("Notebooks Shared",
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
       ),
@@ -80,18 +75,21 @@ with SingleTickerProviderStateMixin {
             child: Image(
               image: AssetImage("assets/img_shine.png"),
               opacity: const AlwaysStoppedAnimation<double>(0.1),
-              color: Theme.of(context).colorScheme.inverseSurface,
+              color: Theme.of(context).colorScheme.tertiary,
               width: 850,
               ),
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.7,
+              height: MediaQuery.of(context).size.height * 0.8,
               child: Column(
                 children: [
                   // AVATARS
                   Padding(
-                    padding: const EdgeInsets.only(top: 40, bottom: 20, left: 16, right: 16),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.08, 
+                      bottom: 10, left: 16, right: 16
+                    ),
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 12.0, 
@@ -123,36 +121,48 @@ with SingleTickerProviderStateMixin {
                                     width: 2,
                                   ),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.check_rounded,
                                   size: iconSize,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               ),
                             ),
                           ],
                         );
-                      }).toList(),
+                      }).take(5).toList(),
                     ),
                   ),
               
-                  Text(
-                    "Successfully Shared!",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Expanded(
+                      child: Text(
+                        widget.users.length > 1 ?
+                        "Shared Successfully to ${widget.users[0].name} and ${widget.users.length - 1} Others"
+                        : widget.users.length == 1 ?
+                        "Shared Successfully to ${widget.users[0].name}!"
+                        : "Successfully Shared Notebooks!",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
 
                   // SHARED NOTEBOOKS
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   ShareSelectionView(notebooks: widget.notebooks, isSolid: true),
                   Spacer(),
             
                   // RETURN BUTTON
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: XLButton(
                       onTap: widget.onBack,
                       child: Text(

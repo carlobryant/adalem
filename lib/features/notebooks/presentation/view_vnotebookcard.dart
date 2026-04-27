@@ -31,9 +31,7 @@ class VerticalNotebookCard extends StatelessWidget {
     final surfaceColor = !isSolid ? 
       Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)
       : Theme.of(context).colorScheme.surface;
-    final borderColor = !isSolid ?
-      Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1)
-      : Theme.of(context).colorScheme.onSurface;
+    final borderColor = Theme.of(context).colorScheme.inverseSurface.withValues(alpha: 0.1);
     final displayDate = updatedAt.split('-').first;
 
     return Container(
