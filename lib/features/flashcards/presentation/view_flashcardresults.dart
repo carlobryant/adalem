@@ -74,13 +74,13 @@ class FlashcardResultsView extends StatelessWidget {
               child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 16),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(onAgain != null ? "(${Constraint.flashcardPts} points is rewarded for every completed flashcard session)"
-                      : "(Flashcards are displayed at calculated intervals to reduce extraneous cognitive load)",
+                      Text(onAgain != null ? "${Constraint.flashcardPts} points is rewarded for every completed flashcard session."
+                      : "Flashcards are displayed at calculated intervals to reduce extraneous cognitive load.",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.inversePrimary,
                           fontStyle: FontStyle.italic,
@@ -88,7 +88,7 @@ class FlashcardResultsView extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                       Divider(color: Theme.of(context).colorScheme.inversePrimary),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 18),
                       Text(onAgain != null ? "Ready for more?"
                         : "All caught up! Check back later.",
                         style: TextStyle(
@@ -98,7 +98,7 @@ class FlashcardResultsView extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 15),
                       onAgain != null ?
                       XLButton(onTap: onAgain, inversed: true,
                       surfacecolor: Theme.of(context).colorScheme.primary,

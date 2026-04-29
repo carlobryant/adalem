@@ -78,28 +78,45 @@ class QuizResultView extends StatelessWidget {
                 child: SafeArea(
                   top: false,
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.only(bottom: 24, left: 24, right: 24, top: 16),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const SizedBox(height: 2),
-                        _buildStatRow("Quiz Difficulty", aveDifficulty, context),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text( noItems < 4 ? 
+                            "Quiz ended early, take a break! You may be cognitively overloaded."
+                            : (aveDifficulty == "Hard" || aveDifficulty == "Very Hard") && sessionAccuracy <= 0.5 ?
+                            "No progress without challenge, that's learning. You're doing great!"
+                            : (aveDifficulty == "Hard" || aveDifficulty == "Very Hard") && sessionAccuracy > 0.5 ?
+                            "Those items were difficult, you did a great job!" :
+                            "Quiz adjusts based on performance and difficulty of items.",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.inversePrimary,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                          ),
+                        ),
                         Divider(color: Theme.of(context).colorScheme.inversePrimary),
+                        const SizedBox(height: 18),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: _buildStatRow("Quiz Difficulty", aveDifficulty, context, isContainer: true)
+                        ),
                         const SizedBox(height: 8),
                         _buildStatRow("Accuracy", "$accuracyPercent%", context),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 3),
                         _buildStatRow("Number of Items", "$noItems", context),
-                        const SizedBox(height: 5),
-                        Text("(Adjusts based on performance and difficulty of items)",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 12,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 18),
                         XLButton(onTap: () => Navigator.of(context).pop(),
                         inversed: true,
                         surfacecolor: Theme.of(context).colorScheme.primary,
@@ -121,9 +138,9 @@ class QuizResultView extends StatelessWidget {
     );
   }
 
-    Widget _buildStatRow(String label, String value, context) {
+    Widget _buildStatRow(String label, String value, context,{isContainer = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: isContainer ? 0 : 50),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -131,7 +148,8 @@ class QuizResultView extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: Theme.of(context).colorScheme.inversePrimary,
+              color: isContainer ? Theme.of(context).colorScheme.primary 
+              : Theme.of(context).colorScheme.inversePrimary,
           )),
           Text(value.toUpperCase(), 
             style: TextStyle(
@@ -139,7 +157,8 @@ class QuizResultView extends StatelessWidget {
               fontFamily: "LoveYaLikeASister",
               letterSpacing: 2,
               fontWeight: FontWeight.w900,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: isContainer ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onPrimary,
           )),
         ],
       ),
