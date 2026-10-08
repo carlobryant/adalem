@@ -75,9 +75,9 @@ class AIDataSourceImpl implements AIDataSource {
 
     } catch (e) {
       if (e is FirebaseAIException) {
-          if (e.message == "aiinvalidresponseexception") throw AIInvalidResponseException();
-          if (e.message == "quota-exceeded") throw AIQuotaExceededException();
-          if (e.message == "model-not-found") throw AIUnknownException("model not found.");
+          if (e.message.contains(RegExp(r'response', caseSensitive: false))) throw AIInvalidResponseException();
+          if (e.message.contains(RegExp(r'quota', caseSensitive: false))) throw AIQuotaExceededException();
+          if (e.message.contains(RegExp(r'model', caseSensitive: false))) throw AIUnknownException("model not found.");
           throw AIUnknownException;
       }
       if (e is FormatException) throw AIInvalidResponseException();

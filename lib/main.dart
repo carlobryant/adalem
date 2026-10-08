@@ -52,7 +52,7 @@ void main() async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
-  final modelAI = FirebaseAI.googleAI().generativeModel(model: 'gemini-3-flash-preview');
+  final modelAI = FirebaseAI.googleAI().generativeModel(model: 'gemini-3.8-flash');
 
   final authRepo = AuthRepositoryImpl(dataSource: AuthRemoteDataSourceImpl());
   final notebookRepo = NotebookRepositoryImpl(dataSource: FirestoreDataSourceImpl());

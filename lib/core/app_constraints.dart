@@ -1,6 +1,6 @@
 class Constraint {
-  static const int maxCreate = 10;
-  static const int maxDailyCr = 3;
+  static const int maxCreate = 15;
+  static const int maxDailyCr = maxCreate;
   static const int maxShare = 10;
   static const int maxUploadMB = 15;
   static const int maxActivity = 56;
